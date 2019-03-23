@@ -4,13 +4,13 @@
      fade dismissible>
       Login failed. Please try again.
     </b-alert>
-    <b-form class="form-signin">
+    <b-form @submit="sendLogin" class="form-signin">
       <h1 class="h3 mb-3">Please sign in</h1>
       <b-form-input id="inputName" class="form-control marg-bot"
       placeholder="User name" required autofocus />
       <b-form-input type="password" id="inputPass" class="form-control marg-bot"
       placeholder="Password" required />
-      <b-button @click="sendLogin" block variant="primary" size="lg"
+      <b-button type="submit" block variant="primary" size="lg"
        class="marg-bot">Sign in</b-button>
     </b-form>
   </div>
@@ -23,14 +23,26 @@ export default {
   name: 'login',
   data() {
     return {
+      apiServer: process.env.VUE_APP_API_SERVER,
+      apiPort: process.env.VUE_APP_API_PORT,
       showFailLoginAlert: false,
     };
   },
   methods: {
-    sendLogin() {
-      axios.get('http://127.0.0.1/test')
+    sendLogin(evt) {
+      evt.preventDefault();
+      console.log(process.env.VUE_APP_API_SERVER);
+      console.log(process.env.VUE_APP_API_PORT);
+      axios.get(`${this.apiServer}:${this.apiPort}/api/token`)
         .then((response) => {
           console.log(response.status);
+          if (response.status === 201) {
+            console.log(response.data);
+            localStorage.setItem('token', response.data.token);
+            this.$router.push({ name: 'projects' });
+          } else {
+            this.showFailLoginAlert = true;
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -55,7 +67,8 @@ body {
   max-width: 330px;
   padding: 15px;
   margin: auto;
-  padding-top: 20%
+  padding-top: 20%;
+  text-align: center;
 }
 
 .form-signin .form-control {
