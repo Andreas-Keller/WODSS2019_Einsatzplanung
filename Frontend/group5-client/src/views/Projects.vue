@@ -1,14 +1,22 @@
 <template>
-  <p>Projects</p>
+  <div>
+    <Navbar />
+    <p>Projects</p>
+  </div>
 </template>
 
 <script>
+import Navbar from '@/components/Navbar.vue';
+
 export default {
   name: 'projects',
+  components: {
+    Navbar,
+  },
   methods: {
     checkToken() {
       if (localStorage.getItem('token') === null) {
-        this.$router.push({ name: 'login' });
+        // this.$router.push({ name: 'login' });
       }
     },
   },
