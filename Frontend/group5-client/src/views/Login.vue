@@ -6,9 +6,9 @@
     </b-alert>
     <b-form @submit="sendLogin" class="form-signin">
       <h1 class="h3 mb-3">Please sign in</h1>
-      <b-form-input id="inputName" class="form-control marg-bot"
-      placeholder="User name" required autofocus />
-      <b-form-input type="password" id="inputPass" class="form-control marg-bot"
+      <b-form-input v-model="email" type="email" id="inputMail" class="form-control marg-bot"
+      placeholder="E-Mail" required autofocus />
+      <b-form-input v-model="pw" type="password" id="inputPass" class="form-control marg-bot"
       placeholder="Password" required />
       <b-button type="submit" block variant="primary" size="lg"
        class="marg-bot">Sign in</b-button>
@@ -26,14 +26,14 @@ export default {
       apiServer: process.env.VUE_APP_API_SERVER,
       apiPort: process.env.VUE_APP_API_PORT,
       showFailLoginAlert: false,
+      email: '',
+      pw: '',
     };
   },
   methods: {
     sendLogin(evt) {
       evt.preventDefault();
-      console.log(process.env.VUE_APP_API_SERVER);
-      console.log(process.env.VUE_APP_API_PORT);
-      axios.get(`${this.apiServer}:${this.apiPort}/api/token`)
+      axios.post(`${this.apiServer}:${this.apiPort}/api/token`, { emailAddress: this.email, rawPassword: this.pw })
         .then((response) => {
           console.log(response.status);
           if (response.status === 201) {
