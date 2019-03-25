@@ -1,7 +1,9 @@
 <template>
   <div>
     <Navbar />
-    <p>Projects</p>
+    <div>
+      <p>Projects</p>
+    </div>
   </div>
 </template>
 
