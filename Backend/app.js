@@ -14,7 +14,7 @@ const { Gstore } = require('gstore-node');
 const { Datastore } = require('@google-cloud/datastore');
 
 const gstore = new Gstore();
-const datastore = Datastore();
+const datastore = new Datastore();
 
 gstore.connect(datastore);
 const PORT = process.env.PORT || 8080;
