@@ -18,5 +18,13 @@
  */
 exports.handler = function createEmployee(req, res, next) {
   res.send('createEmployee')
+    // Save the data to the database.
+    // getModel().create(data, (err, savedData) => {
+    //     if (err) {
+    //         next(err);
+    //         return;
+    //     }
+    //     res.redirect(`${req.baseUrl}/${savedData.id}`);
+    // });
   next()
 }
