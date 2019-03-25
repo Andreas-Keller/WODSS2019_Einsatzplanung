@@ -9,6 +9,8 @@
   "dependencies": {
     "@google-cloud/datastore": "^3.0.0",
     "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
     "gstore-node": "^6.0.0",
     "joi": "^14.3.1",
