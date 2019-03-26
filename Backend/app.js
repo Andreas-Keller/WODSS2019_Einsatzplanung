@@ -9,11 +9,27 @@ var cors = require('cors');
 app.use(cors());  // enable pre-flight
 app.use(bodyParser.json());
 
-const { Gstore } = require('gstore-node');
-const { Datastore } = require('@google-cloud/datastore');
+const admin = require('firebase-admin');
 
-const gstore = new Gstore();
-const datastore = new Datastore();
+admin.initializeApp({
+    credential: admin.credential.applicationDefault()
+});
+
+const db = admin.firestore();
+var docRef = db.collection('users').doc('alovelace');
+
+var setAda = docRef.set({
+    first: 'Ada',
+    last: 'Lovelace',
+    born: 1815
+});
+
+
+// const { Gstore } = require('gstore-node');
+// const { Datastore } = require('@google-cloud/datastore');
+//
+// const gstore = new Gstore();
+// const datastore = new Datastore();
 
 swaggerRoutes(app, {
     api: './api.yml',
@@ -22,7 +38,7 @@ swaggerRoutes(app, {
 });
 
 
-gstore.connect(datastore);
+// gstore.connect(datastore);
 
 
 const PORT = process.env.PORT || 8080;
