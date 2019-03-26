@@ -8,18 +8,44 @@
  *   rawPassword {string} Raw employee password.
  *
  */
-exports.handler = function requestToken(req, res, next) {
+exports.handler = async function requestToken(req, res, next) {
     let jwt = require('jsonwebtoken');
     let emailAddress = req.body.emailAddress;
     let rawPassword = req.body.rawPassword;
 
-    const Employees = require('../datastore/employee.schema.js');
-    Employees.list()
+    // const Employees = require('../datastore/employee.schema.js');
+    // Employees.list()
+    const employees = require('../firestore/employee.crud.js');
 
-
-
-    //TODO check if in database and password okay, if yes return jwt
-    token = {token: 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJGSE5XIHdvZHNzIiwic3ViIjoiTG9naW4gdG9rZW4iLCJlbXBsb3llZSI6eyJpZCI6MSwiZmlyc3ROYW1lIjoiU2ltb24iLCJsYXN0TmFtZSI6IldhZWNodGVyIiwiZW1haWxBZGRyZXNzIjoic2ltb24ud2FlY2h0ZXJAc3R1ZGVudHMuZmhudy5jaCIsInJvbGUiOiJBRE1JTklTVFJBVE9SIiwiYWN0aXZlIjp0cnVlfSwiaWF0IjoxNTE2MjM5MDIyfQ.3eFaVQ_QOJSFq8CnIudMGNnvzCQFRblTR9K5yxXmfClczT3UN6ZrFZ5eKUc0L1H-67ROPv5hz_odMq867P9ofA'}
-    res.status(201).send(token)
+    let employee = await employees.findBy("emailAddress", emailAddress);
+    if (emailAddress && rawPassword) {
+        if (employee.data().emailAddress === emailAddress && employee.data().password === rawPassword) {
+            let token = jwt.sign({emailAddress: emailAddress},
+                process.env.JWT_SECRET,
+                {
+                    expiresIn: '24h' // expires in 24 hours
+                }
+            );
+            // return the JWT token for the future API calls
+            res.send(201).json({
+                success: true,
+                message: 'Authentication successful!',
+                token: token
+            });
+        } else {
+            res.send(403).json({
+                success: false,
+                message: 'Incorrect username or password'
+            });
+        }
+    } else {
+        res.send(400).json({
+            success: false,
+            message: 'Authentication failed! Please check the request'
+        });
+    }
+    // //TODO check if in database and password okay, if yes return jwt
+    // token = {token: 'eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJGSE5XIHdvZHNzIiwic3ViIjoiTG9naW4gdG9rZW4iLCJlbXBsb3llZSI6eyJpZCI6MSwiZmlyc3ROYW1lIjoiU2ltb24iLCJsYXN0TmFtZSI6IldhZWNodGVyIiwiZW1haWxBZGRyZXNzIjoic2ltb24ud2FlY2h0ZXJAc3R1ZGVudHMuZmhudy5jaCIsInJvbGUiOiJBRE1JTklTVFJBVE9SIiwiYWN0aXZlIjp0cnVlfSwiaWF0IjoxNTE2MjM5MDIyfQ.3eFaVQ_QOJSFq8CnIudMGNnvzCQFRblTR9K5yxXmfClczT3UN6ZrFZ5eKUc0L1H-67ROPv5hz_odMq867P9ofA'}
+    // res.status(201).send(token)
     next()
 }
