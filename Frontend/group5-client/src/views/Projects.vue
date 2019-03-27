@@ -26,11 +26,18 @@ export default {
   methods: {
     checkToken() {
       if (localStorage.getItem('token') === null) {
-        // this.$router.push({ name: 'login' });
+        this.$router.push({ name: 'login' });
       } else {
-        const decoded = jwtDecode(localStorage.getItem('token'));
-        this.logedInEmployee = decoded.employee;
-        this.logedInEmployeeName = `${this.logedInEmployee.firstName} ${this.logedInEmployee.lastName}`;
+        try {
+          const decoded = jwtDecode(localStorage.getItem('token'));
+          console.log();
+          this.logedInEmployee = decoded.employee;
+          this.logedInEmployeeName = `${this.logedInEmployee.firstName} ${this.logedInEmployee.lastName}`;
+        } catch (error) {
+          // COMMENTED OUT FOR DEV PURPOSE
+          // localStorage.removeItem('token');
+          // this.$router.push({ name: 'login' });
+        }
       }
     },
   },
