@@ -5,7 +5,7 @@ admin.initializeApp({
     databaseURL: "https://wodss2019.firebaseio.com"
 });
 
-const db = admin.database();
+const db = admin.firestore();
 
 module.exports = {
     db
