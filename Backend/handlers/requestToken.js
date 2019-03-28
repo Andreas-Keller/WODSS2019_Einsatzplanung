@@ -13,7 +13,7 @@ exports.handler = async function requestToken(req, res, next) {
     let emailAddress = req.body.emailAddress;
     let rawPassword = req.body.rawPassword;
 
-    const employees = require('../firestore/employee.crud.js');
+    const employees = require('../firebase/employee.crud.js');
 
     let employee = await employees.findBy("emailAddress", emailAddress);
     if (emailAddress && rawPassword) {

@@ -34,8 +34,8 @@ exports.handler = async function createEmployee(req, res, next) {
         employee.rawPassword === null) {
         res.status(412).send("Precondition for the employee failed");
     }
-    const employeeFirestore = require('../firestore/employee.crud.js');
-    res.status(201).send(await employeeFirestore.createEmployee(employee));
+    const employeeFirebase = require('../firebase/employee.crud.js');
+    res.status(201).send(await employeeFirebase.createEmployee(employee));
 
     next()
 };

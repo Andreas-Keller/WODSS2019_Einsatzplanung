@@ -1,8 +1,8 @@
-const firestore = require('./firestore.admin.js');
+const firebase = require('./firebase.admin.js');
 const uuidv4 = require('uuid/v4');
 
 const getEmployees = () => {
-    let employees = firestore.db.collection('employees');
+    let employees = firebase.db.collection('employees');
     return employees.get()
         .then(snapshot => {
             snapshot.forEach(doc => {
@@ -15,7 +15,7 @@ const getEmployees = () => {
 };
 
 const getEmployee = (id) => {
-    let employees = firestore.db.collection('employees');
+    let employees = firebase.db.collection('employees');
     return employees.where('id', '==', id).get()
         .then(snapshot => {
             if (snapshot.empty) {
@@ -43,7 +43,7 @@ const createEmployee = (employee) => {
         password: employee.rawPassword
     };
 
-    employee = firestore.db.collection('employees')
+    employee = firebase.db.collection('employees')
         .doc(data.id)
         .set({data}, {merge: true});
     return employee;
@@ -65,7 +65,7 @@ const updateEmployee = (employee) => {
             password: employee.rawPassword
         };
 
-        return firestore.db.collection('employees')
+        return firebase.db.collection('employees')
             .doc(employee.id)
             .update({
                 data
@@ -85,14 +85,14 @@ const deleteEmployee = (id) => {
         password: null
     };
 
-    return firestore.db.collection('employees')
+    return firebase.db.collection('employees')
         .doc(id)
         .update({
             data
         });
 };
 const findBy = (lookupVar, value) => {
-    let employees = firestore.db.collection('employees');
+    let employees = firebase.db.collection('employees');
     return employees.where("" + lookupVar, '==', value).get()
         .then(snapshot => {
             if (snapshot.empty) {
