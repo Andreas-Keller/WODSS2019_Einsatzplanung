@@ -14,6 +14,21 @@ const getEmployees = (req ,res, next) => {
 
     //next()
 };
+/*
+const getEmployeeForJWT = (req ,res, next) => {
+
+    //console.log(req.body.emailAddress);
+    Employee.find((err, employees) => {
+        if(err) {
+            //res.status(412).json(err)
+        }
+        return employees.filter( e => e.emailAddress === req.body.emailAddress);
+    })
+    //next()
+};
+
+*/
+
 
 
 // from datastore controller
@@ -74,5 +89,6 @@ module.exports = {
     getEmployee,
     createEmployee,
     updateEmployee,
-    deleteEmployee
+    deleteEmployee,
+    //getEmployeeForJWT
 };

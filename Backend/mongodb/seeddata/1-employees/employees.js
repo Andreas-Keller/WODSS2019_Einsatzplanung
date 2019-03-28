@@ -10,7 +10,7 @@ module.exports = [
     {
         firstName: "jack",
         lastName: "ripper",
-        emailAddress: "jp@foo.ch",
+        emailAddress: "jr@foo.ch",
         password: 1234,
         active: true,
         role: "PROJECTMANAGER",

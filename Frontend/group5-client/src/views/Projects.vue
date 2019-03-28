@@ -19,8 +19,8 @@ export default {
   },
   data() {
     return {
-      logedInEmployee: '',
-      logedInEmployeeName: '',
+      loggedInEmployee: '',
+      loggedInEmployeeName: '',
     };
   },
   methods: {
@@ -32,7 +32,7 @@ export default {
           const decoded = jwtDecode(localStorage.getItem('token'));
           console.log();
           this.logedInEmployee = decoded.employee;
-          this.logedInEmployeeName = `${this.logedInEmployee.firstName} ${this.logedInEmployee.lastName}`;
+          this.logedInEmployeeName = `${this.loggedInEmployee.firstName} ${this.loggedInEmployee.lastName}`;
         } catch (error) {
           // COMMENTED OUT FOR DEV PURPOSE
           // localStorage.removeItem('token');
