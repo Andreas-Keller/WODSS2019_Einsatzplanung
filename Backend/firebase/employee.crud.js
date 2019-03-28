@@ -50,29 +50,19 @@ const createEmployee = (employee) => {
 
 };
 const updateEmployee = (employee) => {
-    if (employee.active !== null &&
-        employee.id !== null &&
-        employee.firstName !== null &&
-        employee.lastName !== null &&
-        employee.emailAddress !== null &&
-        employee.rawPassword !== null) {
+    let data = {
+        active: employee.active,
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+        emailAddress: employee.emailAddress,
+        password: employee.rawPassword
+    };
 
-        let data = {
-            active: employee.active,
-            firstName: employee.firstName,
-            lastName: employee.lastName,
-            emailAddress: employee.emailAddress,
-            password: employee.rawPassword
-        };
-
-        return firebase.db.collection('employees')
-            .doc(employee.id)
-            .update({
-                data
-            });
-    } else {
-        return false;
-    }
+    return firebase.db.collection('employees')
+        .doc(employee.id)
+        .update({
+            data
+        });
 };
 
 const deleteEmployee = (id) => {
