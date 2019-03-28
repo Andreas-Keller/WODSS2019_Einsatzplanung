@@ -8,6 +8,6 @@
  *   
  */
 exports.handler = function getEmployees(req, res, next) {
-  res.send('getEmployees')
+  res.send('getEmployees');
   next()
-}
+};
