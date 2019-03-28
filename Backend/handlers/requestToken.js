@@ -13,8 +13,6 @@ exports.handler = async function requestToken(req, res, next) {
     let emailAddress = req.body.emailAddress;
     let rawPassword = req.body.rawPassword;
 
-    // const Employees = require('../datastore/employee.schema.js');
-    // Employees.list()
     const employees = require('../firestore/employee.crud.js');
 
     let employee = await employees.findBy("emailAddress", emailAddress);

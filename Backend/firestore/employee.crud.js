@@ -33,30 +33,21 @@ const getEmployee = (id) => {
 };
 
 const createEmployee = (employee) => {
-    if (employee.active !== null &&
-        employee.firstName !== null &&
-        employee.lastName !== null &&
-        employee.emailAddress !== null &&
-        employee.role !== null &&
-        employee.rawPassword !== null) {
+    let data = {
+        active: employee.active,
+        id: uuidv4(),
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+        emailAddress: employee.emailAddress,
+        role: employee.role,
+        password: employee.rawPassword
+    };
 
-        let data = {
-            active: employee.active,
-            id: uuidv4(),
-            firstName: employee.firstName,
-            lastName: employee.lastName,
-            emailAddress: employee.emailAddress,
-            role: employee.role,
-            password: employee.rawPassword
-        };
+    employee = firestore.db.collection('employees')
+        .doc(data.id)
+        .set({data}, {merge: true});
+    return employee;
 
-        employee = firestore.db.collection('employees')
-            .doc(data.id)
-            .set({data}, {merge: true});
-        return employee;
-    } else {
-        return false;
-    }
 };
 const updateEmployee = (employee) => {
     if (employee.active !== null &&
