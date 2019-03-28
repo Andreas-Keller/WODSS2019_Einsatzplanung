@@ -106,38 +106,81 @@
 
 <script>
 
-const items = [
-  {
-    isActive: true, role: 'MANAGER', first_name: 'Dickerson', last_name: 'Macdonald', email: 'dm@foo.com',
-  },
-  {
-    isActive: false, role: 'DEVELOPER', first_name: 'Larsen', last_name: 'Shaw', email: 'ls@foo.com',
-  },
-  {
-    isActive: false, role: 'MANAGER', first_name: 'Geneva', last_name: 'Wilson', email: 'gw@foo.com',
-  },
-  {
-    isActive: true, role: 'DEVELOPER', first_name: 'Jami', last_name: 'Carney', email: 'cj@foo.com',
-  },
-];
+import axios from 'axios';
+
+const items = [{
+  _id: 123,
+  firstName: 'Dickerson',
+  lastName: 'Macdonald',
+  emailAddress: 'dm@foo.com',
+  active: true,
+  role: 'MANAGER',
+}];
+//
+//
+// [
+//  {
+//    isActive: true, role: 'MANAGER', first_name: 'Dickerson',
+//    last_name: 'Macdonald', email: 'dm@foo.com',
+//  },
+//  {
+//    isActive: false, role: 'DEVELOPER', first_name: 'Larsen',
+//    last_name: 'Shaw', email: 'ls@foo.com',
+//  },
+//  {
+//    isActive: false, role: 'MANAGER', first_name: 'Geneva',
+//    last_name: 'Wilson', email: 'gw@foo.com',
+//  },
+//  {
+//    isActive: true, role: 'DEVELOPER', first_name: 'Jami',
+//    last_name: 'Carney', email: 'cj@foo.com',
+//  },
+// ];
 
 
 export default {
   name: 'Employees',
 
+  beforeMount() {
+    axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`)
+      .then((response) => { this.items = response.data; });
+  },
+
   data() {
     return {
       items,
+
       fields: [
-        { key: 'isActive', label: 'is Active', sortable: true },
-        { key: 'role', label: 'Role', sortable: true },
         {
-          key: 'first_name', label: 'First name', sortable: true, sortDirection: 'desc',
+          key: '_id',
+          label: 'ID',
         },
         {
-          key: 'last_name', label: 'Last name', sortable: true, sortDirection: 'desc',
+          key: 'firstName',
+          label: 'First Name',
+          sortable: true,
         },
-        { key: 'email', label: 'Email' },
+        {
+          key: 'lastName',
+          label: 'Last Name',
+          sortable: true,
+        },
+        {
+          key: 'emailAddress',
+          label: 'Email',
+          sortable: true,
+          sortDirection: 'desc',
+        },
+        {
+          key: 'active',
+          label: 'Is Active',
+          sortable: true,
+          sortDirection: 'desc',
+        },
+        {
+          key: 'role',
+          label: 'Role',
+        },
       ],
       currentPage: 1,
       perPage: 5,
@@ -147,7 +190,10 @@ export default {
       sortDesc: false,
       sortDirection: 'asc',
       filter: null,
-      modalInfo: { title: '', content: '' },
+      modalInfo: {
+        title: '',
+        content: '',
+      },
     };
   },
   computed: {

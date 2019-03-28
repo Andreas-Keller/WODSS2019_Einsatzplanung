@@ -1,0 +1,7 @@
+{
+  "name": "mongodb",
+  "version": "1.0.0",
+  "dependencies": {
+    "mongo-seeding": "^3.1.0"
+  }
+}

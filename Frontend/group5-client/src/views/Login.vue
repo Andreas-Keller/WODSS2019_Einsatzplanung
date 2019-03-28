@@ -33,13 +33,13 @@ export default {
   methods: {
     sendLogin(evt) {
       evt.preventDefault();
-      axios.post(`${this.apiServer}/api/token`, { emailAddress: this.email, rawPassword: this.pw })
+      axios.post(`${this.apiServer}:${this.apiPort}/api/token`, { emailAddress: this.email, rawPassword: this.pw })
         .then((response) => {
           console.log(response.status);
           if (response.status === 201) {
             console.log(response.data);
             localStorage.setItem('token', response.data.token);
-            this.$router.push({ name: 'projects' });
+            this.$router.push({ name: 'dashboard' });
           } else {
             this.showFailLoginAlert = true;
           }

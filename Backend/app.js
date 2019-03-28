@@ -24,6 +24,14 @@ swaggerRoutes(app, {
 
 gstore.connect(datastore);
 
+/*
+    mongoose connection
+ */
+const mongoose = require('mongoose')
+const url = `mongodb://127.0.0.1/wodds-testing`
+mongoose.Promise = global.Promise
+mongoose.connect(url, { useNewUrlParser: true });
+
 
 const PORT = process.env.PORT || 8080;
 app.listen(process.env.PORT || 8080, () => {

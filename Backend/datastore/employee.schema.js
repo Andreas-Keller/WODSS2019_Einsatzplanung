@@ -10,7 +10,7 @@ const employeeSchema = new Schema({
     lastName: {joi: Joi.string().required()},
     emailAddress: {joi: Joi.string().email().required()},
     password: {joi: Joi.string().required()},
-    activeID: {joi: Joi.boolean().required()},
+    active: {joi: Joi.boolean().required()},
     role: {joi: Joi.string().valid(['ADMINISTRATOR', 'PROJECTMANAGER', 'DEVELOPER']).required()}
 }, {
     joi: {
