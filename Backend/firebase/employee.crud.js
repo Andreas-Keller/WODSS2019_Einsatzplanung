@@ -80,6 +80,7 @@ const deleteEmployee = (id) => {
             data
         });
 };
+//FindBy does not work
 const findBy = (lookupVar, value) => {
     let employees = firebase.db.collection('employees');
     return employees.where("" + lookupVar, '==', value).get()
