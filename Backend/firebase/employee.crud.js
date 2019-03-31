@@ -47,7 +47,6 @@ const createEmployee = (employee) => {
         .doc(data.id)
         .set({data}, {merge: true});
     return employee;
-
 };
 const updateEmployee = (employee) => {
     let data = {

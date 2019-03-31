@@ -8,9 +8,7 @@
  *   rawPassword {string} Raw employee password.
  *
  */
-exports.handler = async
-
-function requestToken(req, res, next) {
+exports.handler = async function requestToken(req, res, next) {
     let jwt = require('jsonwebtoken');
     let emailAddress = req.body.emailAddress;
     let rawPassword = req.body.rawPassword;
