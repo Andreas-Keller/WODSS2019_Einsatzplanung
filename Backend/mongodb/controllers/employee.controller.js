@@ -1,16 +1,37 @@
-const Employee = require('./employee.schema.js');
+const Employee = require('../domain/employee.js');
 
-const getEmployees = (req ,res) => {
-    const pageCursor = req.query.cursor;
+const getEmployees = (req ,res, next) => {
 
-    // List employees with the Query settings defined on Schema
-    Employee.list({ start: pageCursor })
-        .then((entities) => {
-            res.json(entities);
-        })
-        .catch(err => res.status(412).json(err));
+    //const pageCursor = req.query.cursor;
+
+    Employee.find((err, employees) => {
+        if(err) {
+            res.status(412).json(err)
+        }
+        //res.set("Content-Type", "application/json")
+        res.json(employees)
+    })
+
+    //next()
+};
+/*
+const getEmployeeForJWT = (req ,res, next) => {
+
+    //console.log(req.body.emailAddress);
+    Employee.find((err, employees) => {
+        if(err) {
+            //res.status(412).json(err)
+        }
+        return employees.filter( e => e.emailAddress === req.body.emailAddress);
+    })
+    //next()
 };
 
+*/
+
+
+
+// from datastore controller
 const getEmployee = (req, res) => {
     const employeeId = +req.params.id;
     Employee.get(employeeId)
@@ -68,5 +89,6 @@ module.exports = {
     getEmployee,
     createEmployee,
     updateEmployee,
-    deleteEmployee
+    deleteEmployee,
+    //getEmployeeForJWT
 };

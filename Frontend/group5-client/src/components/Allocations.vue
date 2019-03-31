@@ -3,9 +3,9 @@
 </template>
 
 <script>
-  export default {
-    name: 'Allocations',
-  };
+export default {
+  name: 'Allocations',
+};
 </script>
 
 <style scoped>

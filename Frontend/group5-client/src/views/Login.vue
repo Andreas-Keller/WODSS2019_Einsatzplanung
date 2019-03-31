@@ -39,7 +39,7 @@ export default {
           if (response.status === 201) {
             console.log(response.data);
             localStorage.setItem('token', response.data.token);
-            this.$router.push({ name: 'projects' });
+            this.$router.push({ name: 'dashboard' });
           } else {
             this.showFailLoginAlert = true;
           }
