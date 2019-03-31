@@ -17,12 +17,12 @@ exports.handler = async function requestToken(req, res, next) {
 
     let employee = await employees.findBy("emailAddress", emailAddress);
     if (employee === 404) {
-        res.send(404).json({
+        res.status(404).send({
             success: false,
             message: 'Authentication failed! Please check the request'
         });
     } else if (employee === 500) {
-        res.send(500).json({
+        res.status(500).send({
             success: false,
             message: 'Authentication failed! Internal Error'
         });
@@ -36,19 +36,19 @@ exports.handler = async function requestToken(req, res, next) {
                     }
                 );
                 // return the JWT token for the future API calls
-                res.send(201).json({
+                res.status(201).send({
                     success: true,
                     message: 'Authentication successful!',
                     token: token
                 });
             } else {
-                res.send(403).json({
+                res.status(403).send({
                     success: false,
                     message: 'Incorrect username or password'
                 });
             }
         } else {
-            res.send(400).json({
+            res.status(400).send({
                 success: false,
                 message: 'Authentication failed! Please check the request'
             });
