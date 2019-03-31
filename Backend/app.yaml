@@ -17,3 +17,4 @@ runtime: nodejs10
 # [END runtime]
 env_variables:
   PORT: "8080"
+  JWT_SECRET: "TheWorldIsFlat"

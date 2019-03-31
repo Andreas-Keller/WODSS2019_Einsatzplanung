@@ -9,11 +9,11 @@ var cors = require('cors');
 app.use(cors());  // enable pre-flight
 app.use(bodyParser.json());
 
-const { Gstore } = require('gstore-node');
-const { Datastore } = require('@google-cloud/datastore');
-
-const gstore = new Gstore();
-const datastore = new Datastore();
+// const { Gstore } = require('gstore-node');
+// const { Datastore } = require('@google-cloud/datastore');
+//
+// const gstore = new Gstore();
+// const datastore = new Datastore();
 
 swaggerRoutes(app, {
     api: './api.yml',
@@ -22,7 +22,7 @@ swaggerRoutes(app, {
 });
 
 
-gstore.connect(datastore);
+// gstore.connect(datastore);
 
 /*
     mongoose connection
