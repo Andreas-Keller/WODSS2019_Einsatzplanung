@@ -1,7 +1,13 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>
+    <select v-model.number="role">
+      <option>0</option>
+      <option>1</option>
+      <option>2</option>
+      <option>3</option>
+    </select>
+    <p v-if="role < 2">
       For a guide and recipes on how to configure / customize this project,<br>
       check out the
       <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
@@ -35,6 +41,11 @@ export default {
   name: 'HelloWorld',
   props: {
     msg: String,
+  },
+  data() {
+    return {
+      role: 0,
+    };
   },
 };
 </script>

@@ -4,21 +4,33 @@ const express = require('express');
 const app = express();
 app.enable('trust proxy');
 
+var bodyParser = require('body-parser');
+var cors = require('cors');
+app.use(cors());  // enable pre-flight
+app.use(bodyParser.json());
+
+// const { Gstore } = require('gstore-node');
+// const { Datastore } = require('@google-cloud/datastore');
+//
+// const gstore = new Gstore();
+// const datastore = new Datastore();
+
 swaggerRoutes(app, {
     api: './api.yml',
     handlers:  './handlers',
     authorizers: './handlers/security'
 });
 
-// // By default, the client will authenticate using the service account file
-// // specified by the GOOGLE_APPLICATION_CREDENTIALS environment variable and use
-// // the project specified by the GOOGLE_CLOUD_PROJECT environment variable. See
-// // https://github.com/GoogleCloudPlatform/google-cloud-node/blob/master/docs/authentication.md
-// // These environment variables are set automatically on Google App Engine
-// const Datastore = require('@google-cloud/datastore');
-//
-// // Instantiate a datastore client
-// const datastore = Datastore();
+
+// gstore.connect(datastore);
+
+/*
+    mongoose connection
+ */
+const mongoose = require('mongoose')
+const url = `mongodb://127.0.0.1/wodds-testing`
+mongoose.Promise = global.Promise
+mongoose.connect(url, { useNewUrlParser: true });
 
 
 const PORT = process.env.PORT || 8080;
