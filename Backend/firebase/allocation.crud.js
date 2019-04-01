@@ -33,7 +33,7 @@ const getAllocation = (id) => {
         });
 };
 
-const createAllocation  = (allocation) => {
+const createAllocation = (allocation) => {
     let data = {
         id: uuidv4(),
         startDate: allocation.startDate,
@@ -45,7 +45,7 @@ const createAllocation  = (allocation) => {
 
     allocation = firebase.db.collection('allocations')
         .doc(data.id)
-        .set( {data}, {merge: true});
+        .set(data, {merge: true});
     return allocation;
 };
 
@@ -60,7 +60,7 @@ const updateAllocation = (allocation) => {
 
     return firebase.db.collection('allocations')
         .doc(allocation.id)
-        .update({ data });
+        .update(data);
 };
 
 const deleteAllocation = (id) => {
@@ -74,14 +74,14 @@ const deleteAllocation = (id) => {
 
     return firebase.db.collection('allocations')
         .doc(id)
-        .update({ data })
+        .update(data)
 };
 
 const findBy = (lookupVar, value) => {
     let allocations = firebase.db.collection('allocations');
     return allocations.where("" + lookupVar, '==', value).get()
         .then(snapshot => {
-            if (snapshot.empty)  {
+            if (snapshot.empty) {
                 console.log('No matching data.');
                 return 404;
             }
@@ -96,10 +96,10 @@ const findBy = (lookupVar, value) => {
 };
 
 module.exports = {
-  getAllocations,
-  getAllocation,
-  createAllocation,
-  updateAllocation,
-  deleteAllocation,
-  findBy
+    getAllocations,
+    getAllocation,
+    createAllocation,
+    updateAllocation,
+    deleteAllocation,
+    findBy
 };

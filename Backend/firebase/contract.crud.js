@@ -33,7 +33,7 @@ const getContract = (id) => {
         });
 };
 
-const createContract  = (contract) => {
+const createContract = (contract) => {
     let data = {
         id: uuidv4(),
         startDate: contract.startDate,
@@ -44,7 +44,7 @@ const createContract  = (contract) => {
 
     contract = firebase.db.collection('contracts')
         .doc(data.id)
-        .set( {data}, {merge: true});
+        .set(data, {merge: true});
     return contract;
 };
 
@@ -58,7 +58,7 @@ const updateContract = (contract) => {
 
     return firebase.db.collection('contracts')
         .doc(contract.id)
-        .update({ data });
+        .update(data);
 };
 
 const deleteContract = (id) => {
@@ -72,14 +72,14 @@ const deleteContract = (id) => {
 
     return firebase.db.collection('contracts')
         .doc(id)
-        .update({ data })
+        .update(data)
 };
 
 const findBy = (lookupVar, value) => {
     let contracts = firebase.db.collection('contracts');
     return contracts.where("" + lookupVar, '==', value).get()
         .then(snapshot => {
-            if (snapshot.empty)  {
+            if (snapshot.empty) {
                 console.log('No matching data.');
                 return 404;
             }

@@ -16,7 +16,7 @@ exports.handler = async function requestToken(req, res, next) {
     if (emailAddress == null || rawPassword == null) {
         res.status(412).send({
             success: false,
-            message: 'Authentication failed! Please check the request'
+            message: 'Precondition for the username/password failed'
         });
     } else {
         const firebase = require('../firebase/firebase.admin.js');
@@ -27,7 +27,7 @@ exports.handler = async function requestToken(req, res, next) {
                     console.log('No matching documents. (findBy)');
                     res.status(404).send({
                         success: false,
-                        message: 'Authentication failed! Please check the request'
+                        message: 'Employee not found or invalid password'
                     });
                 }
                 snapshot.forEach(doc => {
@@ -48,7 +48,7 @@ exports.handler = async function requestToken(req, res, next) {
                     } else {
                         res.status(404).send({
                             success: false,
-                            message: 'Incorrect username or password'
+                            message: 'Employee not found or invalid password'
                         });
                     }
                 });
@@ -57,7 +57,7 @@ exports.handler = async function requestToken(req, res, next) {
                 console.log('Error getting employee', err);
                 res.status(500).send({
                     success: false,
-                    message: 'Authentication failed! Internal Error'
+                    message: 'Uncaught or internal server error'
                 });
             });
     }
