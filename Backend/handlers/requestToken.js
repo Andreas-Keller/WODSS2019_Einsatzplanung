@@ -21,7 +21,7 @@ exports.handler = async function requestToken(req, res, next) {
     } else {
         const firebase = require('../firebase/firebase.admin.js');
         let employees = firebase.db.collection('employees');
-        employees.where("emailAddress", '==', emailAddress).get()
+        await employees.where("emailAddress", '==', emailAddress).get()
             .then(snapshot => {
                 if (snapshot.empty) {
                     console.log('No matching documents. (findBy)');
