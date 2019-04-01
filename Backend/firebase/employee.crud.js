@@ -15,21 +15,7 @@ const getEmployees = () => {
 };
 
 const getEmployee = (id) => {
-    let employees = firebase.db.collection('employees');
-    return employees.where('id', '==', id).get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching documents.');
-                return 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-            });
-        })
-        .catch(err => {
-            console.log('Error getting employee', err);
-            return 500;
-        });
+    return findBy("id", id)
 };
 
 const createEmployee = (employee) => {
