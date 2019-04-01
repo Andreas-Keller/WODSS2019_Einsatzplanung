@@ -21,11 +21,9 @@ exports.handler = async function createAllocation(req, res, next) {
         contractId: req.body.contractId,
         projectId: req.body.projectId
     };
-    const allocationFirebase = require('../firebase/allocation.crud.js');
+
     const contractFirebase = require('../firebase/contract.crud.js');
     const projectFirebase = require('../firebase/project.crud.js');
-
-
     if (allocation.startDate === null ||
         allocation.endDate === null ||
         allocation.pensumPercentage === null ||
@@ -39,6 +37,7 @@ exports.handler = async function createAllocation(req, res, next) {
         res.status(404).send("Contract or project not found")
 
     } else {
+        const allocationFirebase = require('../firebase/allocation.crud.js');
         res.status(201).send(await allocationFirebase.createAllocation(allocation));
     }
     next()

@@ -13,33 +13,28 @@
  */
 
 exports.handler = async function createContract(req, res, next) {
-  //TODO FIX EVERYTHING
-  let allocation = {
+
+  let contract = {
     startDate: req.body.startDate,
     endDate: req.body.endDate,
     pensumPercentage: req.body.pensumPercentage,
-    contractId: req.body.contractId,
-    projectId: req.body.projectId
+    employeeId: req.body.employeeId
   };
-    const allocationFirebase = require('../firebase/allocation.crud.js');
-    const contractFirebase = require('../firebase/contract.crud.js');
-    const projectFirebase = require('../firebase/project.crud.js');
 
-
-  if (allocation.startDate === null ||
-      allocation.endDate === null ||
-      allocation.pensumPercentage === null ||
-      allocation.contractId === null ||
-      allocation.projectId === null) {
+  const employeeFirebase = require('../firebase/employee.crud.js');
+  if (contract.startDate === null ||
+      contract.endDate === null ||
+      contract.pensumPercentage === null ||
+      contract.employeeId === null) {
     res.status(412).send("Precondition for the allocation failed");
 
-  } else if (contractFirebase.getContract(allocation.contractId) === 404 ||
-      projectFirebase.getProject(allocation.projectId) === 404) {
+  } else if (employeeFirebase.getEmployee(contract.employeeId) === 404) {
 
-    res.status(404).send("Contract or project not found")
+    res.status(404).send("Employee not found")
 
   } else {
-    res.status(201).send(await allocationFirebase.createAllocation(allocation));
+    const contractFirebase = require('../firebase/contract.crud.js');
+    res.status(201).send(await contractFirebase.createContract(contract));
   }
   next()
 };
