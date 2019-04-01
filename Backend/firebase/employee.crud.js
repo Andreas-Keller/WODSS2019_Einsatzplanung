@@ -83,7 +83,7 @@ const deleteEmployee = (id) => {
 //FindBy does not work
 const findBy = (lookupVar, value) => {
     let employees = firebase.db.collection('employees');
-    return employees.where("" + lookupVar, '==', value).get()
+    return employees.where("" + lookupVar, '==', "" + value).get()
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No matching documents.');
@@ -98,7 +98,23 @@ const findBy = (lookupVar, value) => {
             return 500;
         });
 };
-
+const findByEmail = (email) => {
+    let employees = firebase.db.collection('employees');
+    return employees.where("emailAddress", '==', email).get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                return 404;
+            }
+            snapshot.forEach(doc => {
+                console.log(doc.id, '=>', doc.data());
+            });
+        })
+        .catch(err => {
+            console.log('Error getting employee', err);
+            return 500;
+        });
+};
 module.exports = {
     getEmployees,
     getEmployee,

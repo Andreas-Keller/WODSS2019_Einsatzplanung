@@ -13,21 +13,27 @@ exports.handler = async function requestToken(req, res, next) {
     let emailAddress = req.body.emailAddress;
     let rawPassword = req.body.rawPassword;
 
-    const employees = require('../firebase/employee.crud.js');
-
-    let employee = await employees.findBy("emailAddress", emailAddress);
-    if (employee === 404) {
-        res.status(404).send({
+    if (emailAddress == null || rawPassword == null) {
+        res.status(412).send({
             success: false,
             message: 'Authentication failed! Please check the request'
         });
-    } else if (employee === 500) {
-        res.status(500).send({
-            success: false,
-            message: 'Authentication failed! Internal Error'
-        });
     } else {
-        if (emailAddress && rawPassword) {
+        const employees = require('../firebase/employee.crud.js');
+
+        let employee = await
+            employees.findBy("emailAddress", emailAddress);
+        if (employee === 404) {
+            res.status(404).send({
+                success: false,
+                message: 'Authentication failed! Please check the request'
+            });
+        } else if (employee === 500) {
+            res.status(500).send({
+                success: false,
+                message: 'Authentication failed! Internal Error'
+            });
+        } else {
             if (employee.data().emailAddress === emailAddress && employee.data().password === rawPassword) {
                 let token = jwt.sign({emailAddress: emailAddress},
                     process.env.JWT_SECRET,
@@ -42,16 +48,11 @@ exports.handler = async function requestToken(req, res, next) {
                     token: token
                 });
             } else {
-                res.status(403).send({
+                res.status(404).send({
                     success: false,
                     message: 'Incorrect username or password'
                 });
             }
-        } else {
-            res.status(400).send({
-                success: false,
-                message: 'Authentication failed! Please check the request'
-            });
         }
     }
     next()
