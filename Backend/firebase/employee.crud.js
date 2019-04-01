@@ -98,7 +98,6 @@ const findBy = async (lookupVar, value) => {
             console.log('Error getting employee', err);
             returnValue = 500;
         });
-
     return returnValue;
 };
 

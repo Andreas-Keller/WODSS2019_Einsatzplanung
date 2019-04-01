@@ -19,47 +19,33 @@ exports.handler = async function requestToken(req, res, next) {
             message: 'Precondition for the username/password failed'
         });
     } else {
-        const firebase = require('../firebase/firebase.admin.js');
-        let employees = firebase.db.collection('employees');
-        await employees.where("emailAddress", '==', emailAddress).get()
-            .then(snapshot => {
-                if (snapshot.empty) {
-                    console.log('No matching documents. (findBy)');
-                    res.status(404).send({
-                        success: false,
-                        message: 'Employee not found or invalid password'
-                    });
-                }
-                snapshot.forEach(doc => {
-                    console.log(doc.id, '=>', doc.data());
-                    if (doc.data().emailAddress === emailAddress && doc.data().password === rawPassword) {
-                        let token = jwt.sign({emailAddress: emailAddress},
-                            process.env.JWT_SECRET,
-                            {
-                                expiresIn: '24h' // expires in 24 hours
-                            }
-                        );
-                        // return the JWT token for the future API calls
-                        res.status(201).send({
-                            success: true,
-                            message: 'Authentication successful!',
-                            token: token
-                        });
-                    } else {
-                        res.status(404).send({
-                            success: false,
-                            message: 'Employee not found or invalid password'
-                        });
+        const employeeFirebase = require('../firebase/employee.crud.js');
+        let foundUser = await employeeFirebase.findBy("emailAddress", emailAddress);
+        if (foundUser === 500) {
+            res.status(foundUser).send('Uncaught or internal server error');
+        } else if (foundUser === 404) {
+            res.status(404).send('Employee not found or invalid password')
+        } else {
+            if (foundUser.data().emailAddress === emailAddress && foundUser.data().password === rawPassword) {
+                let token = jwt.sign({emailAddress: emailAddress},
+                    process.env.JWT_SECRET,
+                    {
+                        expiresIn: '24h' // expires in 24 hours
                     }
+                );
+                // return the JWT token for the future API calls
+                res.status(201).send({
+                    success: true,
+                    message: 'Authentication successful!',
+                    token: token
                 });
-            })
-            .catch(err => {
-                console.log('Error getting employee', err);
-                res.status(500).send({
+            } else {
+                res.status(404).send({
                     success: false,
-                    message: 'Uncaught or internal server error'
+                    message: 'Employee not found or invalid password'
                 });
-            });
+            }
+        }
     }
     next()
 };
