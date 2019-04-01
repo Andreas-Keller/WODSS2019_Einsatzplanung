@@ -10,8 +10,8 @@
  */
 exports.handler = async function requestToken(req, res, next) {
     let jwt = require('jsonwebtoken');
-    let emailAddress = req.body.emailAddress;
-    let rawPassword = req.body.rawPassword;
+    let emailAddress = ""+req.body.emailAddress;
+    let rawPassword = ""+req.body.rawPassword;
 
     if (emailAddress == null || rawPassword == null) {
         res.status(412).send({
@@ -33,7 +33,7 @@ exports.handler = async function requestToken(req, res, next) {
                 message: 'Authentication failed! Internal Error'
             });
         } else {
-            if (employee.data().password === rawPassword) {
+            if (employee.data.password === rawPassword) {
                 let token = jwt.sign({emailAddress: emailAddress},
                     process.env.JWT_SECRET,
                     {

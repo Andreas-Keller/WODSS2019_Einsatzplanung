@@ -130,7 +130,7 @@ const findAllEmailFilter = (email) => {
             }
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
-                if(doc.data().emailAddress.toLowerCase()===email.toLowerCase()){
+                if(doc.data.emailAddress.toLowerCase()===email.toLowerCase()){
                     return doc;
                 }
             });
