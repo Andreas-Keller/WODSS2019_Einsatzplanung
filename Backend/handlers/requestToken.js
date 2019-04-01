@@ -32,7 +32,7 @@ exports.handler = async function requestToken(req, res, next) {
                 }
                 snapshot.forEach(doc => {
                     console.log(doc.id, '=>', doc.data());
-                    if (doc.data().password === rawPassword) {
+                    if (doc.data().emailAddress === emailAddress && doc.data().password === rawPassword) {
                         let token = jwt.sign({emailAddress: emailAddress},
                             process.env.JWT_SECRET,
                             {
