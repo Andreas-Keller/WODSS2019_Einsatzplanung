@@ -16,25 +16,18 @@ exports.handler = async function requestToken(req, res, next) {
     if (emailAddress == null || rawPassword == null) {
         res.status(412).send({
             success: false,
-            message: 'Authentication failed! Please check the request'
+            message: 'Precondition for the username/password failed'
         });
     } else {
-        const employees = require('../firebase/employee.crud.js');
-
-        let employee = await employees.findBy("emailAddress", emailAddress);
-        if (employee === 404) {
-            res.status(404).send({
-                success: false,
-                message: 'Authentication failed! Please check the request'
-            });
-        } else if (employee === 500) {
-            res.status(500).send({
-                success: false,
-                message: 'Authentication failed! Internal Error'
-            });
+        const employeeFirebase = require('../firebase/employee.crud.js');
+        let foundUser = await employeeFirebase.findBy("emailAddress", emailAddress);
+        if (foundUser === 500) {
+            res.status(foundUser).send('Uncaught or internal server error');
+        } else if (foundUser === 404) {
+            res.status(404).send('Employee not found or invalid password')
         } else {
-            if (employee.data().password === rawPassword) {
-                let token = jwt.sign({emailAddress: emailAddress},
+            if (foundUser.data().emailAddress === emailAddress && foundUser.data().password === rawPassword) {
+                let token = jwt.sign(foundUser.data(),
                     process.env.JWT_SECRET,
                     {
                         expiresIn: '24h' // expires in 24 hours
@@ -49,7 +42,7 @@ exports.handler = async function requestToken(req, res, next) {
             } else {
                 res.status(404).send({
                     success: false,
-                    message: 'Incorrect username or password'
+                    message: 'Employee not found or invalid password'
                 });
             }
         }

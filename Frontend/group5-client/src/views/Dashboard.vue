@@ -46,6 +46,7 @@ export default {
           console.log(decoded);
           this.loggedInEmployeeName = `${this.loggedInEmployee.firstName} ${this.loggedInEmployee.lastName}`;
           this.loggedInRole = this.loggedInEmployee.role;
+          console.log(`${this.loggedInRole}`);
         } catch (error) {
           // COMMENTED OUT FOR DEV PURPOSE
           /*

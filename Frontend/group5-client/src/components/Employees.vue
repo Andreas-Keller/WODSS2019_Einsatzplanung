@@ -48,9 +48,9 @@
     <!-- Main table element -->
     <b-table
       show-empty
-      bordered=true
-      hover=true
-      striped=true
+      bordered
+      hover
+      striped
       stacked="md"
       :items="items"
       :fields="fields"
@@ -152,6 +152,7 @@ export default {
     if (this.loggedInRole === 'ADMINISTRATOR') {
       axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`)
         .then((response) => {
+          console.log(response.data);
           this.items = response.data;
         });
     } else if (this.loggedInRole === 'PROJECTMANAGER') {

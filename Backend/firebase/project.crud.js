@@ -33,7 +33,7 @@ const getProject = (id) => {
         });
 };
 
-const createProject  = (project) => {
+const createProject = (project) => {
     let data = {
         id: uuidv4(),
         name: project.name,
@@ -45,7 +45,7 @@ const createProject  = (project) => {
 
     project = firebase.db.collection('projects')
         .doc(data.id)
-        .set( {data}, {merge: true});
+        .set(data, {merge: true});
     return project;
 };
 
@@ -60,7 +60,7 @@ const updateProject = (project) => {
 
     return firebase.db.collection('projects')
         .doc(project.id)
-        .update({ data });
+        .update(data);
 };
 
 const deleteProject = (id) => {
@@ -74,14 +74,14 @@ const deleteProject = (id) => {
 
     return firebase.db.collection('projects')
         .doc(id)
-        .update({ data })
+        .update(data)
 };
 
 const findBy = (lookupVar, value) => {
     let projects = firebase.db.collection('projects');
     return projects.where("" + lookupVar, '==', value).get()
         .then(snapshot => {
-            if (snapshot.empty)  {
+            if (snapshot.empty) {
                 console.log('No matching data.');
                 return 404;
             }

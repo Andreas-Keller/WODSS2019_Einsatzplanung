@@ -1,35 +1,29 @@
 const firebase = require('./firebase.admin.js');
 const uuidv4 = require('uuid/v4');
 
-const getEmployees = () => {
+const getEmployees = async () => {
     let employees = firebase.db.collection('employees');
-    return employees.get()
-        .then(snapshot => {
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-            });
-        })
-        .catch(err => {
-            console.log('Error getting Employees', err);
-        });
-};
-
-const getEmployee = (id) => {
-    let employees = firebase.db.collection('employees');
-    return employees.where('id', '==', id).get()
+    let returnValue = null;
+    await employees.get()
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No matching documents.');
-                return 404;
+                returnValue = 404;
             }
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
             });
+            returnValue = snapshot.docs.map(doc => doc.data());
         })
         .catch(err => {
             console.log('Error getting employee', err);
-            return 500;
+            returnValue = 500;
         });
+    return returnValue;
+};
+
+const getEmployee = (id) => {
+    return findBy("id", id)
 };
 
 const createEmployee = (employee) => {
@@ -45,7 +39,7 @@ const createEmployee = (employee) => {
 
     employee = firebase.db.collection('employees')
         .doc(data.id)
-        .set(data, {merge: true});
+        .set({data}, {merge: true});
     return employee;
 };
 const updateEmployee = (employee) => {
@@ -80,68 +74,32 @@ const deleteEmployee = (id) => {
             data
         );
 };
-//FindBy does not work
-const findBy = (lookupVar, value) => {
+const findBy = async (lookupVar, value) => {
     let employees = firebase.db.collection('employees');
-    return employees.where(lookupVar, '==', value).get()
+    let returnValue = null;
+    await employees.where(lookupVar, '==', value).limit(1).get()
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No matching documents. (findBy)');
-                return 404;
+                returnValue = 404;
             }
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
-                return doc;
+                returnValue = doc;
             });
         })
         .catch(err => {
             console.log('Error getting employee', err);
-            return 500;
+            returnValue = 500;
         });
+    return returnValue;
 };
 
-const findAllEmailFilter = (email) => {
-    let employees = firebase.db.collection('employees');
-    employees.get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching documents. (findAllFilter)');
-                return 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-                if (doc.data().emailAddress === email.toLowerCase()) {
-                    return doc;
-                }
-            });
-        })
-        .catch(err => {
-            console.log('Error getting employee', err);
-            return 500;
-        });
-
-    // return employees.where("emailAddress", "==", email.toLowerCase()).get()
-    //     .then(snapshot => {
-    //         if (snapshot.empty) {
-    //             console.log('No matching documents. (findByEmail)');
-    //             return 404;
-    //         }
-    //         snapshot.forEach(doc => {
-    //             console.log(doc.id, '=>', doc.data());
-    //             return doc;
-    //         });
-    //     })
-    //     .catch(err => {
-    //         console.log('Error getting employee', err);
-    //         return 500;
-    //     });
-};
 module.exports = {
     getEmployees,
     getEmployee,
     createEmployee,
     updateEmployee,
     deleteEmployee,
-    findBy,
-    findAllEmailFilter
+    findBy
 };
