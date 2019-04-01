@@ -85,8 +85,8 @@ const findBy = (lookupVar, value) => {
     let employees = firebase.db.collection('employees');
     console.log("Lookup Var: " + lookupVar);
     console.log("value Var: " + value);
-    console.log(employees);
-    return employees.where(lookupVar, "==", value).get()
+    console.log(employees.get());
+    return employees.where(lookupVar, '==', value).get()
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No matching documents.');
@@ -96,7 +96,6 @@ const findBy = (lookupVar, value) => {
                 console.log(doc.id, '=>', doc.data());
                 return doc;
             });
-
         })
         .catch(err => {
             console.log('Error getting employee', err);
@@ -105,7 +104,7 @@ const findBy = (lookupVar, value) => {
 };
 const findByEmail = (email) => {
     let employees = firebase.db.collection('employees');
-    return employees.where("emailAddress", "==", email).get()
+    return employees.where('emailAddress', '==', email).get()
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No matching documents.');

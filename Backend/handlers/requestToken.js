@@ -21,7 +21,7 @@ exports.handler = async function requestToken(req, res, next) {
     } else {
         const employees = require('../firebase/employee.crud.js');
 
-        let employee = await employees.findBy("emailAddress", emailAddress);
+        let employee = await employees.findBy('emailAddress', emailAddress);
         if (employee === 404) {
             res.status(404).send({
                 success: false,
