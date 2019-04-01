@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid>
+  <b-container v-if="this.loggedInRole !== 'DEVELOPER'" fluid>
     <h1>Employees</h1>
     <!-- User Interface controls -->
     <b-row>
@@ -48,6 +48,9 @@
     <!-- Main table element -->
     <b-table
       show-empty
+      bordered=true
+      hover=true
+      striped=true
       stacked="md"
       :items="items"
       :fields="fields"
@@ -141,9 +144,22 @@ const items = [{
 export default {
   name: 'Employees',
 
+  props: {
+    loggedInRole: String,
+  },
+
   beforeMount() {
-    axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`)
-      .then((response) => { this.items = response.data; });
+    if (this.loggedInRole === 'ADMINISTRATOR') {
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`)
+        .then((response) => {
+          this.items = response.data;
+        });
+    } else if (this.loggedInRole === 'PROJECTMANAGER') {
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?role=DEVELOPER`)
+        .then((response) => {
+          this.items = response.data;
+        });
+    }
   },
 
   data() {
@@ -151,10 +167,11 @@ export default {
       items,
 
       fields: [
+        /*
         {
           key: '_id',
           label: 'ID',
-        },
+        }, */
         {
           key: 'firstName',
           label: 'First Name',

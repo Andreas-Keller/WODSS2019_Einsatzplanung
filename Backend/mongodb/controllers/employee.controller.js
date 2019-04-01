@@ -4,13 +4,25 @@ const getEmployees = (req ,res, next) => {
 
     //const pageCursor = req.query.cursor;
 
-    Employee.find((err, employees) => {
-        if(err) {
-            res.status(412).json(err)
-        }
-        //res.set("Content-Type", "application/json")
-        res.json(employees)
-    })
+    if (req.query.role === undefined) {
+        Employee.find((err, employees) => {
+            if(err) {
+                res.status(412).json(err)
+            }
+            //res.set("Content-Type", "application/json")
+            res.json(employees)
+        })
+    } else {
+        console.log(req.query.role);
+        Employee.find({role: req.query.role}, null, function(err, employees) {
+            if(err) {
+                res.status(412).json(err)
+            }
+
+            res.json(employees);
+        });
+    }
+    
 
     //next()
 };
