@@ -121,5 +121,6 @@ module.exports = {
     createEmployee,
     updateEmployee,
     deleteEmployee,
-    findBy
+    findBy,
+    findByEmail
 };
