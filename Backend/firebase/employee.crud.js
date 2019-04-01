@@ -13,7 +13,7 @@ const getEmployees = async () => {
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
             });
-            returnValue = snapshot;
+            returnValue = snapshot.docs;
         })
         .catch(err => {
             console.log('Error getting employee', err);
