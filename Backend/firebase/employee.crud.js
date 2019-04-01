@@ -45,7 +45,7 @@ const createEmployee = (employee) => {
 
     employee = firebase.db.collection('employees')
         .doc(data.id)
-        .set({data}, {merge: true});
+        .set(data, {merge: true});
     return employee;
 };
 const updateEmployee = (employee) => {
@@ -59,9 +59,9 @@ const updateEmployee = (employee) => {
 
     return firebase.db.collection('employees')
         .doc(employee.id)
-        .update({
+        .update(
             data
-        });
+        );
 };
 
 const deleteEmployee = (id) => {
@@ -76,16 +76,17 @@ const deleteEmployee = (id) => {
 
     return firebase.db.collection('employees')
         .doc(id)
-        .update({
+        .update(
             data
-        });
+        );
 };
+//FindBy does not work
 const findBy = (lookupVar, value) => {
     let employees = firebase.db.collection('employees');
-    return employees.where("" + lookupVar, '==', value).get()
+    return employees.where(lookupVar, '==', value).get()
         .then(snapshot => {
             if (snapshot.empty) {
-                console.log('No matching documents.');
+                console.log('No matching documents. (findBy)');
                 return 404;
             }
             snapshot.forEach(doc => {
@@ -98,11 +99,48 @@ const findBy = (lookupVar, value) => {
         });
 };
 
+const findAllEmailFilter = (email) => {
+    let employees = firebase.db.collection('employees');
+    employees.get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                console.log('No matching documents. (findAllFilter)');
+                return 404;
+            }
+            snapshot.forEach(doc => {
+                console.log(doc.id, '=>', doc.data());
+                if (doc.data().emailAddress === email.toLowerCase()) {
+                    return doc;
+                }
+            });
+        })
+        .catch(err => {
+            console.log('Error getting employee', err);
+            return 500;
+        });
+
+    // return employees.where("emailAddress", "==", email.toLowerCase()).get()
+    //     .then(snapshot => {
+    //         if (snapshot.empty) {
+    //             console.log('No matching documents. (findByEmail)');
+    //             return 404;
+    //         }
+    //         snapshot.forEach(doc => {
+    //             console.log(doc.id, '=>', doc.data());
+    //             return doc;
+    //         });
+    //     })
+    //     .catch(err => {
+    //         console.log('Error getting employee', err);
+    //         return 500;
+    //     });
+};
 module.exports = {
     getEmployees,
     getEmployee,
     createEmployee,
     updateEmployee,
     deleteEmployee,
-    findBy
+    findBy,
+    findAllEmailFilter
 };

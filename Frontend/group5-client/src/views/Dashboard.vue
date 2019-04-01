@@ -1,10 +1,10 @@
 <template>
   <div>
     <Navbar :employeeName=loggedInEmployeeName />
-    <Employees />
-    <Projects />
-    <Contracts />
-    <Allocations />
+    <Employees :loggedInRole=loggedInRole />
+    <Projects  />
+    <Contracts :loggedInRole=loggedInRole />
+    <Allocations :loggedInRole=loggedInRole />
   </div>
 </template>
 
@@ -25,6 +25,7 @@ export default {
     return {
       loggedInEmployee: '',
       loggedInEmployeeName: '',
+      loggedInRole: '',
     };
   },
   components: {
@@ -42,7 +43,9 @@ export default {
         try {
           const decoded = jwtDecode(localStorage.getItem('token'));
           this.loggedInEmployee = decoded;
+          console.log(decoded);
           this.loggedInEmployeeName = `${this.loggedInEmployee.firstName} ${this.loggedInEmployee.lastName}`;
+          this.loggedInRole = this.loggedInEmployee.role;
         } catch (error) {
           // COMMENTED OUT FOR DEV PURPOSE
           console.log(error);

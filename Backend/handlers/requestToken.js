@@ -10,49 +10,56 @@
  */
 exports.handler = async function requestToken(req, res, next) {
     let jwt = require('jsonwebtoken');
-    let emailAddress = req.body.emailAddress;
-    let rawPassword = req.body.rawPassword;
+    let emailAddress = "" + req.body.emailAddress;
+    let rawPassword = "" + req.body.rawPassword;
 
-    const employees = require('../firebase/employee.crud.js');
-
-    let employee = await employees.findBy("emailAddress", emailAddress);
-    if (employee === 404) {
-        res.send(404).json({
+    if (emailAddress == null || rawPassword == null) {
+        res.status(412).send({
             success: false,
             message: 'Authentication failed! Please check the request'
         });
-    } else if (employee === 500) {
-        res.send(500).json({
-            success: false,
-            message: 'Authentication failed! Internal Error'
-        });
     } else {
-        if (emailAddress && rawPassword) {
-            if (employee.data().emailAddress === emailAddress && employee.data().password === rawPassword) {
-                let token = jwt.sign({emailAddress: emailAddress},
-                    process.env.JWT_SECRET,
-                    {
-                        expiresIn: '24h' // expires in 24 hours
+        const firebase = require('../firebase/firebase.admin.js');
+        let employees = firebase.db.collection('employees');
+        await employees.where("emailAddress", '==', emailAddress).get()
+            .then(snapshot => {
+                if (snapshot.empty) {
+                    console.log('No matching documents. (findBy)');
+                    res.status(404).send({
+                        success: false,
+                        message: 'Authentication failed! Please check the request'
+                    });
+                }
+                snapshot.forEach(doc => {
+                    console.log(doc.id, '=>', doc.data());
+                    if (doc.data().emailAddress === emailAddress && doc.data().password === rawPassword) {
+                        let token = jwt.sign({emailAddress: emailAddress},
+                            process.env.JWT_SECRET,
+                            {
+                                expiresIn: '24h' // expires in 24 hours
+                            }
+                        );
+                        // return the JWT token for the future API calls
+                        res.status(201).send({
+                            success: true,
+                            message: 'Authentication successful!',
+                            token: token
+                        });
+                    } else {
+                        res.status(404).send({
+                            success: false,
+                            message: 'Incorrect username or password'
+                        });
                     }
-                );
-                // return the JWT token for the future API calls
-                res.send(201).json({
-                    success: true,
-                    message: 'Authentication successful!',
-                    token: token
                 });
-            } else {
-                res.send(403).json({
+            })
+            .catch(err => {
+                console.log('Error getting employee', err);
+                res.status(500).send({
                     success: false,
-                    message: 'Incorrect username or password'
+                    message: 'Authentication failed! Internal Error'
                 });
-            }
-        } else {
-            res.send(400).json({
-                success: false,
-                message: 'Authentication failed! Please check the request'
             });
-        }
     }
     next()
 };

@@ -1,5 +1,7 @@
 <template>
-  <h1>Projects</h1>
+  <b-container fluid>
+    <h1>Projects</h1>
+  </b-container>
 </template>
 
 <script>
