@@ -8,10 +8,51 @@
  *   rawPassword {string} Raw employee password.
  *
  */
+exports.handler = async function requestToken(req, res, next) {
+    let jwt = require('jsonwebtoken');
+    let emailAddress = req.body.emailAddress;
+    let rawPassword = req.body.rawPassword;
 
-const controller = require('../mongodb/controllers/token.controller')
+    const employees = require('../firebase/employee.crud.js');
 
-
-exports.handler = function requestToken(req, res, next) {
-    controller.requestToken(req,res,next)
-}
+    let employee = await employees.findBy("emailAddress", emailAddress);
+    if (employee === 404) {
+        res.status(404).send({
+            success: false,
+            message: 'Authentication failed! Please check the request'
+        });
+    } else if (employee === 500) {
+        res.status(500).send({
+            success: false,
+            message: 'Authentication failed! Internal Error'
+        });
+    } else {
+        if (emailAddress && rawPassword) {
+            if (employee.data().emailAddress === emailAddress && employee.data().password === rawPassword) {
+                let token = jwt.sign({emailAddress: emailAddress},
+                    process.env.JWT_SECRET,
+                    {
+                        expiresIn: '24h' // expires in 24 hours
+                    }
+                );
+                // return the JWT token for the future API calls
+                res.status(201).send({
+                    success: true,
+                    message: 'Authentication successful!',
+                    token: token
+                });
+            } else {
+                res.status(403).send({
+                    success: false,
+                    message: 'Incorrect username or password'
+                });
+            }
+        } else {
+            res.status(400).send({
+                success: false,
+                message: 'Authentication failed! Please check the request'
+            });
+        }
+    }
+    next()
+};
