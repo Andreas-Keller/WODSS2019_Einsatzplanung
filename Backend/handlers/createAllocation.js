@@ -12,9 +12,6 @@
  *   projectId {int64} Project ID of the allocation.
  *
  */
-const allocationFirebase = require('../firebase/allocation.crud.js');
-const contractFirebase = require('../firebase/contract.crud.js');
-const projectFirebase = require('../firebase/project.crud.js');
 
 exports.handler = async function createAllocation(req, res, next) {
     let allocation = {
@@ -24,6 +21,9 @@ exports.handler = async function createAllocation(req, res, next) {
         contractId: req.body.contractId,
         projectId: req.body.projectId
     };
+    const allocationFirebase = require('../firebase/allocation.crud.js');
+    const contractFirebase = require('../firebase/contract.crud.js');
+    const projectFirebase = require('../firebase/project.crud.js');
 
 
     if (allocation.startDate === null ||

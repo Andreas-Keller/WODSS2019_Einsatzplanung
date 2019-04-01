@@ -11,15 +11,9 @@
  *   employeeId {int64} Employee ID of the contract.
  *   
  */
-exports.handler = function createContract(req, res, next) {
-  res.send('createContract')
-  next()
-}
-const allocationFirebase = require('../firebase/allocation.crud.js');
-const contractFirebase = require('../firebase/contract.crud.js');
-const projectFirebase = require('../firebase/project.crud.js');
 
 exports.handler = async function createContract(req, res, next) {
+  //TODO FIX EVERYTHING
   let allocation = {
     startDate: req.body.startDate,
     endDate: req.body.endDate,
@@ -27,6 +21,9 @@ exports.handler = async function createContract(req, res, next) {
     contractId: req.body.contractId,
     projectId: req.body.projectId
   };
+    const allocationFirebase = require('../firebase/allocation.crud.js');
+    const contractFirebase = require('../firebase/contract.crud.js');
+    const projectFirebase = require('../firebase/project.crud.js');
 
 
   if (allocation.startDate === null ||
