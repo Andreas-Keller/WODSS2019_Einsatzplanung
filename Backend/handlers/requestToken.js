@@ -10,8 +10,8 @@
  */
 exports.handler = async function requestToken(req, res, next) {
     let jwt = require('jsonwebtoken');
-    let emailAddress = ""+req.body.emailAddress;
-    let rawPassword = ""+req.body.rawPassword;
+    let emailAddress = "" + req.body.emailAddress;
+    let rawPassword = "" + req.body.rawPassword;
 
     if (emailAddress == null || rawPassword == null) {
         res.status(412).send({
@@ -21,7 +21,7 @@ exports.handler = async function requestToken(req, res, next) {
     } else {
         const employees = require('../firebase/employee.crud.js');
 
-        let employee = await employees.findAllEmailFilter(emailAddress);
+        let employee = await employees.findBy("emailAddress", emailAddress);
         if (employee === 404) {
             res.status(404).send({
                 success: false,
@@ -33,7 +33,7 @@ exports.handler = async function requestToken(req, res, next) {
                 message: 'Authentication failed! Internal Error'
             });
         } else {
-            if (employee.data.password === rawPassword) {
+            if (employee.data().password === rawPassword) {
                 let token = jwt.sign({emailAddress: emailAddress},
                     process.env.JWT_SECRET,
                     {

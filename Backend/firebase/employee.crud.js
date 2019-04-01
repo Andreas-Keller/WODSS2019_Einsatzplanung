@@ -45,7 +45,7 @@ const createEmployee = (employee) => {
 
     employee = firebase.db.collection('employees')
         .doc(data.id)
-        .set({data}, {merge: true});
+        .set(data, {merge: true});
     return employee;
 };
 const updateEmployee = (employee) => {
@@ -59,9 +59,9 @@ const updateEmployee = (employee) => {
 
     return firebase.db.collection('employees')
         .doc(employee.id)
-        .update({
+        .update(
             data
-        });
+        );
 };
 
 const deleteEmployee = (id) => {
@@ -76,17 +76,14 @@ const deleteEmployee = (id) => {
 
     return firebase.db.collection('employees')
         .doc(id)
-        .update({
+        .update(
             data
-        });
+        );
 };
 //FindBy does not work
-const findBy = async (lookupVar, value) => {
+const findBy = (lookupVar, value) => {
     let employees = firebase.db.collection('employees');
-    console.log("Lookup Var: " + lookupVar);
-    console.log("value Var: " + value);
-    console.log(await employees.get());
-    return await employees.where(lookupVar, '==', value).get()
+    return employees.where(lookupVar, '==', value).get()
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No matching documents. (findBy)');
@@ -102,24 +99,7 @@ const findBy = async (lookupVar, value) => {
             return 500;
         });
 };
-const findByEmail = (email) => {
-    let employees = firebase.db.collection('employees');
-    return employees.where("emailAddress", "==", email.toLowerCase()).get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching documents. (findByEmail)');
-                return 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-                return doc;
-            });
-        })
-        .catch(err => {
-            console.log('Error getting employee', err);
-            return 500;
-        });
-};
+
 const findAllEmailFilter = (email) => {
     let employees = firebase.db.collection('employees');
     employees.get()
@@ -130,18 +110,7 @@ const findAllEmailFilter = (email) => {
             }
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
-                try {
-                    console.log(doc.data().data.emailAddress);
-                } catch {
-
-                    console.log("data() failed");
-                }
-                try {
-                    console.log(doc.data.data.emailAddress);
-                } catch {
-                    console.log("data failed");
-                }
-                if (doc.data().data.emailAddress === email.toLowerCase()) {
+                if (doc.data().emailAddress === email.toLowerCase()) {
                     return doc;
                 }
             });
@@ -174,6 +143,5 @@ module.exports = {
     updateEmployee,
     deleteEmployee,
     findBy,
-    findByEmail,
     findAllEmailFilter
 };
