@@ -89,7 +89,7 @@ const findBy = async (lookupVar, value) => {
     return await employees.where(lookupVar, '==', value).get()
         .then(snapshot => {
             if (snapshot.empty) {
-                console.log('No matching documents.');
+                console.log('No matching documents. (findBy)');
                 return 404;
             }
             snapshot.forEach(doc => {
@@ -107,7 +107,7 @@ const findByEmail = (email) => {
     return employees.where('emailAddress', '==', email).get()
         .then(snapshot => {
             if (snapshot.empty) {
-                console.log('No matching documents.');
+                console.log('No matching documents. (findByEmail)');
                 return 404;
             }
             snapshot.forEach(doc => {
