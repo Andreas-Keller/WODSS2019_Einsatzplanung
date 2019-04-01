@@ -1,17 +1,25 @@
 const firebase = require('./firebase.admin.js');
 const uuidv4 = require('uuid/v4');
 
-const getEmployees = () => {
+const getEmployees = async () => {
     let employees = firebase.db.collection('employees');
-    return employees.get()
+    let returnValue = null;
+    await employees.get()
         .then(snapshot => {
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                returnValue = 404;
+            }
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
             });
+            returnValue = snapshot;
         })
         .catch(err => {
-            console.log('Error getting Employees', err);
+            console.log('Error getting employee', err);
+            returnValue = 500;
         });
+    return returnValue;
 };
 
 const getEmployee = (id) => {
@@ -31,7 +39,7 @@ const createEmployee = (employee) => {
 
     employee = firebase.db.collection('employees')
         .doc(data.id)
-        .set(data, {merge: true});
+        .set({data}, {merge: true});
     return employee;
 };
 const updateEmployee = (employee) => {
