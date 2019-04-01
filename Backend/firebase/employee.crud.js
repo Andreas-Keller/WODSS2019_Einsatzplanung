@@ -104,7 +104,7 @@ const findBy = async (lookupVar, value) => {
 };
 const findByEmail = (email) => {
     let employees = firebase.db.collection('employees');
-    return employees.where('emailAddress', '==', email).get()
+    return employees.where("emailAddress", "==", email.toLowerCase()).get()
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No matching documents. (findByEmail)');
@@ -120,6 +120,42 @@ const findByEmail = (email) => {
             return 500;
         });
 };
+const findAllEmailFilter = (email) => {
+    let employees = firebase.db.collection('employees');
+    employees.get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                console.log('No matching documents. (findAllFilter)');
+                return 404;
+            }
+            snapshot.forEach(doc => {
+                console.log(doc.id, '=>', doc.data());
+                if(doc.data().emailAddress.toLowerCase()===email.toLowerCase()){
+                    return doc;
+                }
+            });
+        })
+        .catch(err => {
+            console.log('Error getting employee', err);
+            return 500;
+        });
+
+    // return employees.where("emailAddress", "==", email.toLowerCase()).get()
+    //     .then(snapshot => {
+    //         if (snapshot.empty) {
+    //             console.log('No matching documents. (findByEmail)');
+    //             return 404;
+    //         }
+    //         snapshot.forEach(doc => {
+    //             console.log(doc.id, '=>', doc.data());
+    //             return doc;
+    //         });
+    //     })
+    //     .catch(err => {
+    //         console.log('Error getting employee', err);
+    //         return 500;
+    //     });
+};
 module.exports = {
     getEmployees,
     getEmployee,
@@ -127,5 +163,6 @@ module.exports = {
     updateEmployee,
     deleteEmployee,
     findBy,
-    findByEmail
+    findByEmail,
+    findAllEmailFilter
 };
