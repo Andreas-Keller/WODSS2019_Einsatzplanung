@@ -33,7 +33,7 @@ exports.handler = async function requestToken(req, res, next) {
                 message: 'Authentication failed! Internal Error'
             });
         } else {
-            if (employee.data().password === rawPassword) {
+            if (employee.password === rawPassword) {
                 let token = jwt.sign({emailAddress: emailAddress},
                     process.env.JWT_SECRET,
                     {

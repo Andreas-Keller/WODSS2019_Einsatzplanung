@@ -91,7 +91,7 @@ const findBy = (lookupVar, value) => {
             }
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
-                return doc;
+                return doc.data();
             });
         })
         .catch(err => {
