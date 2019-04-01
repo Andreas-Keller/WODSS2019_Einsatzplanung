@@ -19,40 +19,47 @@ exports.handler = async function requestToken(req, res, next) {
             message: 'Authentication failed! Please check the request'
         });
     } else {
-        const employees = require('../firebase/employee.crud.js');
-
-        let employee = await employees.findBy("emailAddress", emailAddress);
-        if (employee === 404) {
-            res.status(404).send({
-                success: false,
-                message: 'Authentication failed! Please check the request'
-            });
-        } else if (employee === 500) {
-            res.status(500).send({
-                success: false,
-                message: 'Authentication failed! Internal Error'
-            });
-        } else {
-            if (employee.data().password === rawPassword) {
-                let token = jwt.sign({emailAddress: emailAddress},
-                    process.env.JWT_SECRET,
-                    {
-                        expiresIn: '24h' // expires in 24 hours
+        const firebase = require('./firebase.admin.js');
+        let employees = firebase.db.collection('employees');
+        employees.where("emailAddress", '==', emailAddress).get()
+            .then(snapshot => {
+                if (snapshot.empty) {
+                    console.log('No matching documents. (findBy)');
+                    res.status(404).send({
+                        success: false,
+                        message: 'Authentication failed! Please check the request'
+                    });
+                }
+                snapshot.forEach(doc => {
+                    console.log(doc.id, '=>', doc.data());
+                    if (doc.data().password === rawPassword) {
+                        let token = jwt.sign({emailAddress: emailAddress},
+                            process.env.JWT_SECRET,
+                            {
+                                expiresIn: '24h' // expires in 24 hours
+                            }
+                        );
+                        // return the JWT token for the future API calls
+                        res.status(201).send({
+                            success: true,
+                            message: 'Authentication successful!',
+                            token: token
+                        });
+                    } else {
+                        res.status(404).send({
+                            success: false,
+                            message: 'Incorrect username or password'
+                        });
                     }
-                );
-                // return the JWT token for the future API calls
-                res.status(201).send({
-                    success: true,
-                    message: 'Authentication successful!',
-                    token: token
                 });
-            } else {
-                res.status(404).send({
+            })
+            .catch(err => {
+                console.log('Error getting employee', err);
+                res.status(500).send({
                     success: false,
-                    message: 'Incorrect username or password'
+                    message: 'Authentication failed! Internal Error'
                 });
-            }
-        }
+            });
     }
     next()
 };
