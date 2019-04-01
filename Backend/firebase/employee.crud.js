@@ -131,17 +131,17 @@ const findAllEmailFilter = (email) => {
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
                 try {
-                    console.log(doc.data().emailAddress);
+                    console.log(doc.data().data.emailAddress);
                 } catch {
 
                     console.log("data() failed");
                 }
                 try {
-                    console.log(doc.data.emailAddress);
+                    console.log(doc.data.data.emailAddress);
                 } catch {
                     console.log("data failed");
                 }
-                if (doc.data.emailAddress === email.toLowerCase()) {
+                if (doc.data().data.emailAddress === email.toLowerCase()) {
                     return doc;
                 }
             });
