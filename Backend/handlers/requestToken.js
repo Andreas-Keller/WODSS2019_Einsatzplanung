@@ -19,7 +19,7 @@ exports.handler = async function requestToken(req, res, next) {
             message: 'Authentication failed! Please check the request'
         });
     } else {
-        const firebase = require('./firebase.admin.js');
+        const firebase = require('../firebase/firebase.admin.js');
         let employees = firebase.db.collection('employees');
         employees.where("emailAddress", '==', emailAddress).get()
             .then(snapshot => {
