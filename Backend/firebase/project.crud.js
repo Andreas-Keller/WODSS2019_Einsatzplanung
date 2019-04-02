@@ -1,41 +1,20 @@
 const firebase = require('./firebase.admin.js');
-const uuidv4 = require('uuid/v4');
+const crud = require('./firebase.global.crud.js');
 
-const getProjects = () => {
-    let projects = firebase.db.collection('projects');
-    return projects.get()
-        .then(snapshot => {
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data())
-            });
-        })
-        .catch(error => {
-            console.log('Error getting projects', error);
-            return 500;
-        });
+let projects = firebase.db.collection('projects');
+
+const getProjects = async () => {
+    return crud.getAll(projects);
 };
 
-const getProject = (id) => {
-    let project = firebase.db.collection('projects')
-    return project.where('id', '==', id).get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching data.');
-                return 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-            });
-        })
-        .catch(error => {
-            console.log('Error getting project', error);
-            return 500;
-        });
+const getProject = async (id) => {
+    return await crud.findBy("id", id)
 };
 
-const createProject = (project) => {
+//TODO implement id correct
+const createProject = async (project) => {
     let data = {
-        id: uuidv4(),
+        id: '',
         name: project.name,
         ftePercentage: project.ftePercentage,
         startDate: project.startDate,
@@ -43,13 +22,10 @@ const createProject = (project) => {
         projectManagerId: project.projectManagerId
     };
 
-    project = firebase.db.collection('projects')
-        .doc(data.id)
-        .set(data, {merge: true});
-    return project;
+    return await crud.create(data, projects);
 };
 
-const updateProject = (project) => {
+const updateProject = async (project) => {
     let data = {
         name: project.name,
         ftePercentage: project.ftePercentage,
@@ -58,41 +34,15 @@ const updateProject = (project) => {
         projectManagerId: project.projectManagerId
     };
 
-    return firebase.db.collection('projects')
-        .doc(project.id)
-        .update(data);
+    return await crud.update(data, projects);
 };
 
-const deleteProject = (id) => {
-    let data = {
-        name: null,
-        ftePercentage: null,
-        startDate: null,
-        endDate: null,
-        projectManagerId: null
-    };
-
-    return firebase.db.collection('projects')
-        .doc(id)
-        .update(data)
+const deleteProject = async (id) => {
+    return await crud.deleteEntity(id, projects);
 };
 
-const findBy = (lookupVar, value) => {
-    let projects = firebase.db.collection('projects');
-    return projects.where("" + lookupVar, '==', value).get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching data.');
-                return 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-            });
-        })
-        .catch(error => {
-            console.log('Error getting project', error);
-            return 500;
-        });
+const findBy = async (lookupVar, value) => {
+    return await crud.findBy(lookupVar, value, projects);
 };
 
 module.exports = {

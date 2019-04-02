@@ -1,41 +1,20 @@
 const firebase = require('./firebase.admin.js');
-const uuidv4 = require('uuid/v4');
+const crud = require('./firebase.global.crud.js');
 
-const getAllocations = () => {
-    let allocations = firebase.db.collection('allocations');
-    return allocations.get()
-        .then(snapshot => {
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data())
-            });
-        })
-        .catch(error => {
-            console.log('Error getting allocations', error);
-            return 500;
-        });
+let allocations = firebase.db.collection('allocations');
+
+const getAllocations = async () => {
+    return crud.getAll(allocations);
 };
 
-const getAllocation = (id) => {
-    let allocation = firebase.db.collection('allocations')
-    return allocation.where('id', '==', id).get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching data.');
-                return 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-            });
-        })
-        .catch(error => {
-            console.log('Error getting allocation', error);
-            return 500;
-        });
+const getAllocation = async (id) => {
+    return await crud.findBy("id", id)
 };
 
-const createAllocation = (allocation) => {
+//TODO implement id correct
+const createAllocation = async (allocation) => {
     let data = {
-        id: uuidv4(),
+        id: '',
         startDate: allocation.startDate,
         endDate: allocation.endDate,
         pensumPercentage: allocation.pensumPercentage,
@@ -43,13 +22,10 @@ const createAllocation = (allocation) => {
         projectId: allocation.projectId
     };
 
-    allocation = firebase.db.collection('allocations')
-        .doc(data.id)
-        .set(data, {merge: true});
-    return allocation;
+    return await crud.create(data, allocations);
 };
 
-const updateAllocation = (allocation) => {
+const updateAllocation = async (allocation) => {
     let data = {
         startDate: allocation.startDate,
         endDate: allocation.endDate,
@@ -58,41 +34,15 @@ const updateAllocation = (allocation) => {
         projectId: allocation.projectId
     };
 
-    return firebase.db.collection('allocations')
-        .doc(allocation.id)
-        .update(data);
+    return await crud.update(data, allocations);
 };
 
-const deleteAllocation = (id) => {
-    let data = {
-        startDate: null,
-        endDate: null,
-        pensumPercentage: null,
-        contractId: null,
-        projectId: null
-    };
-
-    return firebase.db.collection('allocations')
-        .doc(id)
-        .update(data)
+const deleteAllocation = async (id) => {
+    return await crud.deleteEntity(id, allocations);
 };
 
-const findBy = (lookupVar, value) => {
-    let allocations = firebase.db.collection('allocations');
-    return allocations.where("" + lookupVar, '==', value).get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching data.');
-                return 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-            });
-        })
-        .catch(error => {
-            console.log('Error getting allocation', error);
-            return 500;
-        });
+const findBy = async (lookupVar, value) => {
+    return await crud.findBy(lookupVar, value, allocations);
 };
 
 module.exports = {

@@ -1,54 +1,30 @@
 const firebase = require('./firebase.admin.js');
-const uuidv4 = require('uuid/v4');
+const crud = require('./firebase.global.crud.js');
 
-const getContracts = () => {
-    let contracts = firebase.db.collection('contracts');
-    return contracts.get()
-        .then(snapshot => {
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data())
-            });
-        })
-        .catch(error => {
-            console.log('Error getting contracts', error);
-            return 500;
-        });
+let contracts = firebase.db.collection('contracts');
+
+const getContracts = async () => {
+    return crud.getAll(contracts);
 };
 
-const getContract = (id) => {
-    let contract = firebase.db.collection('contracts')
-    return contract.where('id', '==', id).get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching data.');
-                return 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-            });
-        })
-        .catch(error => {
-            console.log('Error getting contract', error);
-            return 500;
-        });
+const getContract = async (id) => {
+    return await crud.findBy("id", id)
 };
 
-const createContract = (contract) => {
+//TODO implement id correct
+const createContract = async (contract) => {
     let data = {
-        id: uuidv4(),
+        id: '',
         startDate: contract.startDate,
         endDate: contract.endDate,
         pensumPercentage: contract.pensumPercentage,
         employeeId: contract.employeeId
     };
 
-    contract = firebase.db.collection('contracts')
-        .doc(data.id)
-        .set(data, {merge: true});
-    return contract;
+    return await crud.create(data, contracts);
 };
 
-const updateContract = (contract) => {
+const updateContract = async (contract) => {
     let data = {
         startDate: contract.startDate,
         endDate: contract.endDate,
@@ -56,41 +32,15 @@ const updateContract = (contract) => {
         employeeId: contract.employeeId
     };
 
-    return firebase.db.collection('contracts')
-        .doc(contract.id)
-        .update(data);
+    return await crud.update(data, contracts);
 };
 
-const deleteContract = (id) => {
-    let data = {
-        startDate: null,
-        endDate: null,
-        pensumPercentage: null,
-        contractId: null,
-        projectId: null
-    };
-
-    return firebase.db.collection('contracts')
-        .doc(id)
-        .update(data)
+const deleteContract = async (id) => {
+    return await crud.deleteEntity(id, contracts);
 };
 
-const findBy = (lookupVar, value) => {
-    let contracts = firebase.db.collection('contracts');
-    return contracts.where("" + lookupVar, '==', value).get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching data.');
-                return 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-            });
-        })
-        .catch(error => {
-            console.log('Error getting contract', error);
-            return 500;
-        });
+const findBy = async (lookupVar, value) => {
+    return await crud.findBy(lookupVar, value, contracts);
 };
 
 module.exports = {
