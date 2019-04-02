@@ -47,10 +47,11 @@
 
     <!-- Main table element -->
     <b-table
+      id="employeeTable"
       show-empty
-      bordered=true
-      hover=true
-      striped=true
+      bordered
+      hover
+      striped
       stacked="md"
       :items="items"
       :fields="fields"
@@ -91,17 +92,32 @@
     <b-row>
       <b-col md="6" class="my-1">
         <b-pagination
+          v-model="currentPage"
           :total-rows="totalRows"
           :per-page="perPage"
-          v-model="currentPage"
           class="my-0"
+          aria-controls="employeeTable"
         />
+      </b-col>
+      <b-col md="6">
+        <b-button
+          class="float-right"
+          variant="success"
+          v-b-modal.createUserModal>
+            Create User
+        </b-button>
       </b-col>
     </b-row>
 
     <!-- Info modal -->
     <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
       <pre>{{ modalInfo.content }}</pre>
+    </b-modal>
+
+    <b-modal id="createUserModal" title="Create User">
+      <b-form @submit="createUser">
+        <b-form-input v-model="createUserFirstName" id="firstName" placeholder="John" required/>
+      </b-form>
     </b-modal>
   </b-container>
 </template>
@@ -152,12 +168,15 @@ export default {
     if (this.loggedInRole === 'ADMINISTRATOR') {
       axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`)
         .then((response) => {
+          console.log(response.data);
           this.items = response.data;
+          this.totalRows = this.items.length;
         });
     } else if (this.loggedInRole === 'PROJECTMANAGER') {
       axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?role=DEVELOPER`)
         .then((response) => {
           this.items = response.data;
+          this.totalRows = this.items.length;
         });
     }
   },
@@ -201,7 +220,7 @@ export default {
       ],
       currentPage: 1,
       perPage: 5,
-      totalRows: items.length,
+      totalRows: 0,
       pageOptions: [5, 10, 15],
       sortBy: null,
       sortDesc: false,
@@ -211,6 +230,11 @@ export default {
         title: '',
         content: '',
       },
+      createUserFirstName: '',
+      createUserLastName: '',
+      createUserEmail: '',
+      createUserPw: '',
+      createUserRole: '',
     };
   },
   computed: {
@@ -235,6 +259,11 @@ export default {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
+    },
+    createUser(evt) {
+      evt.preventDefault();
+      // eslint-disable-next-line
+      alert('User created');
     },
   },
 };

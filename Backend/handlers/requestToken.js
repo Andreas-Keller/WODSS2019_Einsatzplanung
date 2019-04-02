@@ -27,7 +27,7 @@ exports.handler = async function requestToken(req, res, next) {
             res.status(404).send('Employee not found or invalid password')
         } else {
             if (foundUser.data().emailAddress === emailAddress && foundUser.data().password === rawPassword) {
-                let token = jwt.sign({emailAddress: emailAddress},
+                let token = jwt.sign(foundUser.data(),
                     process.env.JWT_SECRET,
                     {
                         expiresIn: '24h' // expires in 24 hours

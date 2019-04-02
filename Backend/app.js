@@ -1,4 +1,6 @@
 'use strict';
+
+require('dotenv').config();
 const swaggerRoutes = require('swagger-routes');
 const express = require('express');
 const app = express();
