@@ -1,48 +1,32 @@
 const firebase = require('./firebase.admin.js');
-const uuidv4 = require('uuid/v4');
+const fbHelper = require('./firebaseHelper.js');
+const crud = require('./firebase.global.crud.js');
+
+let employees = firebase.db.collection('employees');
 
 const getEmployees = async () => {
-    let employees = firebase.db.collection('employees');
-    let returnValue = null;
-    await employees.get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching documents.');
-                returnValue = 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-            });
-            returnValue = snapshot.docs.map(doc => doc.data());
-        })
-        .catch(err => {
-            console.log('Error getting employee', err);
-            returnValue = 500;
-        });
-    return returnValue;
+    return crud.getAll(employees);
 };
 
-const getEmployee = (id) => {
-    return findBy("id", id)
+const getEmployee = async (id) => {
+    return await crud.findBy("id", id)
 };
 
-const createEmployee = (employee) => {
+//FIXME CREATE IS BROKEN
+const createEmployee = async (employee) => {
     let data = {
         active: employee.active,
-        id: uuidv4(),
+        id: '',
         firstName: employee.firstName,
         lastName: employee.lastName,
         emailAddress: employee.emailAddress,
         role: employee.role,
         password: employee.rawPassword
     };
-
-    employee = firebase.db.collection('employees')
-        .doc(data.id)
-        .set({data}, {merge: true});
-    return employee;
+    return await crud.create(data, employees);
 };
-const updateEmployee = (employee) => {
+
+const updateEmployee = async (employee) => {
     let data = {
         active: employee.active,
         firstName: employee.firstName,
@@ -50,49 +34,24 @@ const updateEmployee = (employee) => {
         emailAddress: employee.emailAddress,
         password: employee.rawPassword
     };
-
-    return firebase.db.collection('employees')
-        .doc(employee.id)
-        .update(
-            data
-        );
+    return await crud.update(data, employees);
 };
 
-const deleteEmployee = (id) => {
+const deleteEmployee = async (id) => {
     let data = {
         active: false,
         firstName: null,
         lastName: null,
         emailAddress: null,
         role: null,
-        password: null
+        password: null,
+        id: id
     };
 
-    return firebase.db.collection('employees')
-        .doc(id)
-        .update(
-            data
-        );
+    return await crud.update(data, employees);
 };
 const findBy = async (lookupVar, value) => {
-    let employees = firebase.db.collection('employees');
-    let returnValue = null;
-    await employees.where(lookupVar, '==', value).limit(1).get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                console.log('No matching documents. (findBy)');
-                returnValue = 404;
-            }
-            snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-                returnValue = doc;
-            });
-        })
-        .catch(err => {
-            console.log('Error getting employee', err);
-            returnValue = 500;
-        });
-    return returnValue;
+    return await crud.findBy(lookupVar, value, employees);
 };
 
 module.exports = {
