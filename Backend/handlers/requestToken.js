@@ -21,6 +21,7 @@ exports.handler = async function requestToken(req, res, next) {
     } else {
         const employeeFirebase = require('../firebase/employee.crud.js');
         let foundUser = await employeeFirebase.findBy("emailAddress", emailAddress);
+        console.log(foundUser);
         if (foundUser === 500) {
             res.status(foundUser).send('Uncaught or internal server error');
         } else if (foundUser === 404) {
