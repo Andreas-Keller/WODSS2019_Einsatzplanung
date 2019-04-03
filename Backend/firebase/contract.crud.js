@@ -11,28 +11,12 @@ const getContract = async (id) => {
     return await crud.findBy("id", id)
 };
 
-//TODO implement id correct
 const createContract = async (contract) => {
-    let data = {
-        id: '',
-        startDate: contract.startDate,
-        endDate: contract.endDate,
-        pensumPercentage: contract.pensumPercentage,
-        employeeId: contract.employeeId
-    };
-
-    return await crud.create(data, contracts);
+    return await crud.create(contract, contracts);
 };
 
 const updateContract = async (contract) => {
-    let data = {
-        startDate: contract.startDate,
-        endDate: contract.endDate,
-        pensumPercentage: contract.pensumPercentage,
-        employeeId: contract.employeeId
-    };
-
-    return await crud.update(data, contracts);
+    return await crud.update(contract, contracts);
 };
 
 const deleteContract = async (id) => {

@@ -11,30 +11,12 @@ const getProject = async (id) => {
     return await crud.findBy("id", id)
 };
 
-//TODO implement id correct
 const createProject = async (project) => {
-    let data = {
-        id: '',
-        name: project.name,
-        ftePercentage: project.ftePercentage,
-        startDate: project.startDate,
-        endDate: project.endDate,
-        projectManagerId: project.projectManagerId
-    };
-
-    return await crud.create(data, projects);
+    return await crud.create(project, projects);
 };
 
 const updateProject = async (project) => {
-    let data = {
-        name: project.name,
-        ftePercentage: project.ftePercentage,
-        startDate: project.startDate,
-        endDate: project.endDate,
-        projectManagerId: project.projectManagerId
-    };
-
-    return await crud.update(data, projects);
+    return await crud.update(project, projects);
 };
 
 const deleteProject = async (id) => {

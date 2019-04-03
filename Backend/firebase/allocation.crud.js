@@ -11,30 +11,12 @@ const getAllocation = async (id) => {
     return await crud.findBy("id", id)
 };
 
-//TODO implement id correct
 const createAllocation = async (allocation) => {
-    let data = {
-        id: '',
-        startDate: allocation.startDate,
-        endDate: allocation.endDate,
-        pensumPercentage: allocation.pensumPercentage,
-        contractId: allocation.contractId,
-        projectId: allocation.projectId
-    };
-
-    return await crud.create(data, allocations);
+    return await crud.create(allocation, allocations);
 };
 
 const updateAllocation = async (allocation) => {
-    let data = {
-        startDate: allocation.startDate,
-        endDate: allocation.endDate,
-        pensumPercentage: allocation.pensumPercentage,
-        contractId: allocation.contractId,
-        projectId: allocation.projectId
-    };
-
-    return await crud.update(data, allocations);
+    return await crud.update(allocation, allocations);
 };
 
 const deleteAllocation = async (id) => {

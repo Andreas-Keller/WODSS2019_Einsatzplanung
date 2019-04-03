@@ -28,25 +28,33 @@ const create = async (data, collection) => {
                 if (snapshot.empty) {
                     console.log('No matching documents. (findBy)');
                     data.id = id;
-                    returnValue = collection.doc(id)
+                    console.log(id);
+                    returnValue = collection.doc("" + id)
                         .set(data, {merge: true});
+                    return data;
                 }
                 snapshot.forEach(doc => {
                     console.log(doc.id, '=>', doc.data());
                     returnValue = false;
+                    return returnValue;
                 });
             })
             .catch(err => {
                 console.log('Error getting employee', err);
                 returnValue = false;
+                return returnValue;
             });
-        if (entity !== false) {
+        console.log(entity);
+        if (entity !== false && returnValue != null) {
             return entity;
         }
     }
 };
 
 const update = async (data, collection) => {
+    if(data.id==null){
+        return 404;
+    }
     return await collection.update
         .doc(data.id)
         .update(data);
