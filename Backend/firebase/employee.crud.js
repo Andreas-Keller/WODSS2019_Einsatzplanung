@@ -26,7 +26,7 @@ const deleteEmployee = async (id) => {
         lastName: null,
         emailAddress: null,
         role: null,
-        password: null,
+        rawPassword: null,
         id: id
     };
 
