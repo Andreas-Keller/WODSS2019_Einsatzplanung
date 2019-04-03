@@ -76,7 +76,7 @@ const findBy = async (lookupVar, value, collection) => {
             }
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
-                returnValue = doc;
+                returnValue = doc.data();
             });
         })
         .catch(err => {
