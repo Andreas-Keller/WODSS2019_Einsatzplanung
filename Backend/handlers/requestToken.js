@@ -21,13 +21,12 @@ exports.handler = async function requestToken(req, res, next) {
     } else {
         const employeeFirebase = require('../firebase/employee.crud.js');
         let foundUser = await employeeFirebase.findBy("emailAddress", emailAddress);
-        console.log(foundUser);
         if (foundUser === 500) {
             res.status(foundUser).send('Uncaught or internal server error');
         } else if (foundUser === 404) {
             res.status(404).send('Employee not found or invalid password')
         } else {
-            if (foundUser.emailAddress === emailAddress && foundUser.password === rawPassword) {
+            if (foundUser.emailAddress === emailAddress && foundUser.rawPassword === rawPassword) {
                 let token = jwt.sign(foundUser,
                     process.env.JWT_SECRET,
                     {

@@ -61,6 +61,7 @@
       :sort-direction="sortDirection"
       @filtered="onFiltered"
     >
+      <!--
       <template slot="name" slot-scope="row">
         {{ row.value.first }} {{ row.value.last }}
       </template>
@@ -85,6 +86,7 @@
           </ul>
         </b-card>
       </template>
+      -->
     </b-table>
 
     <b-row>
@@ -141,6 +143,11 @@ export default {
           label: 'ID',
         }, */
         {
+          key: 'name',
+          label: 'Name',
+          // sortable: true,
+        },
+        {
           key: 'id',
           label: 'ID',
           sortable: true,
@@ -165,11 +172,6 @@ export default {
         {
           key: 'projectManagerId',
           label: 'ProjectManagerID',
-        },
-        {
-          key: 'name',
-          label: 'Name',
-          sortable: true,
         },
       ],
       currentPage: 1,
