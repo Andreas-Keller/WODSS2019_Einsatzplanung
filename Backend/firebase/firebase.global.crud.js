@@ -1,21 +1,21 @@
+const Await_response = require("../util/await.response");
+
 const getAll = async (collection) => {
-    let returnValue = null;
-    await collection.get()
+    return await collection.get()
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No matching documents.');
-                returnValue = 404;
+                return new Await_response(404, "No matching documents. (getAll)");
             }
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
             });
-            returnValue = snapshot.docs.map(doc => doc.data());
+            return new Await_response(200, "Found documents. (getAll)", snapshot.docs.map(doc => doc.data()));
         })
         .catch(err => {
             console.log('Error getting employee', err);
-            returnValue = 500;
+            return new Await_response(500, 'Error getting employees', err);
         });
-    return returnValue;
 };
 
 const fbHelper = require('./firebaseHelper.js');
@@ -26,64 +26,63 @@ const create = async (data, collection) => {
         let entity = await collection.where("id", '==', id).limit(1).get()
             .then(async snapshot => {
                 if (snapshot.empty) {
-                    console.log('No matching documents. (findBy)');
+                    console.log('Found unused ID (in create)');
                     data.id = id;
-                    console.log(id);
                     returnValue = collection.doc("" + id)
                         .set(data, {merge: true});
-                    return data;
+                    return new Await_response(200, "Created enitity", data);
                 }
                 snapshot.forEach(doc => {
                     console.log(doc.id, '=>', doc.data());
-                    returnValue = false;
-                    return returnValue;
+                    return new Await_response(400, "already found user with this id", false);
                 });
             })
             .catch(err => {
                 console.log('Error getting employee', err);
-                returnValue = false;
-                return returnValue;
+                return new Await_response(500, 'Error creating employee', false);
             });
-        console.log(entity);
-        if (entity !== false && returnValue != null) {
+        if (entity.payload !== false) {
             return entity;
         }
     }
 };
 
 const update = async (data, collection) => {
-    if(data.id==null){
-        return 404;
+    if (data.id == null) {
+        return new Await_response(404, "id was null or undifined in update");
     }
-    return await collection.update
+    return new Await_response(200, "updated", await collection.update
         .doc(data.id)
-        .update(data);
+        .update(data));
 };
 
 const deleteEntity = async (id, collection) => {
-    return await collection
+    if (id == null) {
+        return new Await_response(404, "id was null or undifined in delete");
+    }
+    return new Await_response(204, "deleted", await collection.update
         .doc(id)
-        .delete();
+        .delete(data));
 };
 
 const findBy = async (lookupVar, value, collection) => {
-    let returnValue = null;
+    let response = null;
     await collection.where(lookupVar, '==', value).limit(1).get()
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No matching documents. (findBy)');
-                returnValue = 404;
+                response = new Await_response(404, "No matching documents. (findBy)");
             }
             snapshot.forEach(doc => {
                 console.log(doc.id, '=>', doc.data());
-                returnValue = doc.data();
+                response = new Await_response(200, "Found Data", doc.data());
             });
         })
         .catch(err => {
             console.log('Error getting employee', err);
-            returnValue = 500;
+            response = new Await_response(500, "Error getting employee", err);
         });
-    return returnValue;
+    return response;
 };
 
 module.exports = {

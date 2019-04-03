@@ -35,11 +35,12 @@ exports.handler = async function createEmployee(req, res, next) {
         res.status(412).send("Precondition for the employee failed");
     } else {
         const employeeFirebase = require('../firebase/employee.crud.js');
-        let foundUser = await employeeFirebase.findBy("emailAddress", employee.emailAddress);
-        if (foundUser === 500) {
-            res.status(foundUser).send('Uncaught or internal server error');
-        } else if (foundUser === 404) {
-            res.status(201).send(await employeeFirebase.createEmployee(employee));
+        let foundUser = (await employeeFirebase.findBy("emailAddress", employee.emailAddress));
+        if (foundUser.httpStatus === 500) {
+            res.status(foundUser.httpStatus).send('Uncaught or internal server error');
+        } else if (foundUser.httpStatus === 404) {
+            let createdEmployee = (await employeeFirebase.createEmployee(employee));
+            res.status(createdEmployee.httpStatus).send(createdEmployee.payload);
         }
         else {
             res.status(404).send("User with same email already registered")

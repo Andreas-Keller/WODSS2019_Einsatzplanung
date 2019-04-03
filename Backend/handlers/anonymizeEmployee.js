@@ -10,4 +10,4 @@
 exports.handler = function anonymizeEmployee(req, res, next) {
   res.send('anonymizeEmployee')
   next()
-}
+};

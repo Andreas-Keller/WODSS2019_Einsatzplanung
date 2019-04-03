@@ -11,6 +11,7 @@
 exports.handler = async function getContracts(req, res, next) {
   //res.send('getContracts')
   const contractFirebase = require('../firebase/contract.crud.js');
-  res.status(200).send(await contractFirebase.getContracts());
+  let response = await contractFirebase.getContracts();
+  res.status(response.httpStatus).send(response.payload);
   next()
 }
