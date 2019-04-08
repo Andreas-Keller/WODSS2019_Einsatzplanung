@@ -49,11 +49,9 @@ export default {
           console.log(`${this.loggedInRole}`);
         } catch (error) {
           // COMMENTED OUT FOR DEV PURPOSE
-          /*
           console.log(error);
           localStorage.removeItem('token');
           this.$router.push({ name: 'login' });
-          */
         }
       }
     },

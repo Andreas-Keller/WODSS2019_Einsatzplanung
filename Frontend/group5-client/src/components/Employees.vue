@@ -114,9 +114,18 @@
       <pre>{{ modalInfo.content }}</pre>
     </b-modal>
 
-    <b-modal id="createUserModal" title="Create User">
-      <b-form @submit="createUser">
-        <b-form-input v-model="createUserFirstName" id="firstName" placeholder="John" required/>
+    <b-modal @ok="createUserModal" @cancel="createUserModalCancel"
+      id="createUserModal" title="Create User">
+      <b-form>
+        <b-form-input v-model="createUserFirstName" id="firstName" class="marg-bot"
+          placeholder="First name" required/>
+        <b-form-input v-model="createUserLastName" id="lastName" class="marg-bot"
+          placeholder="Last name" required/>
+        <b-form-input v-model="createUserEmail" id="eMail" class="marg-bot"
+          type="email" placeholder="e@mail.com" required/>
+        <b-form-input v-model="createUserPw" id="password" class="marg-bot"
+          type="password" placeholder="Password" required/>
+        <b-form-select v-model="createUserRole" :options="roleOptions" required></b-form-select>
       </b-form>
     </b-modal>
   </b-container>
@@ -218,6 +227,12 @@ export default {
           label: 'Role',
         },
       ],
+      roleOptions: [
+        { value: null, text: 'Role', disabled: true },
+        { value: 'ADMINISTRATOR', text: 'Administrator' },
+        { value: 'PROJECTMANAGER', text: 'Projectmanager' },
+        { value: 'DEVELOPER', text: 'Developer' },
+      ],
       currentPage: 1,
       perPage: 5,
       totalRows: 0,
@@ -234,7 +249,7 @@ export default {
       createUserLastName: '',
       createUserEmail: '',
       createUserPw: '',
-      createUserRole: '',
+      createUserRole: null,
     };
   },
   computed: {
@@ -260,15 +275,25 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    createUser(evt) {
-      evt.preventDefault();
+    createUserModal(evt) {
+      // evt.preventDefault();
       // eslint-disable-next-line
       alert('User created');
+      console.log(evt);
+    },
+    createUserModalCancel() {
+      this.createUserFirstName = '';
+      this.createUserLastName = '';
+      this.createUserEmail = '';
+      this.createUserPw = '';
+      this.createUserRole = null;
     },
   },
 };
 </script>
 
 <style scoped>
-
+.marg-bot {
+  margin-bottom: 5px;
+}
 </style>
