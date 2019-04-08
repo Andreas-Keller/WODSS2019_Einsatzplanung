@@ -20,20 +20,20 @@ exports.handler = async function createContract(req, res, next) {
         employeeId: req.body.employeeId
     };
 //FIXME THIS IS WRONG, FIRST CHECK IF EVERYTGING IS OKAY, THEN CrEATE CONTRACT
-//     const employeeFirebase = require('../firebase/employee.crud.js');
-//     let employee = await employeeFirebase.getEmployee(contract.employeeId);
-//     if (contract.startDate === null ||
-//         contract.endDate === null ||
-//         contract.pensumPercentage === null ||
-//         contract.employeeId === null) {
-//         res.status(412).send("Precondition for the allocation failed");
-//
-//     } else if (employee.httpStatus === 404) {
-//         res.status(404).send("Employee not found")
-//     } else {
-//         const contractFirebase = require('../firebase/contract.crud.js');
-//         let response = await contractFirebase.createContract(contract)
-//         res.status(response.httpStatus).send(response.payload);
-//     }
-//     next()
+    const employeeFirebase = require('../firebase/employee.crud.js');
+    let employee = await employeeFirebase.getEmployee(contract.employeeId);
+    if (contract.startDate === null ||
+        contract.endDate === null ||
+        contract.pensumPercentage === null ||
+        contract.employeeId === null) {
+        res.status(412).send("Precondition for the allocation failed");
+
+    } else if (employee.httpStatus === 404) {
+        res.status(404).send("Employee not found")
+    } else {
+        const contractFirebase = require('../firebase/contract.crud.js');
+        let response = await contractFirebase.createContract(contract)
+        res.status(response.httpStatus).send(response.payload);
+    }
+    next()
 };

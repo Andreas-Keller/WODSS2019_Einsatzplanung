@@ -336,19 +336,18 @@ export default {
       const data = {
         startDate: this.createContractStartDate,
         endDate: this.createContractEndDate,
-        pensum: this.createContractPensum,
+        pensumPercentage: this.createContractPensum,
         employeeId: this.createContractEmployeeId,
       };
       // todo
-      axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract?password=${this.createContractEmployeeId}&role=${this.createUserRole}`, data, restHeader)
+      axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract?id=${this.createContractEmployeeId}`, data, restHeader)
         .then((response) => {
           const newContract = {
             id: response.data.id,
-            firstName: response.data.firstName,
-            lastName: response.data.lastName,
-            emailAddress: response.data.emailAddress,
-            active: true,
-            role: response.data.role,
+            startDate: response.data.startDate,
+            endDate: response.data.endDate,
+            pensumPercentage: response.data.pensumPercentage,
+            employeeId: response.data.employeeId,
           };
 
           this.items.push(newContract);
@@ -382,7 +381,7 @@ export default {
       const data = {
         startDate: this.selectedContractStartDate,
         endDate: this.selectedContractEndDate,
-        pensum: this.selectedContractPensum,
+        pensumPercentage: this.selectedContractPensum,
         employeeId: this.selectedContractEmployeeId,
       };
 
@@ -393,7 +392,7 @@ export default {
             if (this.items[i].id === this.selectedContractId) {
               this.items[i].startDate = this.selectedContractStartDate;
               this.items[i].endDate = this.selectedContractEndDate;
-              this.items[i].pensum = this.selectedContractPensum;
+              this.items[i].pensumPercentage = this.selectedContractPensum;
               this.items[i].employeeId = this.selectedContractEmployeeId;
             }
           }
@@ -406,17 +405,17 @@ export default {
     },
     // todo
     infoContractDelete() {
-      axios.delete(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee/${this.selectedUserId}`, restHeader)
+      axios.delete(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract/${this.selectedContractId}`, restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
-            if (this.items[i].id === this.selectedUserId) {
+            if (this.items[i].id === this.selectedContractId) {
               this.items.splice(i, 1);
             }
           }
 
           this.totalRows = this.items.length;
-          this.infoUserCancel();
+          this.infoContractCancel();
         })
         .catch((error) => {
           console.log(error);
