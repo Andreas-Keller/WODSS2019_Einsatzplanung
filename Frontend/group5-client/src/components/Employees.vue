@@ -114,9 +114,9 @@
       <pre>{{ modalInfo.content }}</pre>
     </b-modal>
 
-    <b-modal @ok="createUserModal" @cancel="createUserModalCancel"
-      id="createUserModal" title="Create User">
-      <b-form>
+    <b-modal ref="createUser" id="createUserModal"
+      title="Create User" hide-footer hide-header-close>
+      <b-form @submit="createUser">
         <b-form-input v-model="createUserFirstName" id="firstName" class="marg-bot"
           placeholder="First name" required/>
         <b-form-input v-model="createUserLastName" id="lastName" class="marg-bot"
@@ -125,7 +125,16 @@
           type="email" placeholder="e@mail.com" required/>
         <b-form-input v-model="createUserPw" id="password" class="marg-bot"
           type="password" placeholder="Password" required/>
-        <b-form-select v-model="createUserRole" :options="roleOptions" required></b-form-select>
+        <b-form-select v-model="createUserRole" :options="roleOptions"
+          class="marg-bot" required></b-form-select>
+        <b-row>
+          <b-col>
+            <b-button @click="createUserModalCancel" >Cancel</b-button>
+          </b-col>
+          <b-col>
+            <b-button variant="primary" class="float-right" type="submit">Submit</b-button>
+          </b-col>
+        </b-row>
       </b-form>
     </b-modal>
   </b-container>
@@ -165,6 +174,8 @@ const items = [{
 //  },
 // ];
 
+const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+
 
 export default {
   name: 'Employees',
@@ -175,14 +186,14 @@ export default {
 
   beforeMount() {
     if (this.loggedInRole === 'ADMINISTRATOR') {
-      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`)
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
         .then((response) => {
           console.log(response.data);
           this.items = response.data;
           this.totalRows = this.items.length;
         });
     } else if (this.loggedInRole === 'PROJECTMANAGER') {
-      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?role=DEVELOPER`)
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?role=DEVELOPER`, restHeader)
         .then((response) => {
           this.items = response.data;
           this.totalRows = this.items.length;
@@ -193,7 +204,6 @@ export default {
   data() {
     return {
       items,
-
       fields: [
         /*
         {
@@ -275,11 +285,24 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    createUserModal(evt) {
-      // evt.preventDefault();
+    createUser(evt) {
+      evt.preventDefault();
       // eslint-disable-next-line
-      alert('User created');
-      console.log(evt);
+
+      const data = new FormData();
+      data.set('active', true);
+      data.set('firstName', this.createUserFirstName);
+      data.set('lastName', this.createUserLastName);
+      data.set('emailAddress', this.createUserEmail);
+
+      axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
+        .then((response) => {
+          console.log(response.status);
+          this.createUserModalCancel();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     createUserModalCancel() {
       this.createUserFirstName = '';
@@ -287,6 +310,7 @@ export default {
       this.createUserEmail = '';
       this.createUserPw = '';
       this.createUserRole = null;
+      this.$refs.createUser.hide();
     },
   },
 };
