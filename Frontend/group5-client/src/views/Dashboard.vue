@@ -43,7 +43,6 @@ export default {
         try {
           const decoded = jwtDecode(localStorage.getItem('token'));
           this.loggedInEmployee = decoded;
-          console.log(decoded);
           this.loggedInEmployeeName = `${this.loggedInEmployee.firstName} ${this.loggedInEmployee.lastName}`;
           this.loggedInRole = this.loggedInEmployee.role;
           console.log(`${this.loggedInRole}`);
