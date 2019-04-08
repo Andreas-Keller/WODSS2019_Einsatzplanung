@@ -10,7 +10,7 @@
 exports.handler = async function getEmployee(req, res, next) {
     // res.send('getEmployee')
     const employeeFirebase = require('../firebase/employee.crud.js');
-    let response = await employeeFirebase.getEmployee(req.query.id);
+    let response = await employeeFirebase.getEmployee(req.params.id);
     res.status(response.httpStatus).send(response.payload);
-    next()
+    next();
 };

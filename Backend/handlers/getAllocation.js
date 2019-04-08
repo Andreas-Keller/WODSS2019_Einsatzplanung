@@ -7,7 +7,9 @@
  *   id {int64} ID of the allocation.
  *   
  */
-exports.handler = function getAllocation(req, res, next) {
-  res.send('getAllocation')
-  next()
+exports.handler = async function getAllocation(req, res, next) {
+    const fb = require('../firebase/allocation.crud');
+    let response = await fb.getAllocation(req.params.id);
+    res.status(response.httpStatus).send(response.payload);
+    next();
 }

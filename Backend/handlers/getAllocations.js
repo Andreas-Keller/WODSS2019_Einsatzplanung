@@ -10,7 +10,9 @@
  *   toDate {date} End date (YYYY-MM-DD) to create a time range with an upper boundary (Allocations with a start date b...
  *   
  */
-exports.handler = function getAllocations(req, res, next) {
-  res.send('getAllocations')
-  next()
-}
+exports.handler = async function getAllocations(req, res, next) {
+    const fb = require('../firebase/allocation.crud');
+    let response = await fb.getAllocations();
+    res.status(response.httpStatus).send(response.payload);
+    next();
+};

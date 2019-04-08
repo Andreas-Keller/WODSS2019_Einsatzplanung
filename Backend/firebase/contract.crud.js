@@ -8,7 +8,7 @@ const getContracts = async () => {
 };
 
 const getContract = async (id) => {
-    return await crud.findBy("id", id)
+    return await crud.findBy("id", id,contracts)
 };
 
 const createContract = async (contract) => {

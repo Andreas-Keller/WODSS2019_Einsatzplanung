@@ -3,16 +3,20 @@
  */
 function decodeToken(req) {
     let jwt = require('jsonwebtoken');
-    let token =jwt.decode(String(req.headers.authorization).split(' ')[1]);
+    let token = jwt.decode(String(req.headers.authorization).split(' ')[1]);
     console.log(token);
     return token;
 }
 
+
 function verify(token, req) {
     let role = token.role;
-    switch (req.url) {
-        case "/api​/allocation":
-            switch (req.method) {
+    let url = String(req.url);
+    let method = String(req.method)
+    url = url.replace("/" + req.params.id, '');
+    switch (url) {
+        case '/api/allocation':
+            switch (method) {
                 case 'GET':
                     if (role === 'ADMINISTRATOR' || role === 'PROJECTMANAGER' || role === 'DEVELOPER') {
                         return true;
@@ -20,15 +24,6 @@ function verify(token, req) {
                     break;
                 case 'POST':
                     if (role === 'ADMINISTRATOR' || role === 'PROJECTMANAGER') {
-                        return true;
-                    }
-                    break;
-            }
-            break;
-        case "/api​/allocation​/{id}":
-            switch (req.method) {
-                case 'GET':
-                    if (role === 'ADMINISTRATOR' || role === 'PROJECTMANAGER' || role === 'DEVELOPER') {
                         return true;
                     }
                     break;
@@ -44,8 +39,8 @@ function verify(token, req) {
                     break;
             }
             break;
-        case "/api​/contract":
-            switch (req.method) {
+        case '/api​/contract':
+            switch (method) {
                 case 'GET':
                     if (role === 'ADMINISTRATOR' || role === 'PROJECTMANAGER' || role === 'DEVELOPER') {
                         return true;
@@ -53,15 +48,6 @@ function verify(token, req) {
                     break;
                 case 'POST':
                     if (role === 'ADMINISTRATOR') {
-                        return true;
-                    }
-                    break;
-            }
-            break;
-        case "/api​/contract​/{id}":
-            switch (req.method) {
-                case 'GET':
-                    if (role === 'ADMINISTRATOR' || role === 'PROJECTMANAGER' || role === 'DEVELOPER') {
                         return true;
                     }
                     break;
@@ -77,24 +63,17 @@ function verify(token, req) {
                     break;
             }
             break;
-        case "/api​/employee":
-            switch (req.method) {
+        case '/api/employee':
+            console.log('IN EMPLOYEE')
+            switch (method) {
                 case 'GET':
+                    console.log(role)
                     if (role === 'ADMINISTRATOR' || role === 'PROJECTMANAGER' || role === 'DEVELOPER') {
                         return true;
                     }
                     break;
                 case 'POST':
                     if (role === 'ADMINISTRATOR') {
-                        return true;
-                    }
-                    break;
-            }
-            break;
-        case "/api​/employee​/{id}":
-            switch (req.method) {
-                case 'GET':
-                    if (role === 'ADMINISTRATOR' || role === 'PROJECTMANAGER' || role === 'DEVELOPER') {
                         return true;
                     }
                     break;
@@ -110,8 +89,8 @@ function verify(token, req) {
                     break;
             }
             break;
-        case "/api​/project":
-            switch (req.method) {
+        case '/api/project':
+            switch (method) {
                 case 'GET':
                     if (role === 'ADMINISTRATOR' || role === 'PROJECTMANAGER' || role === 'DEVELOPER') {
                         return true;
@@ -119,15 +98,6 @@ function verify(token, req) {
                     break;
                 case 'POST':
                     if (role === 'ADMINISTRATOR') {
-                        return true;
-                    }
-                    break;
-            }
-            break;
-        case "/api​/project​/{id}":
-            switch (req.method) {
-                case 'GET':
-                    if (role === 'ADMINISTRATOR' || role === 'PROJECTMANAGER' || role === 'DEVELOPER') {
                         return true;
                     }
                     break;
@@ -148,19 +118,22 @@ function verify(token, req) {
 }
 
 module.exports = function Bearer(req, res, next) {
-    console.log(req.url)
-    console.log(req.method)
-    // console.log(req)
     if (req.url === '/api/token') {
         //LOGIN DOES NOT REQUIRE A TOKEN
         console.log("LOGIN")
     } else {
-        console.log("OTHER")
-        const token = decodeToken(req);
-        if (!verify(token, req)) {
-            const error = new Error('Unauthorized');
+        if (req.headers.authorization == null) {
+            const error = new Error('Unauthenticated or invalid token');
             error.status = error.statusCode = 401;
             next(error);
+        } else {
+            console.log("OTHER");
+            const token = decodeToken(req);
+            if (!verify(token, req)) {
+                const error = new Error('Unauthenticated or invalid token');
+                error.status = error.statusCode = 401;
+                next(error);
+            }
         }
     }
     next();

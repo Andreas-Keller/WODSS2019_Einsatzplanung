@@ -10,9 +10,9 @@
  *
  */
 exports.handler = async function getProjects(req, res, next) {
-  const projectFirebase = require('../firebase/project.crud.js');
+    const projectFirebase = require('../firebase/project.crud.js');
     let response = await projectFirebase.getProjects();
     res.status(response.httpStatus).send(response.payload);
-  //res.send('getProjects')
-  next()
-}
+    //res.send('getProjects')
+    next();
+};

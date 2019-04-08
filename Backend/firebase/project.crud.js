@@ -8,7 +8,7 @@ const getProjects = async () => {
 };
 
 const getProject = async (id) => {
-    return await crud.findBy("id", id)
+    return await crud.findBy("id", id, projects)
 };
 
 const createProject = async (project) => {
