@@ -3,7 +3,9 @@
  */
 function decodeToken(req) {
     let jwt = require('jsonwebtoken');
-    return jwt.decode(req.headers.authorization.split(' ')[1]);
+    let token =jwt.decode(String(req.headers.authorization).split(' ')[1]);
+    console.log(token);
+    return token;
 }
 
 function verify(token, req) {
@@ -146,9 +148,14 @@ function verify(token, req) {
 }
 
 module.exports = function Bearer(req, res, next) {
+    console.log(req.url)
+    console.log(req.method)
+    // console.log(req)
     if (req.url === '/api/token') {
         //LOGIN DOES NOT REQUIRE A TOKEN
+        console.log("LOGIN")
     } else {
+        console.log("OTHER")
         const token = decodeToken(req);
         if (!verify(token, req)) {
             const error = new Error('Unauthorized');
