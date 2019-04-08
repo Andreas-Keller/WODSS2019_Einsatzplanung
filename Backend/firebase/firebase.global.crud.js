@@ -8,7 +8,7 @@ const getAll = async (collection) => {
                 return new Await_response(404, "No matching documents. (getAll)");
             }
             snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
+                //console.log(doc.id, '=>', doc.data());
             });
             return new Await_response(200, "Found documents. (getAll)", snapshot.docs.map(doc => doc.data()));
         })

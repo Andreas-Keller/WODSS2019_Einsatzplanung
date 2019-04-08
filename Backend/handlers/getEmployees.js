@@ -12,16 +12,11 @@ exports.handler = async function getEmployees(req, res, next) {
     const employeeFirebase = require('../firebase/employee.crud.js');
     let response = await employeeFirebase.getEmployees();
 
-    console.log('params:');
-    console.log(req.query.role);
-
     let data = response.payload;
     let array = [];
 
     if(req.query.role !== undefined) {
         for(let i = 0; i < response.payload.length; i++) {
-            console.log(response.payload[i]);
-
             if(response.payload[i].role === req.query.role && response.payload[i].emailAddress !== null) {
                 array.push(response.payload[i]);
             }
@@ -29,8 +24,6 @@ exports.handler = async function getEmployees(req, res, next) {
         data = array;
     } else {
         for(let i = 0; i < response.payload.length; i++) {
-            console.log(response.payload[i]);
-
             if(response.payload[i].emailAddress !== null) {
                 array.push(response.payload[i]);
             }
