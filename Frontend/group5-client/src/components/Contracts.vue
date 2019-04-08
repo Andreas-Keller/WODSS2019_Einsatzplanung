@@ -110,9 +110,7 @@ import axios from 'axios';
 
 const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
 
-const items = [{
-  id: 1, startDate: 2000, endDate: 3000, percentagePensum: 80, employeeId: 12,
-}];
+const items = [];
 
 export default {
   name: 'Contracts',
@@ -127,6 +125,9 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.items = response.data;
+        })
+        .catch((error) => {
+          console.log(error);
         });
     }
   },
