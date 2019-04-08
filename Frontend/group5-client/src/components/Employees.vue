@@ -185,20 +185,7 @@ export default {
   },
 
   beforeMount() {
-    if (this.loggedInRole === 'ADMINISTRATOR') {
-      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
-        .then((response) => {
-          console.log(response.data);
-          this.items = response.data;
-          this.totalRows = this.items.length;
-        });
-    } else if (this.loggedInRole === 'PROJECTMANAGER') {
-      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?role=DEVELOPER`, restHeader)
-        .then((response) => {
-          this.items = response.data;
-          this.totalRows = this.items.length;
-        });
-    }
+    this.getUser();
   },
 
   data() {
@@ -285,19 +272,50 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
+    getUser() {
+      if (this.loggedInRole === 'ADMINISTRATOR') {
+        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
+          .then((response) => {
+            console.log(response.data);
+            this.items = response.data;
+            this.totalRows = this.items.length;
+          });
+      } else if (this.loggedInRole === 'PROJECTMANAGER') {
+        console.log('only dev');
+        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?role=DEVELOPER`, restHeader)
+          .then((response) => {
+            console.log(response.data);
+            this.items = response.data;
+            this.totalRows = this.items.length;
+          });
+      }
+    },
     createUser(evt) {
       evt.preventDefault();
-      // eslint-disable-next-line
 
-      const data = new FormData();
-      data.set('active', true);
-      data.set('firstName', this.createUserFirstName);
-      data.set('lastName', this.createUserLastName);
-      data.set('emailAddress', this.createUserEmail);
+      const data = {
+        'active': true,
+        'firstName': this.createUserFirstName,
+        'lastName': this.createUserLastName,
+        'emailAddress': this.createUserEmail
+      }
 
-      axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
+      console.log(data);
+
+      axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?password=${this.createUserPw}&role=${this.createUserRole}`, data, restHeader)
         .then((response) => {
           console.log(response.status);
+
+          const newUser = {
+            firstName: this.createUserFirstName,
+            lastName: this.createUserLastName,
+            emailAddress: this.createUserEmail,
+            active: true,
+            role: this.createUserRole,
+          }
+
+          this.items.push(newUser);
+
           this.createUserModalCancel();
         })
         .catch((error) => {
