@@ -13,7 +13,9 @@ function verify(token, req) {
     let role = token.role;
     let url = String(req.url);
     let method = String(req.method)
-    url = url.replace("/" + req.params.id, '');
+    if(req.params.id!=null){
+        url = url.replace("/" + req.params.id, '');
+    }
     switch (url) {
         case '/api/allocation':
             switch (method) {
