@@ -113,8 +113,64 @@
     </b-row>
 
     <!-- Info modal -->
-    <b-modal ref="infoUserModal" id="infoUserModal" title="Info User" hide-footer hide-header-close>
-      <label>User</label>
+    <b-modal ref="infoUserModal" id="infoUserModal" title="Info User"
+      size="lg" @hide="infoUserCancel"
+      hide-footer hide-header-close>
+      <b-form @submit="updateUser">
+        <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
+          label-cols="4" label-cols-lg="2" label="ID"
+          label-for="selectedId">
+          <b-form-input id="selectedId"
+            v-model="selectedUserId"
+            disabled required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="First Name"
+          label-for="selectedFirstName">
+          <b-form-input id="selectedFirstName"
+            v-model="selectedUserFirstName"
+            v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Last Name"
+          label-for="selectedLastName">
+          <b-form-input id="selectedLastName"
+            v-model="selectedUserLastName"
+            v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="E-Mail"
+          label-for="selectedEmail">
+          <b-form-input id="selectedEmail"
+            v-model="selectedUserEmail"
+            v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Role"
+          label-for="selectedUserRole">
+          <b-form-select v-model="selectedUserRole" :options="roleOptions"
+          class="marg-bot" v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'"
+          required></b-form-select>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Active"
+          label-for="selectedActive">
+          <b-form-checkbox id="selectedActive" v-model="selectedUserActive"
+            v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
+          </b-form-checkbox>
+        </b-form-group>
+        <b-row>
+          <b-col>
+            <b-button v-if="this.loggedInRole === 'ADMINISTRATOR'"
+              variant="danger">Delete User</b-button>
+          </b-col>
+          <b-col>
+            <b-button v-if="this.loggedInRole === 'ADMINISTRATOR'"
+              variant="warning" class="float-right marg-left"
+              type="submit">Update</b-button>
+            <b-button @click="infoUserCancel" class="float-right">Cancel</b-button>
+          </b-col>
+        </b-row>
+      </b-form>
     </b-modal>
 
     <!-- Create User Modal -->
@@ -131,12 +187,11 @@
           type="password" placeholder="Password" required/>
         <b-form-select v-model="createUserRole" :options="roleOptions"
           class="marg-bot" required></b-form-select>
-        <b-row>
+        <b-row class="marg-top">
           <b-col>
-            <b-button @click="createUserModalCancel" >Cancel</b-button>
-          </b-col>
-          <b-col>
-            <b-button variant="primary" class="float-right" type="submit">Submit</b-button>
+            <b-button variant="success" class="float-right" type="submit">Create</b-button>
+            <b-button @click="createUserModalCancel"
+            class="float-right marg-right">Cancel</b-button>
           </b-col>
         </b-row>
       </b-form>
@@ -221,6 +276,13 @@ export default {
         { value: 'PROJECTMANAGER', text: 'Projectmanager' },
         { value: 'DEVELOPER', text: 'Developer' },
       ],
+      // Info user data
+      selectedUserId: null,
+      selectedUserFirstName: '',
+      selectedUserLastName: '',
+      selectedUserEmail: '',
+      selectedUserRole: '',
+      selectedUserActive: false,
     };
   },
   computed: {
@@ -305,7 +367,50 @@ export default {
     },
     // eslint-disable-next-line
     userInfoModal(evt) {
+      this.selectedUserId = evt.id;
+      this.selectedUserFirstName = evt.firstName;
+      this.selectedUserLastName = evt.lastName;
+      this.selectedUserEmail = evt.emailAddress;
+      this.selectedUserRole = evt.role;
+      this.selectedUserActive = evt.active;
+
       this.$refs.infoUserModal.show();
+    },
+    updateUser(evt) {
+      evt.preventDefault();
+
+      const data = {
+        active: this.selectedUserActive,
+        firstName: this.selectedUserFirstName,
+        lastName: this.selectedUserLastName,
+        emailAddress: this.selectedUserEmail,
+      };
+
+      axios.put(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?id=${this.selectedUserId}`, data, restHeader)
+        // eslint-disable-next-line
+        .then((response) => {
+          for (let i = 0; i < this.items.length; i += 1) {
+            if (this.items[i].id === this.selectedUserId) {
+              this.items[i].firstName = this.selectedUserFirstName;
+              this.items[i].lastName = this.selectedUserLastName;
+              this.items[i].emailAddress = this.selectedUserEmail;
+              this.items[i].active = this.selectedUserActive;
+              this.items[i].role = this.selectedUserRole;
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    infoUserCancel() {
+      this.selectedUserId = null;
+      this.selectedUserFirstName = '';
+      this.selectedUserLastName = '';
+      this.selectedUserEmail = '';
+      this.selectedUserRole = null;
+
+      this.$refs.infoUserModal.hide();
     },
   },
 };
@@ -314,5 +419,17 @@ export default {
 <style scoped>
 .marg-bot {
   margin-bottom: 5px;
+}
+
+.marg-right {
+  margin-right: 5px;
+}
+
+.marg-left {
+  margin-left: 5px;
+}
+
+.marg-top {
+  margin-top: 5px;
 }
 </style>

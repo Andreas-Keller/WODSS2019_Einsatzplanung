@@ -148,6 +148,7 @@ function verify(token, req) {
 }
 
 module.exports = function Bearer(req, res, next) {
+    /*
     console.log(req.url)
     console.log(req.method)
     // console.log(req)
@@ -163,5 +164,6 @@ module.exports = function Bearer(req, res, next) {
             next(error);
         }
     }
+    */
     next();
 };
