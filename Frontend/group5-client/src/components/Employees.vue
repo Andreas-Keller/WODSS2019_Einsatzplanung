@@ -311,15 +311,12 @@ export default {
       if (this.loggedInRole === 'ADMINISTRATOR') {
         axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
           .then((response) => {
-            console.log(response.data);
             this.items = response.data;
             this.totalRows = this.items.length;
           });
       } else if (this.loggedInRole === 'PROJECTMANAGER') {
-        console.log('only dev');
         axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?role=DEVELOPER`, restHeader)
           .then((response) => {
-            console.log(response.data);
             this.items = response.data;
             this.totalRows = this.items.length;
           });
@@ -337,10 +334,8 @@ export default {
 
       axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?password=${this.createUserPw}&role=${this.createUserRole}`, data, restHeader)
         .then((response) => {
-          console.log(response.status);
-          console.log(response.data);
-
           const newUser = {
+            id: response.data.id,
             firstName: response.data.firstName,
             lastName: response.data.lastName,
             emailAddress: response.data.emailAddress,
@@ -365,7 +360,6 @@ export default {
       this.createUserRole = null;
       this.$refs.createUser.hide();
     },
-    // eslint-disable-next-line
     userInfoModal(evt) {
       this.selectedUserId = evt.id;
       this.selectedUserFirstName = evt.firstName;
@@ -409,9 +403,6 @@ export default {
       axios.delete(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee/${this.selectedUserId}`, restHeader)
         // eslint-disable-next-line
         .then((response) => {
-
-          console.log(response);
-
           for (let i = 0; i < this.items.length; i += 1) {
             if (this.items[i].id === this.selectedUserId) {
               this.items.splice(i, 1);
