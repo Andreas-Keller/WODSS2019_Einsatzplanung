@@ -24,7 +24,7 @@ exports.handler = async function updateEmployee(req, res, next) {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         emailAddress: req.body.emailAddress,
-        id: req.body.id
+        id: req.body.id+""
     };
 
     if (employee.active == null ||
