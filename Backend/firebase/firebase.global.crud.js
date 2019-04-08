@@ -28,7 +28,7 @@ const create = async (data, collection) => {
                 if (snapshot.empty) {
                     console.log('Found unused ID (in create)');
                     data.id = id;
-                    returnValue = collection.doc("" + id)
+                    returnValue = collection.doc(String(id))
                         .set(data, {merge: true});
                     return new Await_response(200, "Created enitity", data);
                 }
@@ -52,7 +52,7 @@ const update = async (data, collection) => {
         return new Await_response(404, "id was null or undifined in update");
     }
     return new Await_response(200, "updated", await collection
-        .doc(data.id)
+        .doc(String(data.id))
         .update(data));
 };
 
@@ -61,7 +61,7 @@ const deleteEntity = async (id, collection) => {
         return new Await_response(404, "id was null or undifined in delete");
     }
     return new Await_response(204, "deleted", await collection
-        .doc(id)
+        .doc(String(id))
         .delete(data));
 };
 

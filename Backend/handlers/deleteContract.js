@@ -7,7 +7,9 @@
  *   id {int64} ID of the contract to be deleted.
  *   
  */
-exports.handler = function deleteContract(req, res, next) {
-  res.send('deleteContract')
-  next()
+exports.handler = async function deleteContract(req, res, next) {
+    const fb = require('../firebase/contract.crud');
+    let response = await fb.deleteContract(req.params.id);
+    res.status(response.httpStatus).send(response.payload);
+    next();
 }
