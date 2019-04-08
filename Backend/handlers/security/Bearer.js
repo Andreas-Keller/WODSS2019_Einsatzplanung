@@ -64,10 +64,8 @@ function verify(token, req) {
             }
             break;
         case '/api/employee':
-            console.log('IN EMPLOYEE')
             switch (method) {
                 case 'GET':
-                    console.log(role)
                     if (role === 'ADMINISTRATOR' || role === 'PROJECTMANAGER' || role === 'DEVELOPER') {
                         return true;
                     }
