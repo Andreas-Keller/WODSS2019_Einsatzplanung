@@ -414,7 +414,7 @@ export default {
         })
         .catch((error) => {
           console.log(error);
-        })
+        });
     },
     infoUserCancel() {
       this.selectedUserId = null;
