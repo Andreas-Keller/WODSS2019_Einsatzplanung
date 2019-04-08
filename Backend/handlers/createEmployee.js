@@ -16,6 +16,7 @@
  *   role {string} Single employee role.
  *
  */
+
 exports.handler = async function createEmployee(req, res, next) {
     let employee = {
         rawPassword: req.query.password,
@@ -46,5 +47,5 @@ exports.handler = async function createEmployee(req, res, next) {
             res.status(404).send("User with same email already registered")
         }
     }
-    next()
+    next();
 };

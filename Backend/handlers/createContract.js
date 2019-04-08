@@ -13,7 +13,6 @@
  */
 
 exports.handler = async function createContract(req, res, next) {
-
   let contract = {
     startDate: req.body.startDate,
     endDate: req.body.endDate,
@@ -27,11 +26,8 @@ exports.handler = async function createContract(req, res, next) {
       contract.pensumPercentage === null ||
       contract.employeeId === null) {
     res.status(412).send("Precondition for the allocation failed");
-
   } else if (employeeFirebase.getEmployee(contract.employeeId) === 404) {
-
     res.status(404).send("Employee not found")
-
   } else {
     const contractFirebase = require('../firebase/contract.crud.js');
     res.status(201).send(await contractFirebase.createContract(contract));
