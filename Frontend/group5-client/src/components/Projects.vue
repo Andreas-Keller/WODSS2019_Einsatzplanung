@@ -108,8 +108,9 @@
 </template>
 
 <script>
-
 import axios from 'axios';
+
+const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
 
 const items = [{
   name: 'Testproject', id: 1, startDate: 200, endDate: 300, ftePercentage: 1100, projectManagerId: 12,
@@ -124,7 +125,7 @@ export default {
 
   beforeMount() {
     // if (this.loggedInRole === 'ADMINISTRATOR') {
-    axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project`)
+    axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project`, restHeader)
       .then((response) => {
         console.log(response.data);
         this.items = response.data;

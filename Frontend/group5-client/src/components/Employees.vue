@@ -62,7 +62,9 @@
       :sort-desc.sync="sortDesc"
       :sort-direction="sortDirection"
       @filtered="onFiltered"
+      @row-clicked="userInfoModal"
     >
+    <!--
       <template slot="name" slot-scope="row">
         {{ row.value.first }} {{ row.value.last }}
       </template>
@@ -87,6 +89,7 @@
           </ul>
         </b-card>
       </template>
+      -->
     </b-table>
 
     <b-row>
@@ -99,7 +102,7 @@
           aria-controls="employeeTable"
         />
       </b-col>
-      <b-col md="6">
+      <b-col md="6" v-if="this.loggedInRole==='ADMINISTRATOR'">
         <b-button
           class="float-right"
           variant="success"
@@ -110,12 +113,13 @@
     </b-row>
 
     <!-- Info modal -->
-    <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
-      <pre>{{ modalInfo.content }}</pre>
+    <b-modal ref="infoUserModal" id="infoUserModal" title="Info User" hide-footer hide-header-close>
+      <label>User</label>
     </b-modal>
 
+    <!-- Create User Modal -->
     <b-modal ref="createUser" id="createUserModal"
-      title="Create User" hide-footer hide-header-close>
+      title="Create User" @hide="createUserModalCancel" hide-footer hide-header-close>
       <b-form @submit="createUser">
         <b-form-input v-model="createUserFirstName" id="firstName" class="marg-bot"
           placeholder="First name" required/>
@@ -142,37 +146,9 @@
 
 
 <script>
-
 import axios from 'axios';
 
-const items = [{
-  _id: 123,
-  firstName: 'Dickerson',
-  lastName: 'Macdonald',
-  emailAddress: 'dm@foo.com',
-  active: true,
-  role: 'MANAGER',
-}];
-//
-//
-// [
-//  {
-//    isActive: true, role: 'MANAGER', first_name: 'Dickerson',
-//    last_name: 'Macdonald', email: 'dm@foo.com',
-//  },
-//  {
-//    isActive: false, role: 'DEVELOPER', first_name: 'Larsen',
-//    last_name: 'Shaw', email: 'ls@foo.com',
-//  },
-//  {
-//    isActive: false, role: 'MANAGER', first_name: 'Geneva',
-//    last_name: 'Wilson', email: 'gw@foo.com',
-//  },
-//  {
-//    isActive: true, role: 'DEVELOPER', first_name: 'Jami',
-//    last_name: 'Carney', email: 'cj@foo.com',
-//  },
-// ];
+const items = [];
 
 const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
 
@@ -190,6 +166,7 @@ export default {
 
   data() {
     return {
+      // Table data
       items,
       fields: [
         /*
@@ -224,12 +201,6 @@ export default {
           label: 'Role',
         },
       ],
-      roleOptions: [
-        { value: null, text: 'Role', disabled: true },
-        { value: 'ADMINISTRATOR', text: 'Administrator' },
-        { value: 'PROJECTMANAGER', text: 'Projectmanager' },
-        { value: 'DEVELOPER', text: 'Developer' },
-      ],
       currentPage: 1,
       perPage: 5,
       totalRows: 0,
@@ -238,15 +209,18 @@ export default {
       sortDesc: false,
       sortDirection: 'asc',
       filter: null,
-      modalInfo: {
-        title: '',
-        content: '',
-      },
+      // Create user data
       createUserFirstName: '',
       createUserLastName: '',
       createUserEmail: '',
       createUserPw: '',
       createUserRole: null,
+      roleOptions: [
+        { value: null, text: 'Role', disabled: true },
+        { value: 'ADMINISTRATOR', text: 'Administrator' },
+        { value: 'PROJECTMANAGER', text: 'Projectmanager' },
+        { value: 'DEVELOPER', text: 'Developer' },
+      ],
     };
   },
   computed: {
@@ -294,25 +268,24 @@ export default {
       evt.preventDefault();
 
       const data = {
-        'active': true,
-        'firstName': this.createUserFirstName,
-        'lastName': this.createUserLastName,
-        'emailAddress': this.createUserEmail
-      }
-
-      console.log(data);
+        active: true,
+        firstName: this.createUserFirstName,
+        lastName: this.createUserLastName,
+        emailAddress: this.createUserEmail,
+      };
 
       axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?password=${this.createUserPw}&role=${this.createUserRole}`, data, restHeader)
         .then((response) => {
           console.log(response.status);
+          console.log(response.data);
 
           const newUser = {
-            firstName: this.createUserFirstName,
-            lastName: this.createUserLastName,
-            emailAddress: this.createUserEmail,
+            firstName: response.data.firstName,
+            lastName: response.data.lastName,
+            emailAddress: response.data.emailAddress,
             active: true,
-            role: this.createUserRole,
-          }
+            role: response.data.role,
+          };
 
           this.items.push(newUser);
 
@@ -329,6 +302,10 @@ export default {
       this.createUserPw = '';
       this.createUserRole = null;
       this.$refs.createUser.hide();
+    },
+    // eslint-disable-next-line
+    userInfoModal(evt) {
+      this.$refs.infoUserModal.show();
     },
   },
 };
