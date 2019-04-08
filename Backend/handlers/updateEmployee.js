@@ -18,26 +18,24 @@
 exports.handler = async function updateEmployee(req, res, next) {
     const fb = require('../firebase/employee.crud.js');
     let employee = {
-        rawPassword: req.query.password,
-        role: req.query.role,
+        //rawPassword: req.query.password,
         active: req.body.active,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         emailAddress: req.body.emailAddress,
-        id: req.body.id
+        id: String(req.params.id)
     };
 
     if (employee.active == null ||
         employee.firstName == null ||
         employee.lastName == null ||
         employee.emailAddress == null ||
-        employee.role == null ||
-        employee.rawPassword == null ||
         employee.id == null) {
-        res.status(412).send("Precondition for the employee failed");
+      res.status(412).send("Precondition for the employee failed");
+    } else {
+      let response = await fb.updateEmployee(employee);
+      res.status(response.httpStatus).send(response.payload);
     }
 
-    let response = await fb.updateEmployee(req.params.id);
-    res.status(response.httpStatus).send(response.payload);
     next();
 }

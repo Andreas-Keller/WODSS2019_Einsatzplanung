@@ -149,8 +149,7 @@
         <b-form-group label-cols="4" label-cols-lg="2" label="Role"
           label-for="selectedUserRole">
           <b-form-select v-model="selectedUserRole" :options="roleOptions"
-          class="marg-bot" v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'"
-          required></b-form-select>
+          class="marg-bot" disabled required></b-form-select>
         </b-form-group>
         <b-form-group label-cols="4" label-cols-lg="2" label="Active"
           label-for="selectedActive">
@@ -161,7 +160,7 @@
         <b-row>
           <b-col>
             <b-button v-if="this.loggedInRole === 'ADMINISTRATOR'"
-              variant="danger">Delete User</b-button>
+              @click="infoUserDelete" variant="danger">Delete User</b-button>
           </b-col>
           <b-col>
             <b-button v-if="this.loggedInRole === 'ADMINISTRATOR'"
@@ -386,7 +385,7 @@ export default {
         emailAddress: this.selectedUserEmail,
       };
 
-      axios.put(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?id=${this.selectedUserId}`, data, restHeader)
+      axios.put(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee/${this.selectedUserId}`, data, restHeader)
         // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -398,10 +397,31 @@ export default {
               this.items[i].role = this.selectedUserRole;
             }
           }
+
+          this.infoUserCancel();
         })
         .catch((error) => {
           console.log(error);
         });
+    },
+    infoUserDelete() {
+      axios.delete(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee/${this.selectedUserId}`, restHeader)
+        // eslint-disable-next-line
+        .then((response) => {
+
+          console.log(response);
+
+          for (let i = 0; i < this.items.length; i += 1) {
+            if (this.items[i].id === this.selectedUserId) {
+              this.items.splice(i, 1);
+            }
+          }
+
+          this.infoUserCancel();
+        })
+        .catch((error) => {
+          console.log(error);
+        })
     },
     infoUserCancel() {
       this.selectedUserId = null;
