@@ -349,6 +349,7 @@ export default {
           };
 
           this.items.push(newUser);
+          this.totalRows = this.items.length;
 
           this.createUserModalCancel();
         })
@@ -417,6 +418,7 @@ export default {
             }
           }
 
+          this.totalRows = this.items.length;
           this.infoUserCancel();
         })
         .catch((error) => {

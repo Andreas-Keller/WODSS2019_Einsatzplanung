@@ -27,7 +27,7 @@ const deleteEmployee = async (id) => {
         emailAddress: null,
         role: null,
         rawPassword: null,
-        id: id
+        id: String(id)
     };
 
     return await crud.update(data, employees);
