@@ -51,7 +51,6 @@ const update = async (data, collection) => {
     if (data.id == null) {
         return new Await_response(404, "id was null or undifined in update");
     }
-
     return new Await_response(200, "updated", await collection
         .doc(data.id)
         .update(data));
