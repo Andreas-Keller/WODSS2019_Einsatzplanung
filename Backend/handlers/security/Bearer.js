@@ -13,9 +13,14 @@ function verify(token, req) {
     let role = token.role;
     let url = String(req.url);
     let method = String(req.method)
-    if(req.params.id!=null){
+    console.log(req.params.id);
+
+    url = url.split('?')[0];
+
+    if(req.params.id !== undefined){
         url = url.replace("/" + req.params.id, '');
     }
+
     switch (url) {
         case '/api/allocation':
             switch (method) {
