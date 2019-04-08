@@ -27,10 +27,10 @@ exports.handler = async function createProject(req, res, next) {
         project.endDate === null ||
         project.projectManagerId) {
         res.status(412).send("Precondition for the allocation failed");
-
     } else {
         const projectFirebase = require('../firebase/project.crud.js');
-        res.status(201).send(await projectFirebase.createProject(project));
+        let response = await projectFirebase.createProject(project)
+        res.status(response.httpStatus).send(response.payload);
     }
     next()
 };
