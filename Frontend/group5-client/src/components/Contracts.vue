@@ -116,7 +116,7 @@
     </b-modal> -->
 
     <!-- Info Contract Modal -->
-    <b-modal ref="infoContractModal" id="infoContractModal" title="Contract Info"
+    <b-modal ref="infoContractModal" id="infoContractModal" :title=this.infoTitle
              size="lg" @hide="infoContractCancel"
              hide-footer hide-header-close>
       <b-form @submit="updateContract">
@@ -273,6 +273,7 @@ export default {
       selectedContractEndDate: '',
       selectedContractPensum: null,
       selectedContractEmployeeId: '',
+      selectedContractEmail: '',
       createContractId: null,
       createContractStartDate: '',
       createContractEndDate: '',
@@ -375,7 +376,8 @@ export default {
       this.selectedContractEndDate = evt.endDate;
       this.selectedContractPensum = evt.pensumPercentage;
       this.selectedContractEmployeeId = evt.employeeId;
-
+      this.selectedContractEmail = evt.email;
+      this.infoTitle = `Contract Info of ${evt.email}`;
       this.$refs.infoContractModal.show();
     },
     updateContract(evt) {
