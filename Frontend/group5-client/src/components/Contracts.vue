@@ -181,8 +181,8 @@
                       type="date" placeholder="End Date" required/>
         <b-form-input v-model="createContractPensum" id="pensum" class="marg-bot"
                       placeholder="Pensum" required/>
-        <b-form-input v-model="createContractEmployeeId" id="employeeId" class="marg-bot"
-                      placeholder="EmployeeId" required/>
+        <b-form-select v-model="createContractEmployeeId" :options="employeeIdOptions"
+                       class="marg-bot" required></b-form-select>
         <b-row class="marg-top">
           <b-col>
             <b-button variant="success" class="float-right" type="submit">Create</b-button>
@@ -270,7 +270,8 @@ export default {
       createContractStartDate: '',
       createContractEndDate: '',
       createContractPensum: null,
-      createContractEmployeeId: '',
+      createContractEmployeeId: null,
+      employeeIdOptions: this.getEmployees(),
     };
   },
   computed: {
@@ -281,24 +282,6 @@ export default {
         .map(f => ({ text: f.label, value: f.key }));
     },
   },
-  /*
-    methods: {
-    info(item, index, button) {
-      this.modalInfo.title = `Row index: ${index}`;
-      this.modalInfo.content = JSON.stringify(item, null, 2);
-      this.$root.$emit('bv::show::modal', 'modalInfo', button);
-    },
-    resetModal() {
-      this.modalInfo.title = '';
-      this.modalInfo.content = '';
-    },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
-    },
-  },
-  */
   methods: {
     info(item, index, button) {
       this.modalInfo.title = `Row index: ${index}`;
@@ -426,6 +409,17 @@ export default {
       this.selectedContractEmployeeId = null;
 
       this.$refs.infoContractModal.hide();
+    },
+    getEmployees() {
+      const employees = [{ value: null, text: 'Employee', disabled: true }];
+      if (this.loggedInRole === 'ADMINISTRATOR') {
+        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
+          .then(response => response.data)
+          .then(res => res.forEach(entry => employees
+            .push({ value: entry.id, text: entry.emailAddress })))
+          .then(() => employees);
+      }
+      return employees;
     },
   },
 };
