@@ -179,7 +179,8 @@
                       type="date" placeholder="Start Date" required/>
         <b-form-input v-model="createContractEndDate" id="endDate" class="marg-bot"
                       type="date" placeholder="End Date" required/>
-        <b-form-input v-model="createContractPensum" id="pensum" class="marg-bot"
+        <b-form-input v-model="createContractPensum" type="number" id="pensum"
+                      min="1" max="100" class="marg-bot"
                       placeholder="Pensum" required/>
         <b-form-select v-model="createContractEmployeeId" :options="employeeIdOptions"
                        class="marg-bot" required></b-form-select>
@@ -215,18 +216,17 @@ export default {
 
   data() {
     return {
+      // API
+      ApiServer: process.env.VUE_APP_API_SERVER,
+      ApiPort: process.env.VUE_APP_API_PORT,
       items,
       fields: [
         /*
         {
-          key: '_id',
-          label: 'ID',
-        }, */
-        {
           key: 'id',
           label: 'ID',
           sortable: true,
-        },
+        }, */
         {
           key: 'startDate',
           label: 'StartDate',
@@ -299,13 +299,13 @@ export default {
     },
     getContract() {
       if (this.loggedInRole === 'ADMINISTRATOR') {
-        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract`, restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
           });
       } else if (this.loggedInRole === 'PROJECTMANAGER') {
-        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract?role=DEVELOPER`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract?role=DEVELOPER`, restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
@@ -321,7 +321,7 @@ export default {
         pensumPercentage: this.createContractPensum,
         employeeId: this.createContractEmployeeId,
       };
-      axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract?id=${this.createContractEmployeeId}`, data, restHeader)
+      axios.post(`${this.ApiServer}:${this.ApiPort}/api/contract?id=${this.createContractEmployeeId}`, data, restHeader)
         .then((response) => {
           const newContract = {
             id: response.data.id,
@@ -366,7 +366,7 @@ export default {
         employeeId: this.selectedContractEmployeeId,
       };
 
-      axios.put(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract/${this.selectedContractId}`, data, restHeader)
+      axios.put(`${this.ApiServer}:${this.ApiPort}/api/contract/${this.selectedContractId}`, data, restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -385,7 +385,7 @@ export default {
         });
     },
     infoContractDelete() {
-      axios.delete(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract/${this.selectedContractId}`, restHeader)
+      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/contract/${this.selectedContractId}`, restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -413,7 +413,7 @@ export default {
     getEmployees() {
       const employees = [{ value: null, text: 'Employee', disabled: true }];
       if (this.loggedInRole === 'ADMINISTRATOR') {
-        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, restHeader)
           .then(response => response.data)
           .then(res => res.forEach(entry => employees
             .push({ value: entry.id, text: entry.emailAddress })))
