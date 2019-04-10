@@ -19,17 +19,21 @@ exports.handler = async function createContract(req, res, next) {
         pensumPercentage: req.body.pensumPercentage,
         employeeId: req.body.employeeId
     };
-//FIXME THIS IS WRONG, FIRST CHECK IF EVERYTGING IS OKAY, THEN CrEATE CONTRACT
+
     const employeeFirebase = require('../firebase/employee.crud.js');
     let employee = await employeeFirebase.getEmployee(contract.employeeId);
     if (contract.startDate === null ||
         contract.endDate === null ||
         contract.pensumPercentage === null ||
         contract.employeeId === null) {
-        res.status(412).send("Precondition for the allocation failed");
+        res.status(412).send("Precondition for the contract failed");
+
+    } else if (employee.httpStatus === 500) {
+        res.status(employee.httpStatus).send("Uncaught or internal server error")
 
     } else if (employee.httpStatus === 404) {
-        res.status(404).send("Employee not found")
+        res.status(employee.httpStatus).send("Employee not found")
+
     } else {
         const contractFirebase = require('../firebase/contract.crud.js');
         let response = await contractFirebase.createContract(contract)

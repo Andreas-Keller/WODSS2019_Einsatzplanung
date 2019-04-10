@@ -14,32 +14,35 @@
  */
 
 exports.handler = async function createAllocation(req, res, next) {
-    //FIXME THIS IS WRONG
-    // let allocation = {
-    //     startDate: req.body.startDate,
-    //     endDate: req.body.endDate,
-    //     pensumPercentage: req.body.pensumPercentage,
-    //     contractId: req.body.contractId,
-    //     projectId: req.body.projectId
-    // };
-    //
-    // const contractFirebase = require('../firebase/contract.crud.js');
-    // const projectFirebase = require('../firebase/project.crud.js');
-    // if (allocation.startDate === null ||
-    //     allocation.endDate === null ||
-    //     allocation.pensumPercentage === null ||
-    //     allocation.contractId === null ||
-    //     allocation.projectId === null) {
-    //     res.status(412).send("Precondition for the allocation failed");
-    //
-    // } else if ((await contractFirebase.getContract(allocation.contractId)).httpStatus === 404 ||
-    //     projectFirebase.getProject(allocation.projectId) === 404) {
-    //
-    //     res.status(404).send("Contract or project not found")
-    //
-    // } else {
-    //     const allocationFirebase = require('../firebase/allocation.crud.js');
-    //     res.status(201).send(await allocationFirebase.createAllocation(allocation));
-    // }
+    let allocation = {
+        startDate: req.body.startDate,
+        endDate: req.body.endDate,
+        pensumPercentage: req.body.pensumPercentage,
+        contractId: req.body.contractId,
+        projectId: req.body.projectId
+    };
+
+    const contractFirebase = require('../firebase/contract.crud.js');
+    const projectFirebase = require('../firebase/project.crud.js');
+    let foundContract = await contractFirebase.getContract(allocation.contractId);
+    let foundProject = await projectFirebase.getProject(allocation.projectId)
+    if (allocation.startDate === null ||
+        allocation.endDate === null ||
+        allocation.pensumPercentage === null ||
+        allocation.contractId === null ||
+        allocation.projectId === null) {
+        res.status(412).send("Precondition for the allocation failed");
+
+    } else if (foundContract.httpStatus === 500 || foundProject.httpStatus === 500) {
+        res.status(500).send('Uncaught or internal server error')
+
+    } else if (foundContract.httpStatus === 404 || foundProject.httpStatus === 404) {
+        res.status(404).send("Contract or project not found")
+
+    } else {
+        const allocationFirebase = require('../firebase/allocation.crud.js');
+        let createdAllocation = await allocationFirebase.createAllocation(allocation);
+        res.status(createdAllocation.httpStatus).send(createdAllocation.payload);
+    }
     next()
 };

@@ -21,15 +21,19 @@ exports.handler = async function createProject(req, res, next) {
         projectManagerId: req.body.projectManagerId
     };
 
+    const projectFirebase = require('../firebase/project.crud.js');
+    let foundProject = await projectFirebase.findBy(project.name);
     if (project.name === null ||
         project.ftePercentage === null ||
         project.startDate === null ||
         project.endDate === null ||
         project.projectManagerId) {
-        res.status(412).send("Precondition for the allocation failed");
+        res.status(412).send("Precondition for the project failed");
+    } else if(foundProject.httpStatus === 500){
+        res.status(foundProject.httpStatus).send('Uncaught or internal server error');
+
     } else {
-        const projectFirebase = require('../firebase/project.crud.js');
-        let response = await projectFirebase.createProject(project)
+        let response = await projectFirebase.createProject(project);
         res.status(response.httpStatus).send(response.payload);
     }
     next()
