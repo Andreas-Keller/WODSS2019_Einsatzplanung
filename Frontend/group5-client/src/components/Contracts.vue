@@ -175,8 +175,10 @@
              title="Create Contract" @hide="createContractModalCancel" hide-footer
              hide-header-close>
       <b-form @submit="createContract">
+        <b-badge>Start Date</b-badge>
         <b-form-input v-model="createContractStartDate" id="startDate" class="marg-bot"
                       type="date" placeholder="Start Date" required/>
+        <b-badge>End Date</b-badge>
         <b-form-input v-model="createContractEndDate" id="endDate" class="marg-bot"
                       type="date" placeholder="End Date" required/>
         <b-form-input v-model="createContractPensum" id="pensum" class="marg-bot"
@@ -248,6 +250,11 @@ export default {
           key: 'employeeId',
           label: 'EmployeeID',
         },
+        {
+          key: 'email',
+          label: 'Employee Email',
+          sortable: true,
+        },
       ],
       currentPage: 1,
       perPage: 5,
@@ -271,6 +278,7 @@ export default {
       createContractEndDate: '',
       createContractPensum: null,
       createContractEmployeeId: null,
+      createContractEmail: '',
       employeeIdOptions: this.getEmployees(),
     };
   },
@@ -301,8 +309,11 @@ export default {
       if (this.loggedInRole === 'ADMINISTRATOR') {
         axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract`, restHeader)
           .then((response) => {
-            this.items = response.data;
-            this.totalRows = this.items.length;
+            this.totalRows = response.data.length;
+            return response.data;
+          })
+          .then((its) => {
+            this.combineItems(its);
           });
       } else if (this.loggedInRole === 'PROJECTMANAGER') {
         axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract?role=DEVELOPER`, restHeader)
@@ -321,19 +332,30 @@ export default {
         pensumPercentage: this.createContractPensum,
         employeeId: this.createContractEmployeeId,
       };
-      axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract?id=${this.createContractEmployeeId}`, data, restHeader)
+      // eslint-disable-next-line
+      Promise.resolve(this.getEmailFromEmployeeId(this.createContractEmployeeId) )
+      // eslint-disable-next-line
+        .then(email => this.createContractEmail = email)
+        .then(() => axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract?id=${this.createContractEmployeeId}`, data, restHeader))
+      // eslint-disable-next-line
+        .then(async (response) => await {
+          res: response,
+          email: this.createContractEmail,
+        })
         .then((response) => {
           const newContract = {
-            id: response.data.id,
-            startDate: response.data.startDate,
-            endDate: response.data.endDate,
-            pensumPercentage: response.data.pensumPercentage,
-            employeeId: response.data.employeeId,
+            id: response.res.data.id,
+            startDate: response.res.data.startDate,
+            endDate: response.res.data.endDate,
+            pensumPercentage: response.res.data.pensumPercentage,
+            employeeId: response.res.data.employeeId,
+            email: response.email,
           };
-
+          return newContract;
+        })
+        .then((newContract) => {
           this.items.push(newContract);
           this.totalRows = this.items.length;
-
           this.createContractModalCancel();
         })
         .catch((error) => {
@@ -420,6 +442,33 @@ export default {
           .then(() => employees);
       }
       return employees;
+    },
+    combineItems(its) {
+      const employees = [];
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
+        .then(response => response.data)
+        .then(res => res.forEach(entry => employees
+          .push({ value: entry.id, text: entry.emailAddress })))
+        .then(() => {
+          // eslint-disable-next-line
+          for(let i = 0; i < its.length; i++) {
+            // eslint-disable-next-line
+            for (let j = 0; j < employees.length; j++) {
+              if (its[i].employeeId === employees[j].value) {
+                // eslint-disable-next-line
+                its[i].email = employees[j].text;
+              }
+            }
+          }
+        })
+        .then(() => { this.items = its; });
+    },
+    async getEmailFromEmployeeId(employeeId) {
+      let address;
+      await axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee/${employeeId}`, restHeader)
+      // eslint-disable-next-line
+        .then(response => address = response.data.emailAddress);
+      return address;
     },
   },
 };
