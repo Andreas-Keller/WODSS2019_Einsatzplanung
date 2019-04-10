@@ -216,7 +216,6 @@ export default {
   data() {
     return {
       items,
-
       fields: [
         /*
         {
@@ -271,7 +270,7 @@ export default {
       createContractStartDate: '',
       createContractEndDate: '',
       createContractPensum: null,
-      createContractEmployeeId: null,
+      createContractEmployeeId: '',
     };
   },
   computed: {
@@ -339,7 +338,6 @@ export default {
         pensumPercentage: this.createContractPensum,
         employeeId: this.createContractEmployeeId,
       };
-      // todo
       axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract?id=${this.createContractEmployeeId}`, data, restHeader)
         .then((response) => {
           const newContract = {
@@ -403,7 +401,6 @@ export default {
           console.log(error);
         });
     },
-    // todo
     infoContractDelete() {
       axios.delete(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract/${this.selectedContractId}`, restHeader)
       // eslint-disable-next-line
@@ -435,5 +432,19 @@ export default {
 </script>
 
 <style scoped>
+  .marg-bot {
+    margin-bottom: 5px;
+  }
 
+  .marg-right {
+    margin-right: 5px;
+  }
+
+  .marg-left {
+    margin-left: 5px;
+  }
+
+  .marg-top {
+    margin-top: 5px;
+  }
 </style>
