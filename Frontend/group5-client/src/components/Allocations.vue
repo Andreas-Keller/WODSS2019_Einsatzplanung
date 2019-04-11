@@ -119,41 +119,42 @@
     <b-form @submit="updateAllocation">
       <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
                     label-cols="4" label-cols-lg="2" label="ID"
-                    label-for="selectedId">
-        <b-form-input id="selectedId"
+                    label-for="selectedId2">
+        <b-form-input id="selectedId2"
                       v-model="selectedAllocationId"
                       disabled required>
         </b-form-input>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
-                    label-for="selectedStartDate">
-        <b-form-input id="selectedStartDate"
+                    label-for="selectedStartDate2">
+        <b-form-input id="selectedStartDate2"
                       v-model="selectedAllocationStartDate"
                       v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
         </b-form-input>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
-                    label-for="selectedEndDate">
-        <b-form-input id="selectedEndDate"
+                    label-for="selectedEndDate2">
+        <b-form-input id="selectedEndDate2"
                       v-model="selectedAllocationEndDate"
                       v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
         </b-form-input>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="Contract Id"
-                    label-for="selectedContractId">
-        <b-form-input id="selectedContractId"
+                    label-for="selectedContractId2">
+        <b-form-input id="selectedContractId2"
                       v-model="selectedAllocationContractId"
                       v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
         </b-form-input>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="Project Id"
                     label-for="selectedAllocationRole">
-        <b-form-input v-model="selectedAllocationProjectId"
+        <b-form-input id="selectedAllocationRole" v-model="selectedAllocationProjectId"
                        class="marg-bot" required></b-form-input>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="Pensum %"
                     label-for="selectedAllocationPensumPercentage">
-        <b-form-input v-model="selectedAllocationPensumPercentage"
+        <b-form-input id="selectedAllocationPensumPercentage"
+                      v-model="selectedAllocationPensumPercentage"
                       class="marg-bot" required></b-form-input>
       </b-form-group>
       <b-row>
@@ -176,15 +177,15 @@
            title="Create Allocation" @hide="createAllocationModalCancel" hide-footer
            hide-header-close>
     <b-form @submit="createAllocation">
-      <b-form-input v-model="createAllocationStartDate" id="startDate" class="marg-bot"
+      <b-form-input v-model="createAllocationStartDate" id="startDate2" class="marg-bot"
                     type="date" placeholder="Start Date" required/>
-      <b-form-input v-model="createAllocationEndDate" id="endDate" class="marg-bot"
+      <b-form-input v-model="createAllocationEndDate" id="endDate2" class="marg-bot"
                     type="date" placeholder="End Date" required/>
-      <b-form-input v-model="createAllocationContractId" id="contractId" class="marg-bot"
+      <b-form-input v-model="createAllocationContractId" id="contractId2" class="marg-bot"
                     placeholder="Contract Id" required/>
-      <b-form-input v-model="createAllocationProjectId" id="projectId" class="marg-bot"
+      <b-form-input v-model="createAllocationProjectId" id="projectId2" class="marg-bot"
                     placeholder="Project Id" required/>
-      <b-form-input v-model="createAllocationPensumPercentage" id="pensum" class="marg-bot"
+      <b-form-input v-model="createAllocationPensumPercentage" id="pensum2" class="marg-bot"
                     placeholder="Pensum %" required/>
       <b-row class="marg-top">
         <b-col>
@@ -367,15 +368,15 @@ export default {
 
       this.$refs.infoAllocationModal.show();
     },
-    // todo
     updateAllocation(evt) {
       evt.preventDefault();
 
       const data = {
-        active: this.selectedAllocationActive,
         startDate: this.selectedAllocationStartDate,
         endDate: this.selectedAllocationEndDate,
-        emailAddress: this.selectedAllocationContractId,
+        contractId: this.selectedAllocationContractId,
+        projectId: this.selectedAllocationProjectId,
+        pensumPercentage: this.selectedAllocationPensumPercentage,
       };
 
       axios.put(`${this.ApiServer}:${this.ApiPort}/api/allocation/${this.selectedAllocationId}`, data, restHeader)
@@ -385,9 +386,9 @@ export default {
             if (this.items[i].id === this.selectedAllocationId) {
               this.items[i].startDate = this.selectedAllocationStartDate;
               this.items[i].endDate = this.selectedAllocationEndDate;
-              this.items[i].emailAddress = this.selectedAllocationContractId;
-              this.items[i].active = this.selectedAllocationActive;
-              this.items[i].role = this.selectedAllocationRole;
+              this.items[i].contractId = this.selectedAllocationContractId;
+              this.items[i].projectId = this.selectedAllocationProjectId;
+              this.items[i].pensumPercentage = this.selectedAllocationPensumPercentage;
             }
           }
 

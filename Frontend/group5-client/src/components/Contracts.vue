@@ -122,8 +122,8 @@
       <b-form @submit="updateContract">
         <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
                       label-cols="4" label-cols-lg="2" label="ID"
-                      label-for="selectedId">
-          <b-form-input id="selectedId"
+                      label-for="selectedId4">
+          <b-form-input id="selectedId4"
                         v-model="selectedContractId"
                         disabled required>
           </b-form-input>
@@ -175,17 +175,28 @@
              title="Create Contract" @hide="createContractModalCancel" hide-footer
              hide-header-close>
       <b-form @submit="createContract">
-        <b-badge>Start Date</b-badge>
-        <b-form-input v-model="createContractStartDate" id="startDate" class="marg-bot"
-                      type="date" placeholder="Start Date" required/>
-        <b-badge>End Date</b-badge>
-        <b-form-input v-model="createContractEndDate" id="endDate" class="marg-bot"
+        <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
+                  label-for="startDate9">
+            <b-form-input v-model="createContractStartDate" id="startDate9" class="marg-bot"
+                  type="date" placeholder="Start Date" required/>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
+                  label-for="endDate9">
+          <b-form-input v-model="createContractEndDate" id="endDate9" class="marg-bot"
                       type="date" placeholder="End Date" required/>
-        <b-form-input v-model="createContractPensum" type="number" id="pensum"
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Pensum %"
+                      label-for="pensum9">
+          <b-form-input v-model="createContractPensum" type="number" id="pensum9"
                       min="1" max="100" class="marg-bot"
                       placeholder="Pensum" required/>
-        <b-form-select v-model="createContractEmployeeId" :options="employeeIdOptions"
-                       class="marg-bot" required></b-form-select>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
+                        label-for="roles9">
+          <b-form-select v-model="createContractEmployeeId" :options="employeeIdOptions"
+                       class="marg-bot" id="roles9" required>
+          </b-form-select>
+        </b-form-group>
         <b-row class="marg-top">
           <b-col>
             <b-button variant="success" class="float-right" type="submit"
