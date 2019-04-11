@@ -188,7 +188,8 @@
                        class="marg-bot" required></b-form-select>
         <b-row class="marg-top">
           <b-col>
-            <b-button variant="success" class="float-right" type="submit">Create</b-button>
+            <b-button variant="success" class="float-right" type="submit"
+                      :disabled="validateState()">Create</b-button>
             <b-button @click="createContractModalCancel"
                       class="float-right marg-right">Cancel</b-button>
           </b-col>
@@ -280,6 +281,7 @@ export default {
       createContractPensum: null,
       createContractEmployeeId: null,
       createContractEmail: '',
+      infoTitle: '',
       employeeIdOptions: this.getEmployees(),
     };
   },
@@ -437,7 +439,7 @@ export default {
     getEmployees() {
       const employees = [{ value: null, text: 'Employee', disabled: true }];
       if (this.loggedInRole === 'ADMINISTRATOR') {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, restHeader)
+        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
           .then(response => response.data)
           .then(res => res.forEach(entry => employees
             .push({ value: entry.id, text: entry.emailAddress })))
@@ -471,6 +473,15 @@ export default {
       // eslint-disable-next-line
         .then(response => address = response.data.emailAddress);
       return address;
+    },
+    validateState() {
+      if (!this.createContractStartDate || !this.createContractEndDate) {
+        return true;
+      }
+      if (this.createContractEndDate < this.createContractStartDate) {
+        return true;
+      }
+      return false;
     },
   },
 };
