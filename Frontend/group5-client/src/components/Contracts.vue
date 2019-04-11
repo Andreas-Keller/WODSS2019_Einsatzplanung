@@ -131,14 +131,14 @@
 
         <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
                       label-for="selectedStartDate">
-          <b-form-input id="selectedStartDate"
+          <b-form-input id="selectedStartDate" type="date"
                         v-model="selectedContractStartDate"
                         v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
           </b-form-input>
         </b-form-group>
         <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
                       label-for="selectedEndDate">
-          <b-form-input id="selectedEndDate"
+          <b-form-input id="selectedEndDate" type="date"
                         v-model="selectedContractEndDate"
                         v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
           </b-form-input>
@@ -191,7 +191,7 @@
                       min="1" max="100" class="marg-bot"
                       placeholder="Pensum" required/>
         </b-form-group>
-        <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
+        <b-form-group label-cols="4" label-cols-lg="2" label="Employee"
                         label-for="roles9">
           <b-form-select v-model="createContractEmployeeId" :options="employeeIdOptions"
                        class="marg-bot" id="roles9" required>
@@ -469,9 +469,16 @@ export default {
             // eslint-disable-next-line
             for (let j = 0; j < employees.length; j++) {
               if (its[i].employeeId === employees[j].value) {
-                // eslint-disable-next-line
-                its[i].email = employees[j].text;
+                if (employees[j].text !== undefined) {
+                  // eslint-disable-next-line
+                  its[i].email = employees[j].text;
+                }
               }
+            }
+            // eslint-disable-next-line
+            if (!its[i].email) {
+              // eslint-disable-next-line
+              its[i].email = 'n.a.';
             }
           }
         })
