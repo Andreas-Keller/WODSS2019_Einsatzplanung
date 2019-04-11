@@ -367,6 +367,7 @@ export default {
 
       this.$refs.infoAllocationModal.show();
     },
+    // todo
     updateAllocation(evt) {
       evt.preventDefault();
 
