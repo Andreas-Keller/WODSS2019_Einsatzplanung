@@ -224,12 +224,11 @@ export default {
       ApiPort: process.env.VUE_APP_API_PORT,
       items,
       fields: [
-        /*
         {
           key: 'id',
           label: 'ID',
           sortable: true,
-        }, */
+        },
         {
           key: 'startDate',
           label: 'StartDate',
