@@ -190,11 +190,11 @@ export default {
           label: 'FTE',
           sortable: true,
           sortDirection: 'desc',
-        },
+        }, /*
         {
           key: 'projectManagerId',
           label: 'ProjectManagerID',
-        },
+        }, */
         {
           key: 'projectManagerMail',
           label: 'Projectmanager E-Mail',
@@ -241,9 +241,6 @@ export default {
       const pmId = this.createProjectPmId.substr(0, this.createProjectPmId.indexOf('-'));
       const pmMail = this.createProjectPmId.substr(this.createProjectPmId.indexOf('-') + 1);
 
-      console.log(pmId);
-      console.log(pmMail);
-
       const data = {
         name: this.createProjectName,
         ftePercentage: this.createProjectFte,
@@ -251,8 +248,6 @@ export default {
         endDate: this.createProjectEnd,
         projectManagerId: pmId,
       };
-
-      console.log(data);
 
       axios.post(`${this.ApiServer}:${this.ApiPort}/api/project`, data, restHeader)
         .then((response) => {
@@ -282,7 +277,6 @@ export default {
       this.$refs.createProjectModal.hide();
     },
     createProjectModalCancel() {
-      console.log('Close');
       this.createProjectName = '';
       this.createProjectFte = null;
       this.createProjectStart = '';
@@ -295,13 +289,11 @@ export default {
     loadPMs() {
       axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
         .then((response) => {
-          console.log(response.data);
           const arr = [{ value: null, text: 'PM', disabled: true }];
           for (let i = 0; i < response.data.length; i += 1) {
             arr.push({ value: `${response.data[i].id}-${response.data[i].emailAddress}`, text: response.data[i].emailAddress });
           }
 
-          console.log(arr);
           this.pmOptions = arr;
         })
         .catch((error) => {
@@ -314,13 +306,11 @@ export default {
 
       axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
         .then((response) => {
-          console.log(response.data);
           projects = response.data;
         })
         .then(() => {
           axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
             .then((response) => {
-              console.log(response.data);
               PMs = response.data;
             })
             .then(() => {
@@ -334,7 +324,6 @@ export default {
                 }
               }
 
-              console.log(projects);
               this.items = projects;
             })
             .catch((error) => {
