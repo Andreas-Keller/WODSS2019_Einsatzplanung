@@ -103,7 +103,7 @@
         <b-button
           class="float-right"
           variant="success"
-          @click="loadPMs"
+          @click="createProjectModalOpen"
           v-b-modal.createProjectModal>
             Create Project
         </b-button>
@@ -111,7 +111,7 @@
     </b-row>
 
     <b-modal ref="createProjectModal" id="createProjectModal"
-      title="Create Project" @hide="createProjectModalCancel" hide.footer hide-header-close>
+      title="Create Project" @hide="createProjectModalCancel" hide-footer hide-header-close>
       <b-form @submit="createProject">
         <b-form-input id="projectName" class="marg-bot" v-model="createProjectName"
           placeholder="Project Name" required />
@@ -121,8 +121,16 @@
           v-model="createProjectStart" placeholder="Project Start Date" required />
         <b-form-input id="projectEnd" class="marg-bot" type="date"
           v-model="createProjectEnd" placeholder="Project End Date" required />
-        <b-form-select v-model="createProjectPmId" :options="pmOptions" class="marg-bot" required>
+        <b-form-select v-model="createProjectPmId"
+         :options="pmOptions" class="marg-bot" required>
         </b-form-select>
+        <b-row class="marg-top">
+          <b-col>
+            <b-button variant="success" class="float-right" type="submit">Create</b-button>
+            <b-button @click="createProjectModalCancelBtn"
+            class="float-right marg-right">Cancel</b-button>
+          </b-col>
+        </b-row>
       </b-form>
     </b-modal>
 
@@ -144,11 +152,7 @@ export default {
   },
 
   beforeMount() {
-    axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
-      .then((response) => {
-        console.log(response.data);
-        this.items = response.data;
-      });
+    this.getProjects();
   },
 
   data() {
@@ -161,17 +165,13 @@ export default {
       fields: [
         /*
         {
-          key: '_id',
+          key: 'id',
           label: 'ID',
+          sortable: true,
         }, */
         {
           key: 'name',
           label: 'Name',
-          // sortable: true,
-        },
-        {
-          key: 'id',
-          label: 'ID',
           sortable: true,
         },
         {
@@ -194,6 +194,12 @@ export default {
         {
           key: 'projectManagerId',
           label: 'ProjectManagerID',
+        },
+        {
+          key: 'projectManagerMail',
+          label: 'Projectmanager E-Mail',
+          sortable: true,
+          sortDirection: 'desc',
         },
       ],
       currentPage: 1,
@@ -229,27 +235,114 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
+    createProject(evt) {
+      evt.preventDefault();
+
+      const pmId = this.createProjectPmId.substr(0, this.createProjectPmId.indexOf('-'));
+      const pmMail = this.createProjectPmId.substr(this.createProjectPmId.indexOf('-') + 1);
+
+      console.log(pmId);
+      console.log(pmMail);
+
+      const data = {
+        name: this.createProjectName,
+        ftePercentage: this.createProjectFte,
+        startDate: this.createProjectStart,
+        endDate: this.createProjectEnd,
+        projectManagerId: pmId,
+      };
+
+      console.log(data);
+
+      axios.post(`${this.ApiServer}:${this.ApiPort}/api/project`, data, restHeader)
+        .then((response) => {
+          const newProject = {
+            id: response.data.id,
+            name: response.data.name,
+            ftePercentage: response.data.ftePercentage,
+            startDate: response.data.startDate,
+            endDate: response.data.endDate,
+            projectManagerId: response.data.projectManagerId,
+            projectManagerMail: pmMail,
+          };
+
+          this.items.unshift(newProject);
+          this.totalRows = this.items.length;
+
+          this.createProjectModalCancelBtn();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     projectInfoModal(evt) {
       console.log(evt);
     },
+    createProjectModalCancelBtn() {
+      this.$refs.createProjectModal.hide();
+    },
     createProjectModalCancel() {
       console.log('Close');
+      this.createProjectName = '';
+      this.createProjectFte = null;
+      this.createProjectStart = '';
+      this.createProjectStart = '';
+      this.createProjectPmId = null;
     },
-    createProject(evt) {
-      console.log(evt);
+    createProjectModalOpen() {
+      this.loadPMs();
     },
     loadPMs() {
       axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
         .then((response) => {
           console.log(response.data);
           const arr = [{ value: null, text: 'PM', disabled: true }];
-          for (let i = 0; i < response.data; i += 1) {
-            arr.push({ value: response.data[i].id, text: response.data[i].emailAddress });
+          for (let i = 0; i < response.data.length; i += 1) {
+            arr.push({ value: `${response.data[i].id}-${response.data[i].emailAddress}`, text: response.data[i].emailAddress });
           }
 
           console.log(arr);
-
           this.pmOptions = arr;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getProjects() {
+      let PMs = [];
+      let projects = [];
+
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
+        .then((response) => {
+          console.log(response.data);
+          projects = response.data;
+        })
+        .then(() => {
+          axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
+            .then((response) => {
+              console.log(response.data);
+              PMs = response.data;
+            })
+            .then(() => {
+              for (let i = 0; i < projects.length; i += 1) {
+                projects[i].projectManagerMail = 'n.a.';
+                for (let j = 0; j < PMs.length; j += 1) {
+                  if (projects[i].projectManagerId === PMs[j].id) {
+                    projects[i].projectManagerMail = PMs[j].emailAddress;
+                    break;
+                  }
+                }
+              }
+
+              console.log(projects);
+              this.items = projects;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
         });
     },
   },

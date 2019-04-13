@@ -379,7 +379,7 @@ export default {
       this.createContractStartDate = '';
       this.createContractEndDate = '';
       this.createContractPensum = '';
-      this.createContractEmployeeId = '';
+      this.createContractEmployeeId = null;
       this.$refs.createContract.hide();
     },
     infoContractModal(evt) {

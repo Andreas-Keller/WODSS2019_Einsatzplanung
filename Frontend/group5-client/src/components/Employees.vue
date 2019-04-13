@@ -346,7 +346,7 @@ export default {
             role: response.data.role,
           };
 
-          this.items.push(newUser);
+          this.items.unshift(newUser);
           this.totalRows = this.items.length;
 
           this.createUserModalCancel();
