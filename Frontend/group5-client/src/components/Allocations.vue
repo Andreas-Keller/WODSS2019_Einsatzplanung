@@ -181,10 +181,12 @@
                     type="date" placeholder="Start Date" required/>
       <b-form-input v-model="createAllocationEndDate" id="endDate2" class="marg-bot"
                     type="date" placeholder="End Date" required/>
-      <b-form-input v-model="createAllocationContractId" id="contractId2" class="marg-bot"
-                    placeholder="Contract Id" required/>
-      <b-form-input v-model="createAllocationProjectId" id="projectId2" class="marg-bot"
-                    placeholder="Project Id" required/>
+      <b-form-select v-model="createAllocationContractId" :options="contractIdOptions"
+                     class="marg-bot" id="contractId12" required>
+      </b-form-select>
+      <b-form-select v-model="createAllocationProjectId" id="projectId2" class="marg-bot"
+                     :options="projectIdOptions" placeholder="Project Id" required>
+      </b-form-select>
       <b-form-input v-model="createAllocationPensumPercentage" id="pensum2" class="marg-bot"
                     placeholder="Pensum %" required/>
       <b-row class="marg-top">
@@ -242,6 +244,11 @@ export default {
           sortable: true,
         },
         {
+          key: 'projectName',
+          label: 'Project Name',
+          sortable: true,
+        },
+        {
           key: 'startDate',
           label: 'Start Date',
           sortable: true,
@@ -272,6 +279,8 @@ export default {
       createAllocationContractId: null,
       createAllocationProjectId: null,
       createAllocationPensumPercentage: null,
+      contractIdOptions: this.getListIds('contract'),
+      projectIdOptions: this.getListIds('project'),
       // Info allocation data
       selectedAllocationId: null,
       selectedAllocationStartDate: '',
@@ -305,19 +314,47 @@ export default {
       this.currentPage = 1;
     },
     getAllocation() {
+      let allocations = [];
+      let projects = [];
       if (this.loggedInRole === 'ADMINISTRATOR') {
         axios.get(`${this.ApiServer}:${this.ApiPort}/api/allocation`, restHeader)
           .then((response) => {
-            this.items = response.data;
-            this.totalRows = this.items.length;
+            allocations = response.data;
+            // this.totalRows = this.items.length;
+          })
+          .then(() => {
+            axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
+              .then((response) => {
+                projects = response.data;
+              })
+              .then(() => {
+                for (let i = 0; i < allocations.length; i += 1) {
+                  allocations[i].projectEmail = 'n.a.';
+                  for (let j = 0; j < projects.length; j += 1) {
+                    if (allocations[i].projectId === projects[j].id) {
+                      allocations[i].projectName = projects[j].name;
+                      break;
+                    }
+                  }
+                }
+                this.items = allocations;
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          })
+          .catch((error) => {
+            console.log(error);
           });
-      } else if (this.loggedInRole === 'PROJECTMANAGER') {
+      }
+
+      /* else if (this.loggedInRole === 'PROJECTMANAGER') {
         axios.get(`${this.ApiServer}:${this.ApiPort}/api/allocation?role=DEVELOPER`, restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
           });
-      }
+      } */
     },
     createAllocation(evt) {
       evt.preventDefault();
@@ -423,6 +460,28 @@ export default {
       this.selectedAllocationRole = null;
 
       this.$refs.infoAllocationModal.hide();
+    },
+    getListIds(url) {
+      // eslint-disable-next-line
+      let listIds = [{ value: null, text: `${url} Ids`, disabled: true }];
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/${url}`, restHeader)
+        .then(response => response.data)
+        .then((data) => {
+          data.forEach((entry) => {
+            listIds
+              .push(
+                {
+                  disabled: false,
+                  text: String(entry.id),
+                  value: Number(entry.id),
+                },
+              );
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      return listIds;
     },
   },
 };
