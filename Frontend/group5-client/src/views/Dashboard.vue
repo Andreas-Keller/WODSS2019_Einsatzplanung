@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Navbar :employeeName="loggedInEmployeeName" />
+    <Navbar :employeeName="this.loggedInEmployeeName" />
     <Employees :loggedInRole="loggedInRole" />
     <Projects  :loggedInRole="loggedInRole" />
     <Contracts :loggedInRole="loggedInRole" />

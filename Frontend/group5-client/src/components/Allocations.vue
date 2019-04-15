@@ -1,5 +1,9 @@
 <template>
 <b-container v-if="this.loggedInRole !== 'DEVELOPER'" fluid>
+  <b-alert v-model="showFailCreateAllocationAlert" variant="danger" class="alert-center"
+           fade dismissible>
+    Project already fully occupied
+  </b-alert>
   <h1>Allocations</h1>
   <!-- Allocation Interface controls -->
   <b-row>
@@ -281,6 +285,7 @@ export default {
       createAllocationPensumPercentage: null,
       contractIdOptions: this.getListIds('contract'),
       projectIdOptions: this.getListIds('project'),
+      showFailCreateAllocationAlert: false,
       // Info allocation data
       selectedAllocationId: null,
       selectedAllocationStartDate: '',
@@ -360,6 +365,12 @@ export default {
     createAllocation(evt) {
       evt.preventDefault();
 
+      Promise.resolve(this.calculateRemainingFTE())
+        .then((FTES) => {
+          if (FTES.FTE <= FTES.occupiedFTE) {
+            this.showFailCreateAllocationAlert = true;
+          }
+        });
       const data = {
         startDate: this.createAllocationStartDate,
         endDate: this.createAllocationEndDate,
@@ -483,6 +494,35 @@ export default {
           console.log(error);
         });
       return listIds;
+    },
+    calculateRemainingFTE() {
+      let FTE = 0;
+      let alreadyOcuppiedFTE = 0;
+      const oneDay = 1000 * 60 * 60 * 24;
+      return axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project/${this.createAllocationProjectId}`, restHeader)
+        .then(response => response.data)
+        .then((data) => {
+          FTE = data.ftePercentage * 100;
+        })
+        .then(() => axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/allocation`, restHeader))
+        .then(response => response.data)
+        .then((data) => {
+          data.forEach((entry) => {
+            if (entry.projectId === this.createAllocationProjectId) {
+              const pensum = entry.pensumPercentage;
+              const duration = Math.round(
+                (new Date(entry.endDate).getTime()
+              - new Date(entry.startDate).getTime()) / oneDay,
+              );
+              alreadyOcuppiedFTE += pensum * duration;
+            }
+          });
+        })
+        // eslint-disable-next-line
+        .then(() => { return { FTE: FTE, occupiedFTE: alreadyOcuppiedFTE }; })
+        .catch((error) => {
+          console.log(error);
+        });
     },
   },
 };
