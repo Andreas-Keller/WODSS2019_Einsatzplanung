@@ -338,6 +338,7 @@ export default {
                   }
                 }
                 this.items = allocations;
+                this.totalRows = this.items.length;
               })
               .catch((error) => {
                 console.log(error);
