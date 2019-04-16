@@ -174,7 +174,7 @@
 
     <!-- Create User Modal -->
     <b-modal ref="createUser" id="createUserModal"
-      title="Create User" @hide="createUserModalCancel" hide-footer hide-header-close>
+      title="Create Employee" @hide="createUserModalCancel" hide-footer hide-header-close>
       <b-form @submit="createUser">
         <b-form-input v-model="createUserFirstName" id="firstName" class="marg-bot"
           placeholder="First name" required/>
@@ -220,6 +220,9 @@ export default {
 
   data() {
     return {
+      // API
+      ApiServer: process.env.VUE_APP_API_SERVER,
+      ApiPort: process.env.VUE_APP_API_PORT,
       // Table data
       items,
       fields: [
@@ -309,13 +312,13 @@ export default {
     },
     getUser() {
       if (this.loggedInRole === 'ADMINISTRATOR') {
-        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
           });
       } else if (this.loggedInRole === 'PROJECTMANAGER') {
-        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?role=DEVELOPER`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=DEVELOPER`, restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
@@ -332,7 +335,7 @@ export default {
         emailAddress: this.createUserEmail,
       };
 
-      axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee?password=${this.createUserPw}&role=${this.createUserRole}`, data, restHeader)
+      axios.post(`${this.ApiServer}:${this.ApiPort}/api/employee?password=${this.createUserPw}&role=${this.createUserRole}`, data, restHeader)
         .then((response) => {
           const newUser = {
             id: response.data.id,
@@ -343,7 +346,7 @@ export default {
             role: response.data.role,
           };
 
-          this.items.push(newUser);
+          this.items.unshift(newUser);
           this.totalRows = this.items.length;
 
           this.createUserModalCancel();
@@ -380,7 +383,7 @@ export default {
         emailAddress: this.selectedUserEmail,
       };
 
-      axios.put(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee/${this.selectedUserId}`, data, restHeader)
+      axios.put(`${this.ApiServer}:${this.ApiPort}/api/employee/${this.selectedUserId}`, data, restHeader)
         // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -400,7 +403,7 @@ export default {
         });
     },
     infoUserDelete() {
-      axios.delete(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee/${this.selectedUserId}`, restHeader)
+      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/employee/${this.selectedUserId}`, restHeader)
         // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {

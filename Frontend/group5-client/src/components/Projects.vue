@@ -60,6 +60,7 @@
       :sort-desc.sync="sortDesc"
       :sort-direction="sortDirection"
       @filtered="onFiltered"
+      @row-clicked="projectInfoModal"
     >
       <!--
       <template slot="name" slot-scope="row">
@@ -98,12 +99,41 @@
           class="my-0"
         />
       </b-col>
+      <b-col md="6" v-if="this.loggedInRole==='ADMINISTRATOR'">
+        <b-button
+          class="float-right"
+          variant="success"
+          @click="createProjectModalOpen"
+          v-b-modal.createProjectModal>
+            Create Project
+        </b-button>
+      </b-col>
     </b-row>
 
-    <!-- Info modal -->
-    <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
-      <pre>{{ modalInfo.content }}</pre>
+    <b-modal ref="createProjectModal" id="createProjectModal"
+      title="Create Project" @hide="createProjectModalCancel" hide-footer hide-header-close>
+      <b-form @submit="createProject">
+        <b-form-input id="projectName" class="marg-bot" v-model="createProjectName"
+          placeholder="Project Name" required />
+        <b-form-input id="projectFte" class="marg-bot" type="number"
+          v-model="createProjectFte" min="0" placeholder="Full Time Employee" required />
+        <b-form-input id="projectStart" class="marg-bot" type="date"
+          v-model="createProjectStart" placeholder="Project Start Date" required />
+        <b-form-input id="projectEnd" class="marg-bot" type="date"
+          v-model="createProjectEnd" placeholder="Project End Date" required />
+        <b-form-select v-model="createProjectPmId"
+         :options="pmOptions" class="marg-bot" required>
+        </b-form-select>
+        <b-row class="marg-top">
+          <b-col>
+            <b-button variant="success" class="float-right" type="submit">Create</b-button>
+            <b-button @click="createProjectModalCancelBtn"
+            class="float-right marg-right">Cancel</b-button>
+          </b-col>
+        </b-row>
+      </b-form>
     </b-modal>
+
   </b-container>
 </template>
 
@@ -112,9 +142,7 @@ import axios from 'axios';
 
 const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
 
-const items = [{
-  name: 'Testproject', id: 1, startDate: 200, endDate: 300, ftePercentage: 1100, projectManagerId: 12,
-}];
+const items = [];
 
 export default {
   name: 'Projects',
@@ -124,33 +152,26 @@ export default {
   },
 
   beforeMount() {
-    // if (this.loggedInRole === 'ADMINISTRATOR') {
-    axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project`, restHeader)
-      .then((response) => {
-        console.log(response.data);
-        this.items = response.data;
-      });
-    // }
+    this.getProjects();
   },
 
   data() {
     return {
+      // API
+      ApiServer: process.env.VUE_APP_API_SERVER,
+      ApiPort: process.env.VUE_APP_API_PORT,
+      // Table data
       items,
-
       fields: [
         /*
         {
-          key: '_id',
+          key: 'id',
           label: 'ID',
+          sortable: true,
         }, */
         {
           key: 'name',
           label: 'Name',
-          // sortable: true,
-        },
-        {
-          key: 'id',
-          label: 'ID',
           sortable: true,
         },
         {
@@ -169,10 +190,16 @@ export default {
           label: 'FTE',
           sortable: true,
           sortDirection: 'desc',
-        },
+        }, /*
         {
           key: 'projectManagerId',
           label: 'ProjectManagerID',
+        }, */
+        {
+          key: 'projectManagerMail',
+          label: 'Projectmanager E-Mail',
+          sortable: true,
+          sortDirection: 'desc',
         },
       ],
       currentPage: 1,
@@ -183,10 +210,15 @@ export default {
       sortDesc: false,
       sortDirection: 'asc',
       filter: null,
-      modalInfo: {
-        title: '',
-        content: '',
-      },
+      // Create Project data
+      createProjectName: '',
+      createProjectFte: null,
+      createProjectStart: '',
+      createProjectEnd: '',
+      createProjectPmId: null,
+      pmOptions: [
+        { value: null, text: 'PM', disabled: true },
+      ],
     };
   },
   computed: {
@@ -198,20 +230,128 @@ export default {
     },
   },
   methods: {
-    info(item, index, button) {
-      this.modalInfo.title = `Row index: ${index}`;
-      this.modalInfo.content = JSON.stringify(item, null, 2);
-      this.$root.$emit('bv::show::modal', 'modalInfo', button);
-    },
-    resetModal() {
-      this.modalInfo.title = '';
-      this.modalInfo.content = '';
-    },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
+    createProject(evt) {
+      evt.preventDefault();
+
+      const pmId = this.createProjectPmId.substr(0, this.createProjectPmId.indexOf('-'));
+      const pmMail = this.createProjectPmId.substr(this.createProjectPmId.indexOf('-') + 1);
+
+      const data = {
+        name: this.createProjectName,
+        ftePercentage: this.createProjectFte,
+        startDate: this.createProjectStart,
+        endDate: this.createProjectEnd,
+        projectManagerId: pmId,
+      };
+
+      axios.post(`${this.ApiServer}:${this.ApiPort}/api/project`, data, restHeader)
+        .then((response) => {
+          const newProject = {
+            id: response.data.id,
+            name: response.data.name,
+            ftePercentage: response.data.ftePercentage,
+            startDate: response.data.startDate,
+            endDate: response.data.endDate,
+            projectManagerId: response.data.projectManagerId,
+            projectManagerMail: pmMail,
+          };
+
+          this.items.unshift(newProject);
+          this.totalRows = this.items.length;
+
+          this.createProjectModalCancelBtn();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    projectInfoModal(evt) {
+      console.log(evt);
+    },
+    createProjectModalCancelBtn() {
+      this.$refs.createProjectModal.hide();
+    },
+    createProjectModalCancel() {
+      this.createProjectName = '';
+      this.createProjectFte = null;
+      this.createProjectStart = '';
+      this.createProjectStart = '';
+      this.createProjectPmId = null;
+    },
+    createProjectModalOpen() {
+      this.loadPMs();
+    },
+    loadPMs() {
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
+        .then((response) => {
+          const arr = [{ value: null, text: 'PM', disabled: true }];
+          for (let i = 0; i < response.data.length; i += 1) {
+            arr.push({ value: `${response.data[i].id}-${response.data[i].emailAddress}`, text: response.data[i].emailAddress });
+          }
+
+          this.pmOptions = arr;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getProjects() {
+      let PMs = [];
+      let projects = [];
+
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
+        .then((response) => {
+          projects = response.data;
+        })
+        .then(() => {
+          axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
+            .then((response) => {
+              PMs = response.data;
+            })
+            .then(() => {
+              for (let i = 0; i < projects.length; i += 1) {
+                projects[i].projectManagerMail = 'n.a.';
+                for (let j = 0; j < PMs.length; j += 1) {
+                  if (projects[i].projectManagerId === PMs[j].id) {
+                    projects[i].projectManagerMail = PMs[j].emailAddress;
+                    break;
+                  }
+                }
+              }
+
+              this.items = projects;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
   },
 };
 </script>
+
+<style scoped>
+.marg-bot {
+  margin-bottom: 5px;
+}
+
+.marg-right {
+  margin-right: 5px;
+}
+
+.marg-left {
+  margin-left: 5px;
+}
+
+.marg-top {
+  margin-top: 5px;
+}
+</style>

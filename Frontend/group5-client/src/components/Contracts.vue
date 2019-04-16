@@ -116,14 +116,14 @@
     </b-modal> -->
 
     <!-- Info Contract Modal -->
-    <b-modal ref="infoContractModal" id="infoContractModal" title="Contract Info"
+    <b-modal ref="infoContractModal" id="infoContractModal" :title=this.infoTitle
              size="lg" @hide="infoContractCancel"
              hide-footer hide-header-close>
       <b-form @submit="updateContract">
         <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
                       label-cols="4" label-cols-lg="2" label="ID"
-                      label-for="selectedId">
-          <b-form-input id="selectedId"
+                      label-for="selectedId4">
+          <b-form-input id="selectedId4"
                         v-model="selectedContractId"
                         disabled required>
           </b-form-input>
@@ -131,14 +131,14 @@
 
         <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
                       label-for="selectedStartDate">
-          <b-form-input id="selectedStartDate"
+          <b-form-input id="selectedStartDate" type="date"
                         v-model="selectedContractStartDate"
                         v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
           </b-form-input>
         </b-form-group>
         <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
                       label-for="selectedEndDate">
-          <b-form-input id="selectedEndDate"
+          <b-form-input id="selectedEndDate" type="date"
                         v-model="selectedContractEndDate"
                         v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
           </b-form-input>
@@ -175,17 +175,32 @@
              title="Create Contract" @hide="createContractModalCancel" hide-footer
              hide-header-close>
       <b-form @submit="createContract">
-        <b-form-input v-model="createContractStartDate" id="startDate" class="marg-bot"
-                      type="date" placeholder="Start Date" required/>
-        <b-form-input v-model="createContractEndDate" id="endDate" class="marg-bot"
+        <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
+                  label-for="startDate9">
+            <b-form-input v-model="createContractStartDate" id="startDate9" class="marg-bot"
+                  type="date" placeholder="Start Date" required/>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
+                  label-for="endDate9">
+          <b-form-input v-model="createContractEndDate" id="endDate9" class="marg-bot"
                       type="date" placeholder="End Date" required/>
-        <b-form-input v-model="createContractPensum" id="pensum" class="marg-bot"
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Pensum %"
+                      label-for="pensum9">
+          <b-form-input v-model="createContractPensum" type="number" id="pensum9"
+                      min="1" max="100" class="marg-bot"
                       placeholder="Pensum" required/>
-        <b-form-input v-model="createContractEmployeeId" id="employeeId" class="marg-bot"
-                      placeholder="EmployeeId" required/>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Employee"
+                        label-for="roles9">
+          <b-form-select v-model="createContractEmployeeId" :options="employeeIdOptions"
+                       class="marg-bot" id="roles9" required>
+          </b-form-select>
+        </b-form-group>
         <b-row class="marg-top">
           <b-col>
-            <b-button variant="success" class="float-right" type="submit">Create</b-button>
+            <b-button variant="success" class="float-right" type="submit"
+                      :disabled="validateState()">Create</b-button>
             <b-button @click="createContractModalCancel"
                       class="float-right marg-right">Cancel</b-button>
           </b-col>
@@ -215,14 +230,11 @@ export default {
 
   data() {
     return {
+      // API
+      ApiServer: process.env.VUE_APP_API_SERVER,
+      ApiPort: process.env.VUE_APP_API_PORT,
       items,
-
       fields: [
-        /*
-        {
-          key: '_id',
-          label: 'ID',
-        }, */
         {
           key: 'id',
           label: 'ID',
@@ -249,6 +261,11 @@ export default {
           key: 'employeeId',
           label: 'EmployeeID',
         },
+        {
+          key: 'email',
+          label: 'Employee Email',
+          sortable: true,
+        },
       ],
       currentPage: 1,
       perPage: 5,
@@ -267,11 +284,15 @@ export default {
       selectedContractEndDate: '',
       selectedContractPensum: null,
       selectedContractEmployeeId: '',
+      selectedContractEmail: '',
       createContractId: null,
       createContractStartDate: '',
       createContractEndDate: '',
       createContractPensum: null,
       createContractEmployeeId: null,
+      createContractEmail: '',
+      infoTitle: '',
+      employeeIdOptions: this.getEmployees(),
     };
   },
   computed: {
@@ -282,24 +303,6 @@ export default {
         .map(f => ({ text: f.label, value: f.key }));
     },
   },
-  /*
-    methods: {
-    info(item, index, button) {
-      this.modalInfo.title = `Row index: ${index}`;
-      this.modalInfo.content = JSON.stringify(item, null, 2);
-      this.$root.$emit('bv::show::modal', 'modalInfo', button);
-    },
-    resetModal() {
-      this.modalInfo.title = '';
-      this.modalInfo.content = '';
-    },
-    onFiltered(filteredItems) {
-      // Trigger pagination to update the number of buttons/pages due to filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
-    },
-  },
-  */
   methods: {
     info(item, index, button) {
       this.modalInfo.title = `Row index: ${index}`;
@@ -317,13 +320,16 @@ export default {
     },
     getContract() {
       if (this.loggedInRole === 'ADMINISTRATOR') {
-        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract`, restHeader)
           .then((response) => {
-            this.items = response.data;
-            this.totalRows = this.items.length;
+            this.totalRows = response.data.length;
+            return response.data;
+          })
+          .then((its) => {
+            this.combineItems(its);
           });
       } else if (this.loggedInRole === 'PROJECTMANAGER') {
-        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract?role=DEVELOPER`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract?role=DEVELOPER`, restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
@@ -339,20 +345,30 @@ export default {
         pensumPercentage: this.createContractPensum,
         employeeId: this.createContractEmployeeId,
       };
-      // todo
-      axios.post(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract?id=${this.createContractEmployeeId}`, data, restHeader)
+      // eslint-disable-next-line
+      Promise.resolve(this.getEmailFromEmployeeId(this.createContractEmployeeId) )
+      // eslint-disable-next-line
+        .then(email => this.createContractEmail = email)
+        .then(() => axios.post(`${this.ApiServer}:${this.ApiPort}/api/contract?id=${this.createContractEmployeeId}`, data, restHeader))
+      // eslint-disable-next-line
+        .then(async (response) => await {
+          res: response,
+          email: this.createContractEmail,
+        })
         .then((response) => {
           const newContract = {
-            id: response.data.id,
-            startDate: response.data.startDate,
-            endDate: response.data.endDate,
-            pensumPercentage: response.data.pensumPercentage,
-            employeeId: response.data.employeeId,
+            id: response.res.data.id,
+            startDate: response.res.data.startDate,
+            endDate: response.res.data.endDate,
+            pensumPercentage: response.res.data.pensumPercentage,
+            employeeId: response.res.data.employeeId,
+            email: response.email,
           };
-
+          return newContract;
+        })
+        .then((newContract) => {
           this.items.push(newContract);
           this.totalRows = this.items.length;
-
           this.createContractModalCancel();
         })
         .catch((error) => {
@@ -363,7 +379,7 @@ export default {
       this.createContractStartDate = '';
       this.createContractEndDate = '';
       this.createContractPensum = '';
-      this.createContractEmployeeId = '';
+      this.createContractEmployeeId = null;
       this.$refs.createContract.hide();
     },
     infoContractModal(evt) {
@@ -372,7 +388,8 @@ export default {
       this.selectedContractEndDate = evt.endDate;
       this.selectedContractPensum = evt.pensumPercentage;
       this.selectedContractEmployeeId = evt.employeeId;
-
+      this.selectedContractEmail = evt.email;
+      this.infoTitle = `Contract Info of ${evt.email}`;
       this.$refs.infoContractModal.show();
     },
     updateContract(evt) {
@@ -385,7 +402,7 @@ export default {
         employeeId: this.selectedContractEmployeeId,
       };
 
-      axios.put(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract/${this.selectedContractId}`, data, restHeader)
+      axios.put(`${this.ApiServer}:${this.ApiPort}/api/contract/${this.selectedContractId}`, data, restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -403,9 +420,8 @@ export default {
           console.log(error);
         });
     },
-    // todo
     infoContractDelete() {
-      axios.delete(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract/${this.selectedContractId}`, restHeader)
+      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/contract/${this.selectedContractId}`, restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -430,10 +446,78 @@ export default {
 
       this.$refs.infoContractModal.hide();
     },
+    getEmployees() {
+      const employees = [{ value: null, text: 'Employee', disabled: true }];
+      if (this.loggedInRole === 'ADMINISTRATOR') {
+        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
+          .then(response => response.data)
+          .then(res => res.forEach(entry => employees
+            .push({ value: entry.id, text: entry.emailAddress })))
+          .then(() => employees);
+      }
+      return employees;
+    },
+    combineItems(its) {
+      const employees = [];
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, restHeader)
+        .then(response => response.data)
+        .then(res => res.forEach(entry => employees
+          .push({ value: entry.id, text: entry.emailAddress })))
+        .then(() => {
+          // eslint-disable-next-line
+          for(let i = 0; i < its.length; i++) {
+            // eslint-disable-next-line
+            for (let j = 0; j < employees.length; j++) {
+              if (its[i].employeeId === employees[j].value) {
+                if (employees[j].text !== undefined) {
+                  // eslint-disable-next-line
+                  its[i].email = employees[j].text;
+                }
+              }
+            }
+            // eslint-disable-next-line
+            if (!its[i].email) {
+              // eslint-disable-next-line
+              its[i].email = 'n.a.';
+            }
+          }
+        })
+        .then(() => { this.items = its; });
+    },
+    async getEmailFromEmployeeId(employeeId) {
+      let address;
+      await axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee/${employeeId}`, restHeader)
+      // eslint-disable-next-line
+        .then(response => address = response.data.emailAddress);
+      return address;
+    },
+    validateState() {
+      if (!this.createContractStartDate || !this.createContractEndDate) {
+        return true;
+      }
+      if (this.createContractEndDate < this.createContractStartDate) {
+        return true;
+      }
+      return false;
+    },
   },
 };
 </script>
 
 <style scoped>
+  .marg-bot {
+    margin-bottom: 5px;
+  }
 
+  .marg-right {
+    margin-right: 5px;
+  }
+
+  .marg-left {
+    margin-left: 5px;
+  }
+
+  .marg-top {
+    margin-top: 5px;
+  }
 </style>

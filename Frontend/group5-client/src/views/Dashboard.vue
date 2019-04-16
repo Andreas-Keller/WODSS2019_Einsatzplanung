@@ -1,10 +1,10 @@
 <template>
   <div>
-    <Navbar :employeeName=loggedInEmployeeName />
-    <Employees :loggedInRole=loggedInRole />
-    <Projects  />
-    <Contracts :loggedInRole=loggedInRole />
-    <Allocations :loggedInRole=loggedInRole />
+    <Navbar :employeeName="this.loggedInEmployeeName" />
+    <Employees :loggedInRole="loggedInRole" />
+    <Projects  :loggedInRole="loggedInRole" />
+    <Contracts :loggedInRole="loggedInRole" />
+    <Allocations :loggedInRole="loggedInRole" />
   </div>
 </template>
 

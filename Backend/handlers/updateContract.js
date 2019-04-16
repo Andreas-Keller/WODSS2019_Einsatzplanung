@@ -15,24 +15,24 @@
  *
  */
 exports.handler = async function updateContract(req, res, next) {
-    let contract = {
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
-        pensumPercentage: req.body.pensumPercentage,
-        employeeId: req.body.employeeId
-    };
+  const fb = require('../firebase/contract.crud.js');
+  let contract = {
+    pensumPercentage: req.body.pensumPercentage,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+    employeeId: req.body.employeeId,
+    id: String(req.params.id)
+  };
 
-    const contractFirebase = require('../firebase/contract.crud.js');
-    if (contract.startDate === null ||
-        contract.endDate === null ||
-        contract.pensumPercentage === null ||
-        contract.employeeId === null) {
-        res.status(412).send("Precondition for the contract failed");
-
-    } else {
-        let updateContract = await contractFirebase.updateContract(contract);
-        res.send(updateContract.httpStatus).send(updateContract.payload);
-    }
-
-    next()
+  if (contract.pensumPercentage == null ||
+      contract.startDate == null ||
+      contract.endDate == null ||
+      contract.employeeId == null ||
+      contract.id == null) {
+    res.status(412).send("Precondition for the contract failed");
+  } else {
+    let response = await fb.updateContract(contract);
+    res.status(response.httpStatus).send(response.payload);
+  }
+  next()
 };

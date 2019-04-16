@@ -62,7 +62,7 @@ const deleteEntity = async (id, collection) => {
     }
     return new Await_response(204, "deleted", await collection
         .doc(String(id))
-        .delete(data));
+        .delete());
 };
 
 const findBy = async (lookupVar, value, collection) => {

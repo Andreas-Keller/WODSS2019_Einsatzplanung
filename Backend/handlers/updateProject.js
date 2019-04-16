@@ -21,7 +21,8 @@ exports.handler = async function updateProject(req, res, next) {
         ftePercentage: req.body.ftePercentage,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        projectManagerId: req.body.projectManagerId
+        projectManagerId: req.body.projectManagerId,
+        id: String(req.params.id)
     };
 
     const projectFirebase = require('../firebase/project.crud.js');
@@ -29,7 +30,8 @@ exports.handler = async function updateProject(req, res, next) {
         project.ftePercentage === null ||
         project.startDate === null ||
         project.endDate === null ||
-        project.projectManagerId) {
+        project.projectManagerId ||
+        project.id == null) {
         res.status(412).send("Precondition for the project failed");
     } else {
         let updateProject = await projectFirebase.updateAllocation(project);
