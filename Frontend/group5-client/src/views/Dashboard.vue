@@ -1,10 +1,22 @@
 <template>
   <div>
-    <Navbar :employeeName="this.loggedInEmployeeName" />
+    <Navbar :employeeName="this.loggedInEmployeeName" class="marg-bot-nav" />
     <Employees :loggedInRole="loggedInRole" />
+    <div class="marg-line">
+      <b-tabs>
+      </b-tabs>
+    </div>
     <Projects  :loggedInRole="loggedInRole" :loggedInId="loggedInId" />
+    <div class="marg-line">
+      <b-tabs>
+      </b-tabs>
+    </div>
     <Contracts :loggedInRole="loggedInRole" />
-    <Allocations :loggedInRole="loggedInRole" />
+    <div class="marg-line">
+      <b-tabs>
+      </b-tabs>
+    </div>
+    <Allocations :loggedInRole="loggedInRole"/>
   </div>
 </template>
 
@@ -64,5 +76,12 @@ export default {
 </script>
 
 <style scoped>
+.marg-bot-nav {
+  margin-bottom: 10px;
+}
 
+.marg-line {
+  margin-bottom: 25px;
+  margin-top: 25px;
+}
 </style>

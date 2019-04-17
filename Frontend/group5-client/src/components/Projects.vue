@@ -1,6 +1,30 @@
 <template>
   <b-container fluid>
     <h1>Projects</h1>
+    <h4>Data filter</h4>
+    <b-row>
+      <b-col md="4">
+        <b-form-group label-cols-sm="3" label="From Date" class="mb-0">
+          <b-form-input type="date" v-bind:max="filterToDate"
+            v-model="filterFromDate">
+          </b-form-input>
+        </b-form-group>
+      </b-col>
+      <b-col md="4">
+        <b-form-group label-cols-sm="3" label="To Date" class="mb-0">
+          <b-form-input type="date" v-bind:min="filterFromDate"
+            v-model="filterToDate">
+          </b-form-input>
+        </b-form-group>
+      </b-col>
+      <b-col md="4">
+        <b-form-group label-cols-sm="3" label="ProjectManager Mail" class="mb-0">
+          <b-form-select v-model="filterPmId" :options="pmOptions">
+          </b-form-select>
+        </b-form-group>
+      </b-col>
+    </b-row>
+    <h4>Table filter</h4>
     <b-row>
       <b-col md="6" class="my-1">
         <b-form-group label-cols-sm="3" label="Filter" class="mb-0">
@@ -292,6 +316,7 @@ export default {
 
   beforeMount() {
     this.getProjects();
+    this.loadPMs();
   },
 
   data() {
@@ -349,6 +374,9 @@ export default {
       sortDesc: false,
       sortDirection: 'asc',
       filter: null,
+      filterFromDate: null,
+      filterToDate: null,
+      filterPmId: null,
       // Create project data
       createProjectName: '',
       createProjectFte: null,
@@ -430,12 +458,18 @@ export default {
     createProjectModalOpen() {
       this.loadPMs(false);
     },
-    loadPMs() {
+    loadPMs(isFilter) {
       axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
         .then((response) => {
           const arr = [{ value: null, text: 'PM', disabled: true }];
           for (let i = 0; i < response.data.length; i += 1) {
-            arr.push({ value: `${response.data[i].id}-${response.data[i].emailAddress}`, text: response.data[i].emailAddress });
+            let val;
+            if (isFilter) {
+              val = `${response.data[i].id}`;
+            } else {
+              val = `${response.data[i].id}-${response.data[i].emailAddress}`;
+            }
+            arr.push({ value: val, text: response.data[i].emailAddress });
           }
 
           this.pmOptions = arr;
@@ -565,6 +599,10 @@ export default {
 </script>
 
 <style scoped>
+h4 {
+  margin-top: 15px;
+}
+
 .marg-bot {
   margin-bottom: 5px;
 }
