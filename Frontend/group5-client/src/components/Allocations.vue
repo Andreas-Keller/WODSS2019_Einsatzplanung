@@ -391,19 +391,23 @@ export default {
               projectId: this.createAllocationProjectId,
               pensumPercentage: this.createAllocationPensumPercentage,
             };
+            const newAllocation = {};
 
+            Promise.resolve(this.getNameOfNewProject(this.createAllocationProjectId))
+            // eslint-disable-next-line
+              .then((obj) => newAllocation.projectName = obj.name)
             axios.post(`${this.ApiServer}:${this.ApiPort}/api/allocation`, data, restHeader)
               .then((response) => {
-                const newAllocation = {
-                  id: response.data.id,
-                  startDate: response.data.startDate,
-                  endDate: response.data.endDate,
-                  contractId: response.data.contractId,
-                  projectId: response.data.projectId,
-                  pensumPercentage: response.data.pensumPercentage,
-                };
-
-                this.items.push(newAllocation);
+                newAllocation.id = response.data.id;
+                newAllocation.startDate = response.data.startDate;
+                newAllocation.endDate = response.data.endDate;
+                newAllocation.contractId = response.data.contractId;
+                newAllocation.projectId = response.data.projectId;
+                newAllocation.pensumPercentage = response.data.pensumPercentage;
+                return newAllocation;
+              })
+              .then((alloc) => {
+                this.items.push(alloc);
                 this.totalRows = this.items.length;
 
                 this.createAllocationModalCancel();
@@ -560,6 +564,10 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+    },
+    getNameOfNewProject(projectId) {
+      return axios.get(`${this.ApiServer}:${this.ApiPort}/api/project/${projectId}`, restHeader)
+        .then(response => response.data);
     },
   },
 };
