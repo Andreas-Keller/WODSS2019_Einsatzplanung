@@ -1,13 +1,6 @@
 /**
  * Bearer
  */
-function decodeToken(req) {
-    let jwt = require('jsonwebtoken');
-    let token = jwt.decode(String(req.headers.authorization).split(' ')[1]);
-    console.log(token);
-    return token;
-}
-
 
 function verify(token, req) {
     let role = token.role;
@@ -16,7 +9,7 @@ function verify(token, req) {
 
     url = url.split('?')[0];
 
-    if(req.params.id !== undefined){
+    if (req.params.id !== undefined) {
         url = url.replace("/" + req.params.id, '');
     }
 
@@ -135,7 +128,8 @@ module.exports = function Bearer(req, res, next) {
             next(error);
         } else {
             console.log("OTHER");
-            const token = decodeToken(req);
+            const util = require("../../util/util");
+            const token = util.decodeToken(req);
             if (!verify(token, req)) {
                 const error = new Error('Unauthenticated or invalid token');
                 error.status = error.statusCode = 401;

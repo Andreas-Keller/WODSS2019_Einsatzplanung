@@ -15,7 +15,7 @@ exports.handler = async function getEmployees(req, res, next) {
     let data = response.payload;
     let array = [];
 
-    if(req.query.role !== undefined) {
+    if(req.query.role != undefined) {
         for(let i = 0; i < response.payload.length; i++) {
             if(response.payload[i].role === req.query.role && response.payload[i].emailAddress !== null) {
                 array.push(response.payload[i]);
