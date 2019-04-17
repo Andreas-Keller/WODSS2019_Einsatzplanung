@@ -536,7 +536,6 @@ export default {
         .then((response) => {
           const arr = [{ value: null, text: 'PM', disabled: true }];
           for (let i = 0; i < response.data.length; i += 1) {
-
             arr.push({ value: `${response.data[i].id}-${response.data[i].emailAddress}`, text: response.data[i].emailAddress });
           }
 
