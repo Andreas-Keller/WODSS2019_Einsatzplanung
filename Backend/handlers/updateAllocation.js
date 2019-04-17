@@ -33,10 +33,29 @@ exports.handler = async function updateAllocation(req, res, next) {
         allocation.contractId == null ||
         allocation.id == null) {
         res.status(412).send("Precondition for the allocation failed");
+
     } else {
-        const fb = require('../firebase/allocation.crud.js');
-        let response = await fb.updateAllocation(allocation);
-        res.status(response.httpStatus).send(response.payload);
+        const allocationFirebase = require('../firebase/allocation.crud.js');
+        let foundAllocation = await allocationFirebase.getAllocation(allocation.id);
+        const contractFirebase = require('../firebase/contract.crud.js');
+        let foundContract = await contractFirebase.getContract(allocation.contractId);
+        const projectFirebase = require('../firebase/project.crud.js');
+        let foundProject = await projectFirebase.getProject(allocation.projectId);
+
+        if (foundAllocation.httpStatus === 500 ||
+            foundContract.httpStatus === 500 ||
+            foundProject.httpStatus === 500) {
+            res.status(500).send("Uncaught or internal server error");
+
+        } else if (foundAllocation.httpStatus === 404 ||
+                    foundContract.httpStatus === 404 ||
+                    foundProject.httpStatus === 404) {
+            res.status(404).send("Allocation, contract or project not found");
+            
+        } else {
+            let updateAllocation = await allocationFirebase.updateAllocation(allocation);
+            res.status(updateAllocation.httpStatus).send(updateAllocation.payload);
+        }
     }
     next()
 };
