@@ -145,11 +145,18 @@
         </b-form-group>
         <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
           label-for="selectedProjectEnd">
-          <b-form-input
+          <b-form-input v-if="new Date().toISOString().split('T')[0] >
+            this.selectedProjectStart"
             id="selectedProjectEnd" v-model="selectedProjectEnd"
             type="date" v-bind:min="new Date().toISOString().split('T')[0]"
             v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR' &&
               this.loggedInId !== String(this.selectedProjectPmId)" required>
+          </b-form-input>
+          <b-form-input v-else id="selectedProjectEnd"
+            v-model="selectedProjectEnd" type="date"
+            v-bind:min="this.selectedProjectStart"
+            v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR' &&
+            this.loggedInId !== String(this.selectedProjectPmId)" required>
           </b-form-input>
         </b-form-group>
         <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
@@ -247,9 +254,11 @@
         <b-form-input id="projectFte" class="marg-bot" type="number"
           v-model="createProjectFte" min="0" placeholder="Full Time Employee" required />
         <b-form-input id="projectStart" class="marg-bot" type="date"
-          v-model="createProjectStart" placeholder="Project Start Date" required />
+          v-model="createProjectStart" v-bind:max="createProjectEnd"
+          placeholder="Project Start Date" required />
         <b-form-input id="projectEnd" class="marg-bot" type="date"
-          v-model="createProjectEnd" placeholder="Project End Date" required />
+          v-model="createProjectEnd" v-bind:min="createProjectStart"
+          placeholder="Project End Date" required />
         <b-form-select v-model="createProjectPmId"
          :options="pmOptions" class="marg-bot" required>
         </b-form-select>
@@ -415,7 +424,7 @@ export default {
       this.createProjectName = '';
       this.createProjectFte = null;
       this.createProjectStart = '';
-      this.createProjectStart = '';
+      this.createProjectEnd = '';
       this.createProjectPmId = null;
     },
     createProjectModalOpen() {
