@@ -29,13 +29,29 @@ exports.handler = async function updateProject(req, res, next) {
         project.ftePercentage === null ||
         project.startDate === null ||
         project.endDate === null ||
-        project.projectManagerId ||
-        project.id == null) {
+        project.projectManagerId === null ||
+        project.id === null) {
         res.status(412).send("Precondition for the project failed");
+
     } else {
         const projectFirebase = require('../firebase/project.crud.js');
-        let updateProject = await projectFirebase.updateAllocation(project);
-        res.send(updateProject.httpStatus).send(updateProject.payload);
+        let foundProject = await projectFirebase.getProject(project.id);
+        const employeeFirebase = require('../firebase/employee.crud');
+        let foundEmployee = await employeeFirebase.getEmployee(project.projectManagerId);
+
+        if (foundProject.httpStatus === 500 ||
+            foundEmployee.httpStatus === 500) {
+            res.status(500).send("Uncaught or internal server error");
+
+        } else if (foundProject.httpStatus === 404 ||
+                    foundEmployee.httpStatus === 404 ||
+                    foundEmployee.role !== "PROJECTMANAGER") {
+            res.status(404).send("Project or project manager not found");
+
+        } else {
+            let updatedProject = await projectFirebase.updateProject(project);
+            res.status(updatedProject.httpStatus).send(updatedProject.payload);
+        }
     }
 
     next()

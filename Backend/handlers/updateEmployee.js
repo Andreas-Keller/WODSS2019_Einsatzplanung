@@ -32,11 +32,22 @@ exports.handler = async function updateEmployee(req, res, next) {
         employee.emailAddress == null ||
         employee.id == null) {
         res.status(412).send("Precondition for the employee failed");
+
     } else {
         const fb = require('../firebase/employee.crud.js');
-        let response = await fb.updateEmployee(employee);
-        res.status(response.httpStatus).send(response.payload);
+        let foundEmployee = await fb.findBy("emailAddress", employee.emailAddress);
+        
+        if (foundEmployee.httpStatus === 500){
+            res.send(foundEmployee.httpStatus).send(foundEmployee.payload);
+
+        } else if (foundEmployee.httpStatus === 404) {
+            res.send(foundEmployee.httpStatus).send("Employee not found");
+
+        } else {
+            let updatedEmployee = await fb.updateEmployee(employee);
+            res.status(updatedEmployee.httpStatus).send(updatedEmployee.payload);
+        }
     }
 
     next();
-}
+};

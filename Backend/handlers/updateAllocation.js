@@ -26,12 +26,12 @@ exports.handler = async function updateAllocation(req, res, next) {
         id: String(req.params.id)
     };
 
-    if (allocation.pensumPercentage == null ||
-        allocation.startDate == null ||
-        allocation.endDate == null ||
-        allocation.projectId == null ||
-        allocation.contractId == null ||
-        allocation.id == null) {
+    if (allocation.pensumPercentage === null ||
+        allocation.startDate === null ||
+        allocation.endDate === null ||
+        allocation.projectId === null ||
+        allocation.contractId === null ||
+        allocation.id === null) {
         res.status(412).send("Precondition for the allocation failed");
 
     } else {
@@ -51,10 +51,10 @@ exports.handler = async function updateAllocation(req, res, next) {
                     foundContract.httpStatus === 404 ||
                     foundProject.httpStatus === 404) {
             res.status(404).send("Allocation, contract or project not found");
-            
+
         } else {
-            let updateAllocation = await allocationFirebase.updateAllocation(allocation);
-            res.status(updateAllocation.httpStatus).send(updateAllocation.payload);
+            let updatedAllocation = await allocationFirebase.updateAllocation(allocation);
+            res.status(updatedAllocation.httpStatus).send(updatedAllocation.payload);
         }
     }
     next()
