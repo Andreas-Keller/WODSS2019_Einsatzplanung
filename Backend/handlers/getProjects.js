@@ -12,7 +12,7 @@
 exports.handler = async function getProjects(req, res, next) {
     const projectFirebase = require('../firebase/project.crud.js');
     let response = await projectFirebase.getProjects();
-    const util = require("../util/util");
+    const util = require("../util/Util");
     const user = util.decodeToken(req);
     if (response.httpStatus === 200) {
         // if (user.role === "DEVELOPER") {
@@ -31,7 +31,7 @@ exports.handler = async function getProjects(req, res, next) {
         if (req.query.projectManagerId) {
             let data = [];
             for (let i = 0; i < response.payload.length; i++) {
-                if (response.payload[i].projectManagerId === req.query.projectManagerId) {
+                if (response.payload[i].projectManagerId == req.query.projectManagerId) {
                     data.push(response.payload[i]);
                 }
             }

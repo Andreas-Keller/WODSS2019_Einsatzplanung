@@ -1,5 +1,5 @@
 <template>
-<b-container v-if="this.loggedInRole !== 'DEVELOPER'" fluid>
+<b-container fluid>
   <b-alert v-model="showFailCreateAllocationAlertFTE" variant="danger" class="alert-center"
            fade dismissible>
     Project already fully occupied - Decrease pensum or reduce timerange

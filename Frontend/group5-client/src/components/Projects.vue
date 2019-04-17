@@ -3,25 +3,30 @@
     <h1>Projects</h1>
     <h4>Data filter</h4>
     <b-row>
-      <b-col md="4">
+      <b-col md="3">
         <b-form-group label-cols-sm="3" label="From Date" class="mb-0">
           <b-form-input type="date" v-bind:max="filterToDate"
             v-model="filterFromDate">
           </b-form-input>
         </b-form-group>
       </b-col>
-      <b-col md="4">
+      <b-col md="3">
         <b-form-group label-cols-sm="3" label="To Date" class="mb-0">
           <b-form-input type="date" v-bind:min="filterFromDate"
             v-model="filterToDate">
           </b-form-input>
         </b-form-group>
       </b-col>
-      <b-col md="4">
-        <b-form-group label-cols-sm="3" label="ProjectManager Mail" class="mb-0">
+      <b-col md="3">
+        <b-form-group label-cols-sm="3" label="PM E-Mail" class="mb-0">
           <b-form-select v-model="filterPmId" :options="pmOptions">
           </b-form-select>
         </b-form-group>
+      </b-col>
+      <b-col md="3">
+        <b-button variant="primary" class="float-right"
+          @click="applyFilter">Filter</b-button>
+        <b-button class="float-right marg-right" @click="resetFilter">Reset</b-button>
       </b-col>
     </b-row>
     <h4>Table filter</h4>
@@ -410,6 +415,74 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
+    resetFilter() {
+      this.filterFromDate = null;
+      this.filterToDate = null;
+      this.filterPmId = null;
+      this.getProjects();
+    },
+    applyFilter() {
+      console.log('apply');
+
+      if (this.filterFromDate === null && this.filterToDate === null && this.filterPmId === null) {
+        console.log('no filter');
+        return;
+      }
+
+      let from = '';
+
+      if (this.filterFromDate !== null && this.filterFromDate !== '') {
+        from = `fromDate=${this.filterFromDate}&`;
+      }
+
+      let to = '';
+
+      if (this.filterToDate !== null && this.filterToDate !== '') {
+        to = `toDate=${this.filterToDate}&`;
+      }
+
+      let pmId = '';
+
+      console.log(this.filterPmId);
+
+      if (this.filterPmId !== null) {
+        pmId = `projectManagerId=${this.filterPmId.split('-')[0]}`;
+      }
+
+      let PMs = [];
+      let projects = [];
+
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/project?${from}${to}${pmId}`, restHeader)
+        .then((response) => {
+          console.log(response);
+          projects = response.data;
+        })
+        .then(() => {
+          axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
+            .then((response) => {
+              PMs = response.data;
+            })
+            .then(() => {
+              for (let i = 0; i < projects.length; i += 1) {
+                projects[i].projectManagerMail = 'n.a.';
+                for (let j = 0; j < PMs.length; j += 1) {
+                  if (projects[i].projectManagerId === PMs[j].id) {
+                    projects[i].projectManagerMail = PMs[j].emailAddress;
+                    break;
+                  }
+                }
+              }
+
+              this.items = projects;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     createProject(evt) {
       evt.preventDefault();
 
@@ -456,20 +529,15 @@ export default {
       this.createProjectPmId = null;
     },
     createProjectModalOpen() {
-      this.loadPMs(false);
+      this.loadPMs();
     },
-    loadPMs(isFilter) {
+    loadPMs() {
       axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
         .then((response) => {
           const arr = [{ value: null, text: 'PM', disabled: true }];
           for (let i = 0; i < response.data.length; i += 1) {
-            let val;
-            if (isFilter) {
-              val = `${response.data[i].id}`;
-            } else {
-              val = `${response.data[i].id}-${response.data[i].emailAddress}`;
-            }
-            arr.push({ value: val, text: response.data[i].emailAddress });
+
+            arr.push({ value: `${response.data[i].id}-${response.data[i].emailAddress}`, text: response.data[i].emailAddress });
           }
 
           this.pmOptions = arr;
@@ -551,10 +619,10 @@ export default {
       this.selectedProjectFte = evt.ftePercentage;
       this.selectedProjectStart = evt.startDate;
       this.selectedProjectEnd = evt.endDate;
-      this.selectedProjectPmId = evt.projectManagerId;
+      this.selectedProjectPmId = String(evt.projectManagerId);
       this.selectedProjectPmIdMail = `${evt.projectManagerId}-${evt.projectManagerMail}`;
 
-      this.loadPMs(true);
+      this.loadPMs();
 
       if (evt.endDate >= new Date().toISOString().split('T')[0]) {
         this.$refs.infoProjectModal.show();

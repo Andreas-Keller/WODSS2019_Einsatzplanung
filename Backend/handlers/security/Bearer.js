@@ -128,7 +128,7 @@ module.exports = function Bearer(req, res, next) {
             next(error);
         } else {
             console.log("OTHER");
-            const util = require("../../util/util");
+            const util = require("../../util/Util");
             const token = util.decodeToken(req);
             if (!verify(token, req)) {
                 const error = new Error('Unauthenticated or invalid token');
