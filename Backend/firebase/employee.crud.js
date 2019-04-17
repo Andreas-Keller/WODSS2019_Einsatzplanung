@@ -8,7 +8,7 @@ const getEmployees = async () => {
 };
 
 const getEmployee = async (id) => {
-    return await crud.findBy("id", id, employees)
+    return await crud.findBy("id", String(id), employees)
 };
 
 const createEmployee = async (employee) => {

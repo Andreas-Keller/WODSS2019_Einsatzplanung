@@ -18,8 +18,8 @@ exports.handler = async function createAllocation(req, res, next) {
         startDate: req.body.startDate,
         endDate: req.body.endDate,
         pensumPercentage: req.body.pensumPercentage,
-        contractId: req.body.contractId,
-        projectId: req.body.projectId
+        contractId: String(req.body.contractId),
+        projectId: String(req.body.projectId)
     };
 
     const contractFirebase = require('../firebase/contract.crud.js');

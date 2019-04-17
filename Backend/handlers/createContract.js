@@ -17,9 +17,9 @@ exports.handler = async function createContract(req, res, next) {
         startDate: req.body.startDate,
         endDate: req.body.endDate,
         pensumPercentage: req.body.pensumPercentage,
-        employeeId: req.body.employeeId
+        employeeId: String(req.body.employeeId)
     };
-
+    console.log(contract);
     const employeeFirebase = require('../firebase/employee.crud.js');
     let employee = await employeeFirebase.getEmployee(contract.employeeId);
     if (contract.startDate === null ||

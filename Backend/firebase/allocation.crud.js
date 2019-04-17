@@ -8,7 +8,7 @@ const getAllocations = async () => {
 };
 
 const getAllocation = async (id) => {
-    return await crud.findBy("id", id, allocations)
+    return await crud.findBy("id", String(id), allocations)
 };
 
 const createAllocation = async (allocation) => {

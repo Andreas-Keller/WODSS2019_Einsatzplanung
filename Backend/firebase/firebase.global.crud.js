@@ -67,7 +67,7 @@ const deleteEntity = async (id, collection) => {
 
 const findBy = async (lookupVar, value, collection) => {
     let response = null;
-    await collection.where(lookupVar, '==', value).limit(1).get()
+    await collection.where(lookupVar, '==', String(value)).limit(1).get()
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No matching documents. (findBy)');

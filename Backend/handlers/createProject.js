@@ -18,7 +18,7 @@ exports.handler = async function createProject(req, res, next) {
         ftePercentage: req.body.ftePercentage,
         startDate: req.body.startDate,
         endDate: req.body.endDate,
-        projectManagerId: req.body.projectManagerId
+        projectManagerId: String(req.body.projectManagerId)
     };
 
     console.log(project);
