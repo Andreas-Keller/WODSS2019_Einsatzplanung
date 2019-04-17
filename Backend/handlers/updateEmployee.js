@@ -36,7 +36,7 @@ exports.handler = async function updateEmployee(req, res, next) {
     } else {
         const fb = require('../firebase/employee.crud.js');
         let foundEmployee = await fb.findBy("emailAddress", employee.emailAddress);
-        
+
         if (foundEmployee.httpStatus === 500){
             res.send(foundEmployee.httpStatus).send(foundEmployee.payload);
 
