@@ -27,7 +27,7 @@ const create = async (data, collection) => {
             .then(async snapshot => {
                 if (snapshot.empty) {
                     console.log('Found unused ID (in create)');
-                    data.id = id;
+                    data.id = String(id);
                     returnValue = collection.doc(String(id))
                         .set(data, {merge: true});
                     return new Await_response(200, "Created enitity", data);
