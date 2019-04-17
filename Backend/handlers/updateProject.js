@@ -36,10 +36,15 @@ exports.handler = async function updateProject(req, res, next) {
         res.status(412).send("Precondition for the project failed");
 
     } else {
+        console.log('-------');
+        console.log(project);
         const projectFirebase = require('../firebase/project.crud.js');
         let foundProject = await projectFirebase.getProject(project.id);
         const employeeFirebase = require('../firebase/employee.crud');
-        let foundEmployee = await employeeFirebase.getEmployee(project.projectManagerId);
+        let foundEmployee = await employeeFirebase.findBy('id', project.projectManagerId);
+        
+        console.log(foundProject);
+        console.log(foundEmployee);
 
         if (foundProject.httpStatus === 500 ||
             foundEmployee.httpStatus === 500) {
@@ -47,7 +52,7 @@ exports.handler = async function updateProject(req, res, next) {
 
         } else if (foundProject.httpStatus === 404 ||
                     foundEmployee.httpStatus === 404 ||
-                    foundEmployee.role !== "PROJECTMANAGER") {
+                    foundEmployee.payload.role !== "PROJECTMANAGER") {
             res.status(404).send("Project or project manager not found");
 
         } else {
