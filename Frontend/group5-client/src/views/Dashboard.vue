@@ -2,7 +2,7 @@
   <div>
     <Navbar :employeeName="this.loggedInEmployeeName" />
     <Employees :loggedInRole="loggedInRole" />
-    <Projects  :loggedInRole="loggedInRole" />
+    <Projects  :loggedInRole="loggedInRole" :loggedInId="loggedInId" />
     <Contracts :loggedInRole="loggedInRole" />
     <Allocations :loggedInRole="loggedInRole" />
   </div>
@@ -26,6 +26,7 @@ export default {
       loggedInEmployee: '',
       loggedInEmployeeName: '',
       loggedInRole: '',
+      loggedInId: '',
     };
   },
   components: {
@@ -45,6 +46,7 @@ export default {
           this.loggedInEmployee = decoded;
           this.loggedInEmployeeName = `${this.loggedInEmployee.firstName} ${this.loggedInEmployee.lastName}`;
           this.loggedInRole = this.loggedInEmployee.role;
+          this.loggedInId = String(this.loggedInEmployee.id);
           console.log(`${this.loggedInRole}`);
         } catch (error) {
           // COMMENTED OUT FOR DEV PURPOSE

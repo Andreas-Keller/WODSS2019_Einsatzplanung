@@ -110,6 +110,135 @@
       </b-col>
     </b-row>
 
+    <!-- Info Project Modal -->
+    <b-modal ref="infoProjectModal" id="infoProjectModal" title="Info Project"
+      size="lg" @hide="infoProjectCancel" hide-footer hide-header-close>
+      <b-form @submit="updateProject">
+        <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
+          label-cols="4" label-cols-lg="2" label="ID"
+          label-for="selectedProjectId">
+          <b-form-input id="selectedProjectId"
+            v-model="selectedProjectId" disabled required />
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Project Name"
+          label-for="selectedProjectName">
+          <b-form-input id="selectedProjectName"
+            v-model="selectedProjectName"
+            v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR' &&
+             this.loggedInId !== String(this.selectedProjectPmId)" required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="FTE Percentage"
+          label-for="selectedProjectFte">
+          <b-form-input
+            id="selectedProjectFte" v-model="selectedProjectFte"
+            type="number" min="0"
+            v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR' &&
+             this.loggedInId !== String(this.selectedProjectPmId)" required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
+          label-for="selectedProjectStart">
+          <b-form-input id="selectedProjectStart" v-model="selectedProjectStart"
+            type="date" disabled required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
+          label-for="selectedProjectEnd">
+          <b-form-input
+            id="selectedProjectEnd" v-model="selectedProjectEnd"
+            type="date" v-bind:min="new Date().toISOString().split('T')[0]"
+            v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR' &&
+              this.loggedInId !== String(this.selectedProjectPmId)" required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
+          label-cols="4" label-cols-lg="2" label="PM ID"
+          label-for="selectedProjectPmId">
+          <b-form-input id="selectedProjectPmId" v-model="selectedProjectPmId"
+          disabled required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="PM E-Mail"
+          label-for="selectedProjectPmMail">
+          <b-form-select
+            id="selectedProjectPmMail" v-model="selectedProjectPmIdMail"
+            :options="pmOptions" v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'"
+            required>
+          </b-form-select>
+        </b-form-group>
+        <b-row>
+          <b-col>
+            <b-button v-if="this.loggedInRole === 'ADMINISTRATOR'"
+              @click="infoProjectDelete" variant="danger">Delete Project</b-button>
+          </b-col>
+          <b-col>
+            <b-button v-if="this.loggedInRole === 'ADMINISTRATOR' ||
+              this.loggedInId === String(this.selectedProjectPmId)"
+              variant="warning" class="float-right marg-left"
+              type="submit">update</b-button>
+            <b-button @click="infoProjectCancelBtn" class="float-right">Cancel</b-button>
+          </b-col>
+        </b-row>
+      </b-form>
+    </b-modal>
+
+    <!-- Info Project Modal Read-Only -->
+    <b-modal ref="infoProjectModalRO" id="infoProjectModalRO" title="Info Project"
+      size="lg" @hide="infoProjectCancel" hide-footer hide-header-close>
+      <b-form>
+        <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
+          label-cols="4" label-cols-lg="2" label="ID"
+          label-for="selectedProjectIdRO">
+          <b-form-input id="selectedProjectIdRO"
+            v-model="selectedProjectId" disabled required />
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Project Name"
+          label-for="selectedProjectNameRO">
+          <b-form-input id="selectedProjectNameRO"
+            v-model="selectedProjectName" disabled required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="FTE Percentage"
+          label-for="selectedProjectFteRO">
+          <b-form-input id="selectedProjectFteRO"
+            v-model="selectedProjectFte" disabled required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
+          label-for="selectedProjectStartRO">
+          <b-form-input id="selectedProjectStartRO" v-model="selectedProjectStart"
+            type="date" disabled required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
+          label-for="selectedProjectEndRO">
+          <b-form-input id="selectedProjectEndRO" v-model="selectedProjectEnd"
+            disabled required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
+          label-cols="4" label-cols-lg="2" label="PM ID"
+          label-for="selectedProjectPmIdRO">
+          <b-form-input id="selectedProjectPmIdRO" v-model="selectedProjectPmId"
+          disabled required>
+          </b-form-input>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="PM E-Mail"
+          label-for="selectedProjectPmMailRO">
+          <b-form-select id="selectedProjectPmMailRO" v-model="selectedProjectPmIdMail"
+            :options="pmOptions" disabled required>
+          </b-form-select>
+        </b-form-group>
+        <b-row>
+          <b-col>
+            <b-button @click="infoProjectROCancelBtn" class="float-right">Cancel</b-button>
+          </b-col>
+        </b-row>
+      </b-form>
+    </b-modal>
+
+    <!-- Create Project Modal -->
     <b-modal ref="createProjectModal" id="createProjectModal"
       title="Create Project" @hide="createProjectModalCancel" hide-footer hide-header-close>
       <b-form @submit="createProject">
@@ -149,6 +278,7 @@ export default {
 
   props: {
     loggedInRole: String,
+    loggedInId: String,
   },
 
   beforeMount() {
@@ -210,7 +340,7 @@ export default {
       sortDesc: false,
       sortDirection: 'asc',
       filter: null,
-      // Create Project data
+      // Create project data
       createProjectName: '',
       createProjectFte: null,
       createProjectStart: '',
@@ -219,6 +349,14 @@ export default {
       pmOptions: [
         { value: null, text: 'PM', disabled: true },
       ],
+      // Info project data
+      selectedProjectId: null,
+      selectedProjectName: '',
+      selectedProjectFte: null,
+      selectedProjectStart: '',
+      selectedProjectEnd: '',
+      selectedProjectPmId: null,
+      selectedProjectPmIdMail: '',
     };
   },
   computed: {
@@ -270,9 +408,6 @@ export default {
           console.log(error);
         });
     },
-    projectInfoModal(evt) {
-      console.log(evt);
-    },
     createProjectModalCancelBtn() {
       this.$refs.createProjectModal.hide();
     },
@@ -284,7 +419,7 @@ export default {
       this.createProjectPmId = null;
     },
     createProjectModalOpen() {
-      this.loadPMs();
+      this.loadPMs(false);
     },
     loadPMs() {
       axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
@@ -333,6 +468,77 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+    },
+    updateProject(evt) {
+      evt.preventDefault();
+
+      const pmId = this.selectedProjectPmIdMail.substr(0, this.selectedProjectPmIdMail.indexOf('-'));
+      const pmMail = this.selectedProjectPmIdMail.substr(this.selectedProjectPmIdMail.indexOf('-') + 1);
+
+      const data = {
+        name: this.selectedProjectName,
+        ftePercentage: this.selectedProjectFte,
+        startDate: this.selectedProjectStart,
+        endDate: this.selectedProjectEnd,
+        projectManagerId: pmId,
+      };
+
+      axios.put(`${this.ApiServer}:${this.ApiPort}/api/project/${this.selectedProjectId}`, data, restHeader)
+        // eslint-disable-next-line
+        .then((response) => {
+
+          console.log(response);
+
+          for (let i = 0; i < this.items.length; i += 1) {
+            if (this.items[i].id === this.selectedProjectId) {
+              this.items[i].name = this.selectedProjectName;
+              this.items[i].ftePercentage = this.selectedProjectFte;
+              this.items[i].endDate = this.selectedProjectEnd;
+              this.items[i].projectManagerId = this.selectedProjectPmId;
+              this.items[i].projectManagerMail = pmMail;
+            }
+          }
+
+          this.infoProjectCancelBtn();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    projectInfoModal(evt) {
+      this.selectedProjectId = evt.id;
+      this.selectedProjectName = evt.name;
+      this.selectedProjectFte = evt.ftePercentage;
+      this.selectedProjectStart = evt.startDate;
+      this.selectedProjectEnd = evt.endDate;
+      this.selectedProjectPmId = evt.projectManagerId;
+      this.selectedProjectPmIdMail = `${evt.projectManagerId}-${evt.projectManagerMail}`;
+
+      this.loadPMs(true);
+
+      if (evt.endDate >= new Date().toISOString().split('T')[0]) {
+        this.$refs.infoProjectModal.show();
+      } else {
+        this.$refs.infoProjectModalRO.show();
+      }
+    },
+    infoProjectCancelBtn() {
+      this.$refs.infoProjectModal.hide();
+    },
+    infoProjectROCancelBtn() {
+      this.$refs.infoProjectModalRO.hide();
+    },
+    infoProjectCancel() {
+      this.selectedProjectId = null;
+      this.selectedProjectName = '';
+      this.selectedProjectFte = null;
+      this.selectedProjectStart = '';
+      this.selectedProjectEnd = '';
+      this.selectedProjectPmId = null;
+    },
+    infoProjectDelete(evt) {
+      console.log('delete');
+      console.log(evt);
     },
   },
 };

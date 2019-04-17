@@ -107,13 +107,13 @@
           class="float-right"
           variant="success"
           v-b-modal.createUserModal>
-            Create User
+            Create Employee
         </b-button>
       </b-col>
     </b-row>
 
     <!-- Info modal -->
-    <b-modal ref="infoUserModal" id="infoUserModal" title="Info User"
+    <b-modal ref="infoUserModal" id="infoUserModal" title="Info Emyployee"
       size="lg" @hide="infoUserCancel"
       hide-footer hide-header-close>
       <b-form @submit="updateUser">
@@ -160,7 +160,7 @@
         <b-row>
           <b-col>
             <b-button v-if="this.loggedInRole === 'ADMINISTRATOR'"
-              @click="infoUserDelete" variant="danger">Delete User</b-button>
+              @click="infoUserDelete" variant="danger">Delete Employee</b-button>
           </b-col>
           <b-col>
             <b-button v-if="this.loggedInRole === 'ADMINISTRATOR'"
