@@ -1,8 +1,12 @@
 <template>
 <b-container v-if="this.loggedInRole !== 'DEVELOPER'" fluid>
-  <b-alert v-model="showFailCreateAllocationAlert" variant="danger" class="alert-center"
+  <b-alert v-model="showFailCreateAllocationAlertFTE" variant="danger" class="alert-center"
            fade dismissible>
-    Project already fully occupied
+    Project already fully occupied - Decrease pensum or reduce timerange
+  </b-alert>
+  <b-alert v-model="showFailCreateAllocationAlertDATE" variant="danger" class="alert-center"
+           fade dismissible>
+    New allocation not compatible with contract - decrease pensum or change timerange
   </b-alert>
   <h1>Allocations</h1>
   <!-- Allocation Interface controls -->
@@ -285,7 +289,8 @@ export default {
       createAllocationPensumPercentage: null,
       contractIdOptions: this.getListIds('contract'),
       projectIdOptions: this.getListIds('project'),
-      showFailCreateAllocationAlert: false,
+      showFailCreateAllocationAlertFTE: false,
+      showFailCreateAllocationAlertDATE: false,
       // Info allocation data
       selectedAllocationId: null,
       selectedAllocationStartDate: '',
@@ -364,39 +369,51 @@ export default {
     },
     createAllocation(evt) {
       evt.preventDefault();
-
-      Promise.resolve(this.calculateRemainingFTE())
-        .then((FTES) => {
-          if (FTES.FTE <= FTES.occupiedFTE) {
-            this.showFailCreateAllocationAlert = true;
-          }
-        });
-      const data = {
-        startDate: this.createAllocationStartDate,
-        endDate: this.createAllocationEndDate,
-        contractId: this.createAllocationContractId,
-        projectId: this.createAllocationProjectId,
-        pensumPercentage: this.createAllocationPensumPercentage,
-      };
-
-      axios.post(`${this.ApiServer}:${this.ApiPort}/api/allocation`, data, restHeader)
-        .then((response) => {
-          const newAllocation = {
-            id: response.data.id,
-            startDate: response.data.startDate,
-            endDate: response.data.endDate,
-            contractId: response.data.contractId,
-            projectId: response.data.projectId,
-            pensumPercentage: response.data.pensumPercentage,
-          };
-
-          this.items.push(newAllocation);
-          this.totalRows = this.items.length;
-
-          this.createAllocationModalCancel();
+      this.showFailCreateAllocationAlertFTE = false;
+      this.showFailCreateAllocationAlertDATE = false;
+      Promise.resolve(this.calculateIfAllocationWithinContract())
+      // eslint-disable-next-line
+        .then(obj => this.showFailCreateAllocationAlertDATE = obj.allocationOk)
+        .then(() => {
+          Promise.resolve(this.calculateRemainingFTEofProject())
+            .then((FTES) => {
+              if (FTES.FTE <= FTES.occupiedFTE) {
+                this.showFailCreateAllocationAlertFTE = true;
+              }
+            });
         })
-        .catch((error) => {
-          console.log(error);
+        .then(() => {
+          if (!this.showFailCreateAllocationAlertFTE && !this.showFailCreateAllocationAlertDATE) {
+            const data = {
+              startDate: this.createAllocationStartDate,
+              endDate: this.createAllocationEndDate,
+              contractId: this.createAllocationContractId,
+              projectId: this.createAllocationProjectId,
+              pensumPercentage: this.createAllocationPensumPercentage,
+            };
+
+            axios.post(`${this.ApiServer}:${this.ApiPort}/api/allocation`, data, restHeader)
+              .then((response) => {
+                const newAllocation = {
+                  id: response.data.id,
+                  startDate: response.data.startDate,
+                  endDate: response.data.endDate,
+                  contractId: response.data.contractId,
+                  projectId: response.data.projectId,
+                  pensumPercentage: response.data.pensumPercentage,
+                };
+
+                this.items.push(newAllocation);
+                this.totalRows = this.items.length;
+
+                this.createAllocationModalCancel();
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            this.createAllocationModalCancel();
+          }
         });
     },
     createAllocationModalCancel() {
@@ -405,6 +422,8 @@ export default {
       this.createAllocationContractId = null;
       this.createAllocationProjectId = null;
       this.createAllocationPensumPercentage = null;
+      // this.showFailCreateAllocationAlertDATE = false;
+      // this.showFailCreateAllocationAlertFTE = false;
       this.$refs.createAllocation.hide();
     },
     allocationInfoModal(evt) {
@@ -469,7 +488,7 @@ export default {
       this.selectedAllocationStartDate = '';
       this.selectedAllocationEndDate = '';
       this.selectedAllocationContractId = null;
-      this.selectedAllocationRole = null;
+      // this.selectedAllocationRole = null;
 
       this.$refs.infoAllocationModal.hide();
     },
@@ -495,15 +514,17 @@ export default {
         });
       return listIds;
     },
-    calculateRemainingFTE() {
+    calculateRemainingFTEofProject() {
       let FTE = 0;
       let alreadyOcuppiedFTE = 0;
       const oneDay = 1000 * 60 * 60 * 24;
+      // get the project's FTE
       return axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project/${this.createAllocationProjectId}`, restHeader)
         .then(response => response.data)
         .then((data) => {
-          FTE = data.ftePercentage * 100;
+          FTE = data.ftePercentage;
         })
+        // collect already occupied FTE's in allocations
         .then(() => axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/allocation`, restHeader))
         .then(response => response.data)
         .then((data) => {
@@ -520,6 +541,22 @@ export default {
         })
         // eslint-disable-next-line
         .then(() => { return { FTE: FTE, occupiedFTE: alreadyOcuppiedFTE }; })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    calculateIfAllocationWithinContract() {
+      return axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract/${this.createAllocationContractId}`, restHeader)
+        .then(response => response.data)
+        .then((contract) => {
+          let ok = false;
+          if (contract.pensumPercentage < this.createAllocationPensumPercentage
+          || contract.startDate > this.createAllocationStartDate
+          || contract.endDate < this.createAllocationEndDate) {
+            ok = true;
+          }
+          return { allocationOk: ok };
+        })
         .catch((error) => {
           console.log(error);
         });
