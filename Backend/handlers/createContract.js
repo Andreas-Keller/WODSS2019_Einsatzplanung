@@ -19,7 +19,6 @@ exports.handler = async function createContract(req, res, next) {
         pensumPercentage: req.body.pensumPercentage,
         employeeId: String(req.body.employeeId)
     };
-    console.log(contract);
     const employeeFirebase = require('../firebase/employee.crud.js');
     let employee = await employeeFirebase.getEmployee(contract.employeeId);
     if (contract.startDate === null ||

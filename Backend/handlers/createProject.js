@@ -20,9 +20,6 @@ exports.handler = async function createProject(req, res, next) {
         endDate: req.body.endDate,
         projectManagerId: String(req.body.projectManagerId)
     };
-
-    console.log(project);
-
     const projectFirebase = require('../firebase/project.crud.js');
     let foundProject = await projectFirebase.findBy('name', project.name);
     if (project.name === undefined ||
