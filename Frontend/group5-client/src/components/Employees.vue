@@ -409,6 +409,7 @@ export default {
           for (let i = 0; i < this.items.length; i += 1) {
             if (this.items[i].id === this.selectedUserId) {
               this.items.splice(i, 1);
+              break;
             }
           }
 

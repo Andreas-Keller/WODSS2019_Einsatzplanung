@@ -36,15 +36,10 @@ exports.handler = async function updateProject(req, res, next) {
         res.status(412).send("Precondition for the project failed");
 
     } else {
-        console.log('-------');
-        console.log(project);
         const projectFirebase = require('../firebase/project.crud.js');
         let foundProject = await projectFirebase.getProject(project.id);
         const employeeFirebase = require('../firebase/employee.crud');
         let foundEmployee = await employeeFirebase.findBy('id', project.projectManagerId);
-        
-        console.log(foundProject);
-        console.log(foundEmployee);
 
         if (foundProject.httpStatus === 500 ||
             foundEmployee.httpStatus === 500) {

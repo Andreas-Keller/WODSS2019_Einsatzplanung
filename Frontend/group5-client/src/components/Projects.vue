@@ -486,9 +486,6 @@ export default {
       axios.put(`${this.ApiServer}:${this.ApiPort}/api/project/${this.selectedProjectId}`, data, restHeader)
         // eslint-disable-next-line
         .then((response) => {
-
-          console.log(response);
-
           for (let i = 0; i < this.items.length; i += 1) {
             if (this.items[i].id === this.selectedProjectId) {
               this.items[i].name = this.selectedProjectName;
@@ -536,9 +533,23 @@ export default {
       this.selectedProjectEnd = '';
       this.selectedProjectPmId = null;
     },
-    infoProjectDelete(evt) {
-      console.log('delete');
-      console.log(evt);
+    infoProjectDelete() {
+      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/project/${this.selectedProjectId}`, restHeader)
+      // eslint-disable-next-line
+        .then((response) => {
+          for (let i = 0; i < this.items.length; i += 1) {
+            if (this.items[i].id === this.selectedProjectId) {
+              this.items.splice(i, 1);
+              break;
+            }
+          }
+
+          this.totalRows = this.items.length;
+          this.infoProjectCancelBtn();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
   },
 };
