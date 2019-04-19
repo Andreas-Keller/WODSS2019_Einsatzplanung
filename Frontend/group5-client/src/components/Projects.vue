@@ -100,9 +100,9 @@
         {{ row.value ? 'Yes' : 'No' }}
       </template>
       -->
-      <template slot="id" slot-scope="row">
+      <template slot="graph" slot-scope="row">
         <b-button size="sm" @click="modalGraph(row.item)" class="mr-1"
-                  v-b-modal.modalGraph="modalGraph" variant="primary">
+                variant="primary">
           Project Calendar
         </b-button>
       </template>
@@ -383,7 +383,7 @@ export default {
           sortDirection: 'desc',
         },
         {
-          key: 'id',
+          key: 'graph',
           label: 'Graph',
         },
       ],
@@ -678,9 +678,9 @@ export default {
         });
     },
     modalGraph(item) {
+      this.$refs.modalGraph.show();
       this.graphId = item.id;
       this.selectedProjectName = item.name;
-      this.$refs.modalGraph.show();
     },
     modalGraphCancel() {
       this.graphId = '';
@@ -689,6 +689,8 @@ export default {
     },
   },
 };
+
+
 </script>
 
 <style scoped>

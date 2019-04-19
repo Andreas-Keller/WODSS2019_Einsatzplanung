@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h1>Calendar of Project {{this.projectName}}</h1>
-    <highcharts :options="this.chartOptions"></highcharts>
+    <h1>Project {{this.projectName}}</h1>
+    <Highcharts  :options="this.chartOptions"></Highcharts>
   </div>
 </template>
 
@@ -11,20 +11,36 @@ import { Chart } from 'highcharts-vue';
 
 const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
 
+let testing;
+
+let result;
 
 export default {
   name: 'Calendar',
   components: {
-    highcharts: Chart,
+    Highcharts: Chart,
   },
   props: {
     projectId: String,
     projectName: String,
   },
+  created() {
+    testing = this.getValues();
+  },
+  mounted() {
+    this.$forceUpdate();
+  },
+  updated() {
+    testing.forEach(entry => result.push({ x: entry.x, y: entry.y }));
+    this.chartOptions.series[0].data = testing;
+  },
+  beforeDestroy() {
+    this.chartOptions.series[0].data = [1, 2, 3];
+  },
   data() {
     return {
       chartOptions: {
-        title: this.projectId,
+        title: { text: 'Project Overview', align: 'left' },
         chart: {
           type: 'area',
           spacingBottom: 30,
@@ -42,7 +58,7 @@ export default {
         },
         series: [{
           // data: [1,2,3] // sample data
-          data: this.getValues(),
+          data: [1, 2, 3],
           name: 'Workload',
         }],
       },
