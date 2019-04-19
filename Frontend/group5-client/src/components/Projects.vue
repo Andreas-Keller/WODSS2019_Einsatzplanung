@@ -99,16 +99,14 @@
       <template slot="isActive" slot-scope="row">
         {{ row.value ? 'Yes' : 'No' }}
       </template>
-
-      <template slot="actions" slot-scope="row">
-        <b-button size="sm" @click="info(row.item, row.index, $event.target)" class="mr-1">
-          Info modal
-        </b-button>
-        <b-button size="sm" @click="row.toggleDetails">
-          {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
+      -->
+      <template slot="id" slot-scope="row">
+        <b-button size="sm" @click="modalGraph(row.item)" class="mr-1"
+                  v-b-modal.modalGraph="modalGraph" variant="primary">
+          Project Calendar
         </b-button>
       </template>
-
+      <!--
       <template slot="row-details" slot-scope="row">
         <b-card>
           <ul>
@@ -300,9 +298,18 @@
         </b-row>
       </b-form>
     </b-modal>
+
+    <!-- modal graph for project -->
+    <b-modal ref="modalGraph" id="modalGraph" size="xl"
+             @hide="modalGraphCancel" hide-footer hide-header-close>
+      <Calendar :projectId=this.graphId  :projectName=this.selectedProjectName
+                v-if="this.graphId"></Calendar>
+    </b-modal>
+    <!--
     <div v-for="item in items" :key=item.id>
       <Calendar :projectId=item.id  :projectName=item.name></Calendar>
     </div>
+    -->
   </b-container>
 </template>
 
@@ -375,6 +382,10 @@ export default {
           sortable: true,
           sortDirection: 'desc',
         },
+        {
+          key: 'id',
+          label: 'Graph',
+        },
       ],
       currentPage: 1,
       perPage: 5,
@@ -404,6 +415,8 @@ export default {
       selectedProjectEnd: '',
       selectedProjectPmId: null,
       selectedProjectPmIdMail: '',
+      // Graph Project Id
+      graphId: '',
     };
   },
   computed: {
@@ -490,7 +503,6 @@ export default {
     },
     createProject(evt) {
       evt.preventDefault();
-
       const pmId = this.createProjectPmId.substr(0, this.createProjectPmId.indexOf('-'));
       const pmMail = this.createProjectPmId.substr(this.createProjectPmId.indexOf('-') + 1);
 
@@ -658,13 +670,22 @@ export default {
               break;
             }
           }
-
           this.totalRows = this.items.length;
           this.infoProjectCancelBtn();
         })
         .catch((error) => {
           console.log(error);
         });
+    },
+    modalGraph(item) {
+      this.graphId = item.id;
+      this.selectedProjectName = item.name;
+      this.$refs.modalGraph.show();
+    },
+    modalGraphCancel() {
+      this.graphId = '';
+      this.selectedProjectName = '';
+      this.$refs.modalGraph.hide();
     },
   },
 };

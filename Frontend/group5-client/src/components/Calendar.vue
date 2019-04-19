@@ -18,7 +18,7 @@ export default {
     highcharts: Chart,
   },
   props: {
-    projectId: null,
+    projectId: String,
     projectName: String,
   },
   data() {
@@ -62,7 +62,7 @@ export default {
           const sortedAllocations = [];
           let level = 0;
           allocations.forEach((entry) => {
-            if (entry.projectId === this.projectId) {
+            if (String(entry.projectId) === this.projectId) {
               sortedAllocations.push([entry.startDate, entry.pensumPercentage, level, 'first']);
               sortedAllocations.push([entry.endDate, entry.pensumPercentage, level, 'last']);
               level += 1;
