@@ -300,12 +300,15 @@
         </b-row>
       </b-form>
     </b-modal>
-
+    <div v-for="item in items">
+      <Calendar :projectId=item.id :projectName=item.name></Calendar>
+    </div>
   </b-container>
 </template>
 
 <script>
 import axios from 'axios';
+import Calendar from '@/components/Calendar.vue';
 
 const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
 
@@ -313,7 +316,9 @@ const items = [];
 
 export default {
   name: 'Projects',
-
+  components: {
+    Calendar,
+  },
   props: {
     loggedInRole: String,
     loggedInId: String,
