@@ -300,8 +300,8 @@
         </b-row>
       </b-form>
     </b-modal>
-    <div v-for="item in items">
-      <Calendar :projectId=item.id :projectName=item.name></Calendar>
+    <div v-for="item in items" :key=item.id>
+      <Calendar :projectId=item.id  :projectName=item.name></Calendar>
     </div>
   </b-container>
 </template>
