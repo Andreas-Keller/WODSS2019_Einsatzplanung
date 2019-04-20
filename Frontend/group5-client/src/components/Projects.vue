@@ -463,7 +463,6 @@ export default {
       console.log('apply');
 
       if (this.filterFromDate === null && this.filterToDate === null && this.filterPmId === null) {
-        console.log('no filter');
         return;
       }
 
@@ -480,8 +479,6 @@ export default {
       }
 
       let pmId = '';
-
-      console.log(this.filterPmId);
 
       if (this.filterPmId !== null) {
         pmId = `projectManagerId=${this.filterPmId.split('-')[0]}`;

@@ -10,6 +10,36 @@
   </b-alert>
   <h1>Allocations</h1>
   <!-- Allocation Interface controls -->
+  <h4>Data filter</h4>
+  <b-row>
+    <b-col>
+      <b-form-group v-if="this.loggedInRole !== 'DEVELOPER'" label-cols="2" label="Employee">
+        <b-form-select v-model="filterEmpId" :options="filterEmpOptions">
+        </b-form-select>
+      </b-form-group>
+      <b-form-group label-cols="2" label="Project">
+        <b-form-select v-model="filterProjectId" :options="filterProjectOptions">
+        </b-form-select>
+      </b-form-group>
+    </b-col>
+    <b-col>
+      <b-form-group label-cols="2" label="From Date">
+        <b-form-input type="date" v-bind:max="filterToDate" v-model="filterFromDate">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group label-cols="2" label="To Date">
+        <b-form-input type="date" v-bind:min="filterFromDate" v-model="filterToDate">
+        </b-form-input>
+      </b-form-group>
+    </b-col>
+    <b-col md="2">
+      <b-button variant="primary" class="float-right"
+        @click="applyFilter">Filter</b-button>
+      <b-button class="float-right marg-right" @click="resetFilter">Reset</b-button>
+    </b-col>
+  </b-row>
+
+  <h4>Table filter</h4>
   <b-row>
     <b-col md="6" class="my-1">
       <b-form-group label-cols-sm="3" label="Filter" class="mb-0">
@@ -240,6 +270,7 @@ export default {
   },
   beforeMount() {
     this.getAllocation();
+    this.loadFilterOptions();
   },
 
   data() {
@@ -294,6 +325,12 @@ export default {
       sortDesc: false,
       sortDirection: 'asc',
       filter: null,
+      filterFromDate: null,
+      filterToDate: null,
+      filterEmpId: null,
+      filterEmpOptions: [],
+      filterProjectId: null,
+      filterProjectOptions: [],
       // Create allocation data
       createAllocationStartDate: '',
       createAllocationEndDate: '',
@@ -322,6 +359,115 @@ export default {
     },
   },
   methods: {
+    loadFilterOptions() {
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
+        .then((response) => {
+          this.filterProjectOptions.push({ value: null, text: 'Project', disabled: true });
+          for (let i = 0; i < response.data.length; i += 1) {
+            this.filterProjectOptions.push({
+              value: response.data[i].id,
+              text: response.data[i].name,
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      if (this.loggedInRole !== 'DEVELOPER') {
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, restHeader)
+          .then((response) => {
+            this.filterEmpOptions.push({ value: null, text: 'Employee', disabled: true });
+
+            for (let i = 0; i < response.data.length; i += 1) {
+              this.filterEmpOptions.push({
+                value: response.data[i].id,
+                text: response.data[i].emailAddress,
+              });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    },
+    applyFilter() {
+      if (this.filterFromDate === null && this.filterToDate === null
+        && this.filterEmpId && this.filterProjectId === null) {
+        return;
+      }
+
+      if (this.loggedInRole === 'DEVELOPER' && this.filterFromDate === null
+        && this.filterToDate === null && this.filterProjectId === null) {
+        return;
+      }
+
+      let from = '';
+
+      if (this.filterFromDate !== null && this.filterFromDate !== '') {
+        from = `fromDate=${this.filterFromDate}&`;
+      }
+
+      let to = '';
+
+      if (this.filterToDate !== null && this.filterToDate !== '') {
+        to = `toDate=${this.filterToDate}&`;
+      }
+
+      let proj = '';
+
+      if (this.filterProjectId !== null) {
+        proj = `projectId=${this.filterProjectId}&`;
+      }
+
+      let emp = '';
+
+      if (this.filterEmpId !== null) {
+        emp = `employeeId=${this.filterEmpId}`;
+      }
+
+      let allocs = [];
+      let projs = [];
+
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/allocation?${from}${to}${proj}${emp}`,
+        restHeader)
+        .then((response) => {
+          console.log(response);
+          allocs = response.data;
+        })
+        .then(() => {
+          axios.get(axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader))
+            .then((response) => {
+              projs = response.data;
+
+              for (let i = 0; i < projs.length; i += 1) {
+                allocs[i].projectEmail = 'n.a.';
+                for (let j = 0; j < projs.length; j += 1) {
+                  if (allocs[i].projectId === projs[j].id) {
+                    allocs[i].projectName = projs[j].name;
+                    break;
+                  }
+                }
+              }
+
+              this.items = allocs;
+              this.totalRows = this.items.length;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      console.log('apply');
+    },
+    resetFilter() {
+      this.filterFromDate = null;
+      this.filterToDate = null;
+      this.filterEmpId = null;
+      this.filterProjectId = null;
+    },
     info(item, index, button) {
       this.modalInfo.title = `Row index: ${index}`;
       this.modalInfo.content = JSON.stringify(item, null, 2);
@@ -586,6 +732,10 @@ export default {
 </script>
 
 <style scoped>
+h4 {
+  margin-top: 15px;
+}
+
 .marg-bot {
   margin-bottom: 5px;
 }
