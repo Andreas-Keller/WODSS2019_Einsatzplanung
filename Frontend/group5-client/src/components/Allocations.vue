@@ -498,7 +498,7 @@ export default {
             })
             .then(() => {
               for (let i = 0; i < allocations.length; i += 1) {
-                allocations[i].projectEmail = 'n.a.';
+                allocations[i].projectName = 'n.a.';
                 for (let j = 0; j < projects.length; j += 1) {
                   if (allocations[i].projectId === projects[j].id) {
                     allocations[i].projectName = projects[j].name;
