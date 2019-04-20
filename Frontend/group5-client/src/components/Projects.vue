@@ -250,7 +250,7 @@
         <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
           label-for="selectedProjectEndRO">
           <b-form-input id="selectedProjectEndRO" v-model="selectedProjectEnd"
-            disabled required>
+            type="date" disabled required>
           </b-form-input>
         </b-form-group>
         <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
