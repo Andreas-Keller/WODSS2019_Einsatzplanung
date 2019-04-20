@@ -99,16 +99,14 @@
       <template slot="isActive" slot-scope="row">
         {{ row.value ? 'Yes' : 'No' }}
       </template>
-
-      <template slot="actions" slot-scope="row">
-        <b-button size="sm" @click="info(row.item, row.index, $event.target)" class="mr-1">
-          Info modal
-        </b-button>
-        <b-button size="sm" @click="row.toggleDetails">
-          {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
+      -->
+      <template slot="graph" slot-scope="row">
+        <b-button size="sm" @click="modalGraph(row.item)" class="mr-1"
+                variant="primary">
+          Project Calendar
         </b-button>
       </template>
-
+      <!--
       <template slot="row-details" slot-scope="row">
         <b-card>
           <ul>
@@ -301,11 +299,23 @@
       </b-form>
     </b-modal>
 
+    <!-- modal graph for project -->
+    <b-modal ref="modalGraph" id="modalGraph" size="xl"
+             @hide="modalGraphCancel" hide-footer hide-header-close>
+      <Calendar :projectId=this.graphId  :projectName=this.selectedProjectName
+                v-if="this.graphId"></Calendar>
+    </b-modal>
+    <!--
+    <div v-for="item in items" :key=item.id>
+      <Calendar :projectId=item.id  :projectName=item.name></Calendar>
+    </div>
+    -->
   </b-container>
 </template>
 
 <script>
 import axios from 'axios';
+import Calendar from '@/components/Calendar.vue';
 
 const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
 
@@ -313,7 +323,9 @@ const items = [];
 
 export default {
   name: 'Projects',
-
+  components: {
+    Calendar,
+  },
   props: {
     loggedInRole: String,
     loggedInId: String,
@@ -370,6 +382,10 @@ export default {
           sortable: true,
           sortDirection: 'desc',
         },
+        {
+          key: 'graph',
+          label: 'Graph',
+        },
       ],
       currentPage: 1,
       perPage: 5,
@@ -399,6 +415,8 @@ export default {
       selectedProjectEnd: '',
       selectedProjectPmId: null,
       selectedProjectPmIdMail: '',
+      // Graph Project Id
+      graphId: '',
     };
   },
   computed: {
@@ -485,7 +503,6 @@ export default {
     },
     createProject(evt) {
       evt.preventDefault();
-
       const pmId = this.createProjectPmId.substr(0, this.createProjectPmId.indexOf('-'));
       const pmMail = this.createProjectPmId.substr(this.createProjectPmId.indexOf('-') + 1);
 
@@ -653,7 +670,6 @@ export default {
               break;
             }
           }
-
           this.totalRows = this.items.length;
           this.infoProjectCancelBtn();
         })
@@ -661,8 +677,20 @@ export default {
           console.log(error);
         });
     },
+    modalGraph(item) {
+      this.$refs.modalGraph.show();
+      this.graphId = item.id;
+      this.selectedProjectName = item.name;
+    },
+    modalGraphCancel() {
+      this.graphId = '';
+      this.selectedProjectName = '';
+      this.$refs.modalGraph.hide();
+    },
   },
 };
+
+
 </script>
 
 <style scoped>

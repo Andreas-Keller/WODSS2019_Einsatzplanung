@@ -220,11 +220,9 @@ const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('t
 
 export default {
   name: 'Allocations',
-
   props: {
     loggedInRole: String,
   },
-
   beforeMount() {
     this.getAllocation();
   },
