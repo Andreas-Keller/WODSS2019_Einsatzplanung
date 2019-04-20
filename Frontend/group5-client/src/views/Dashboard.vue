@@ -17,6 +17,7 @@
       </b-tabs>
     </div>
     <Allocations :loggedInRole="loggedInRole"/>
+    <Footer />
   </div>
 </template>
 
@@ -28,6 +29,7 @@ import Employees from '@/components/Employees.vue';
 import Projects from '@/components/Projects.vue';
 import Contracts from '@/components/Contracts.vue';
 import Allocations from '@/components/Allocations.vue';
+import Footer from '@/components/Footer.vue';
 
 const jwtDecode = require('jwt-decode');
 
@@ -47,6 +49,7 @@ export default {
     Projects,
     Contracts,
     Allocations,
+    Footer,
   },
   methods: {
     checkToken() {

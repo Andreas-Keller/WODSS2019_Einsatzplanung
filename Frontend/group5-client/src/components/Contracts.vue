@@ -1,5 +1,5 @@
 <template>
-  <b-container v-if="this.loggedInRole === 'ADMINISTRATOR'" fluid>
+  <b-container fluid>
     <h1>Contracts</h1>
     <b-row>
       <b-col md="6" class="my-1">
@@ -177,7 +177,8 @@
     <!-- Create Contract Modal -->
     <b-modal ref="createContract" id="createContractModal"
              title="Create Contract" @hide="createContractModalCancel" hide-footer
-             hide-header-close>
+             hide-header-close
+             size="lg">
       <b-form @submit="createContract">
         <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
                       label-for="startDate9">
@@ -262,11 +263,11 @@ export default {
           label: 'Pensum %',
           sortable: true,
           sortDirection: 'desc',
-        },
+        }, /*
         {
           key: 'employeeId',
           label: 'EmployeeID',
-        },
+        }, */
         {
           key: 'email',
           label: 'Employee Email',
@@ -325,6 +326,16 @@ export default {
       this.currentPage = 1;
     },
     getContract() {
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract`, restHeader)
+        .then((response) => {
+          this.totalRows = response.data.length;
+          return response.data;
+        })
+        .then((its) => {
+          this.combineItems(its);
+        });
+
+      /*
       if (this.loggedInRole === 'ADMINISTRATOR') {
         axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract`, restHeader)
           .then((response) => {
@@ -335,12 +346,13 @@ export default {
             this.combineItems(its);
           });
       } else if (this.loggedInRole === 'PROJECTMANAGER') {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract?role=DEVELOPER`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract`, restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
           });
       }
+      */
     },
     createContract(evt) {
       evt.preventDefault();

@@ -1,5 +1,5 @@
 <template>
-  <b-container v-if="this.loggedInRole !== 'DEVELOPER'" fluid>
+  <b-container fluid>
     <h1>Employees</h1>
     <!-- User Interface controls -->
     <b-row>
@@ -174,18 +174,34 @@
 
     <!-- Create User Modal -->
     <b-modal ref="createUser" id="createUserModal"
-      title="Create Employee" @hide="createUserModalCancel" hide-footer hide-header-close>
+      title="Create Employee" @hide="createUserModalCancel" hide-footer hide-header-close
+      size="lg">
       <b-form @submit="createUser">
-        <b-form-input v-model="createUserFirstName" id="firstName" class="marg-bot"
-          placeholder="First name" required/>
-        <b-form-input v-model="createUserLastName" id="lastName" class="marg-bot"
-          placeholder="Last name" required/>
-        <b-form-input v-model="createUserEmail" id="eMail" class="marg-bot"
-          type="email" placeholder="e@mail.com" required/>
-        <b-form-input v-model="createUserPw" id="password" class="marg-bot"
-          type="password" placeholder="Password" required/>
-        <b-form-select v-model="createUserRole" :options="roleOptions"
-          class="marg-bot" required></b-form-select>
+        <b-form-group label-cols="4" label-cols-lg="2" label="First Name"
+          label-for="firstName">
+          <b-form-input v-model="createUserFirstName" id="firstName" class="marg-bot"
+            placeholder="First name" required/>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Last Name"
+          label-for="lastName">
+          <b-form-input v-model="createUserLastName" id="lastName" class="marg-bot"
+            placeholder="Last name" required/>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="E-Mail"
+          label-for="eMail">
+          <b-form-input v-model="createUserEmail" id="eMail" class="marg-bot"
+            type="email" placeholder="e@mail.com" required/>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Password"
+          label-for="password">
+          <b-form-input v-model="createUserPw" id="password" class="marg-bot"
+            type="password" placeholder="Password" required/>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Role"
+          label-for="userRole">
+          <b-form-select v-model="createUserRole" :options="roleOptions"
+            id="userRole" class="marg-bot" required></b-form-select>
+        </b-form-group>
         <b-row class="marg-top">
           <b-col>
             <b-button variant="success" class="float-right" type="submit">Create</b-button>

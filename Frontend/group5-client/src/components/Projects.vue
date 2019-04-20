@@ -274,21 +274,37 @@
 
     <!-- Create Project Modal -->
     <b-modal ref="createProjectModal" id="createProjectModal"
-      title="Create Project" @hide="createProjectModalCancel" hide-footer hide-header-close>
+      title="Create Project" @hide="createProjectModalCancel" hide-footer
+      hide-header-close size="lg">
       <b-form @submit="createProject">
-        <b-form-input id="projectName" class="marg-bot" v-model="createProjectName"
-          placeholder="Project Name" required />
+        <b-form-group label-cols="4" label-cols-lg="2" label="Project Name"
+          label-for="projectName">
+          <b-form-input id="projectName" class="marg-bot" v-model="createProjectName"
+            placeholder="Project Name" required />
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="FTE"
+          label-for="projectFte">
         <b-form-input id="projectFte" class="marg-bot" type="number"
           v-model="createProjectFte" min="0" placeholder="Full Time Employee" required />
-        <b-form-input id="projectStart" class="marg-bot" type="date"
-          v-model="createProjectStart" v-bind:max="createProjectEnd"
-          placeholder="Project Start Date" required />
-        <b-form-input id="projectEnd" class="marg-bot" type="date"
-          v-model="createProjectEnd" v-bind:min="createProjectStart"
-          placeholder="Project End Date" required />
-        <b-form-select v-model="createProjectPmId"
-         :options="pmOptions" class="marg-bot" required>
-        </b-form-select>
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Project Start"
+          label-for="projectStart">
+          <b-form-input id="projectStart" class="marg-bot" type="date"
+            v-model="createProjectStart" v-bind:max="createProjectEnd"
+            placeholder="Project Start Date" required />
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="Project End"
+          label-for="projectEnd">
+          <b-form-input id="projectEnd" class="marg-bot" type="date"
+            v-model="createProjectEnd" v-bind:min="createProjectStart"
+            placeholder="Project End Date" required />
+        </b-form-group>
+        <b-form-group label-cols="4" label-cols-lg="2" label="PM E-Mail"
+          label-for="pmMailSelect">
+          <b-form-select id="pmMailSelect" v-model="createProjectPmId"
+            :options="pmOptions" class="marg-bot" required>
+          </b-form-select>
+        </b-form-group>
         <b-row class="marg-top">
           <b-col>
             <b-button variant="success" class="float-right" type="submit">Create</b-button>
@@ -334,6 +350,10 @@ export default {
   beforeMount() {
     this.getProjects();
     this.loadPMs();
+
+    if (this.loggedInRole === 'DEVELOPER') {
+      this.fields.splice(5, 1);
+    }
   },
 
   data() {

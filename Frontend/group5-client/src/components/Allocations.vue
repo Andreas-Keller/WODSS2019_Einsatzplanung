@@ -182,26 +182,41 @@
 
   <!-- Create Allocation Modal -->
   <b-modal ref="createAllocation" id="createAllocationModal"
-           title="Create Allocation" @hide="createAllocationModalCancel" hide-footer
-           hide-header-close>
+    title="Create Allocation" @hide="createAllocationModalCancel" hide-footer
+    hide-header-close size="lg">
     <b-form @submit="createAllocation">
-      <b-form-input v-model="createAllocationStartDate" id="startDate2" class="marg-bot"
-                    type="date" placeholder="Start Date" required/>
-      <b-form-input v-model="createAllocationEndDate" id="endDate2" class="marg-bot"
-                    type="date" placeholder="End Date" required/>
-      <b-form-select v-model="createAllocationContractId" :options="contractIdOptions"
-                     class="marg-bot" id="contractId12" required>
-      </b-form-select>
-      <b-form-select v-model="createAllocationProjectId" id="projectId2" class="marg-bot"
-                     :options="projectIdOptions" placeholder="Project Id" required>
-      </b-form-select>
-      <b-form-input v-model="createAllocationPensumPercentage" id="pensum2" class="marg-bot"
-                    placeholder="Pensum %" required/>
+      <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
+        label-for="startDate2">
+        <b-form-input v-model="createAllocationStartDate" id="startDate2" class="marg-bot"
+        type="date" placeholder="Start Date" required/>
+      </b-form-group>
+      <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
+        label-for="endDate2">
+        <b-form-input v-model="createAllocationEndDate" id="endDate2" class="marg-bot"
+          type="date" placeholder="End Date" required/>
+      </b-form-group>
+      <b-form-group label-cols="4" label-cols-lg="2" label="Contract ID"
+        label-for="contractId12">
+        <b-form-select v-model="createAllocationContractId" :options="contractIdOptions"
+          class="marg-bot" id="contractId12" required>
+        </b-form-select>
+      </b-form-group>
+      <b-form-group label-cols="4" label-cols-lg="2" label="Project ID"
+        label-for="projectId2">
+        <b-form-select v-model="createAllocationProjectId" id="projectId2" class="marg-bot"
+          :options="projectIdOptions" placeholder="Project Id" required>
+        </b-form-select>
+      </b-form-group>
+      <b-form-group label-cols="4" label-cols-lg="2" label="Pensum"
+        label-for="pensum2">
+        <b-form-input v-model="createAllocationPensumPercentage" id="pensum2"
+          class="marg-bot" placeholder="Pensum %" required/>
+      </b-form-group>
       <b-row class="marg-top">
         <b-col>
           <b-button variant="success" class="float-right" type="submit">Create</b-button>
           <b-button @click="createAllocationModalCancel"
-                    class="float-right marg-right">Cancel</b-button>
+            class="float-right marg-right">Cancel</b-button>
         </b-col>
       </b-row>
     </b-form>
@@ -234,21 +249,21 @@ export default {
       ApiPort: process.env.VUE_APP_API_PORT,
       // Table data
       items,
-      fields: [
+      fields: [ /*
         {
           key: 'id',
           label: 'Allocation Id',
-        },
+        }, */
         {
           key: 'contractId',
           label: 'Contract Id',
           sortable: true,
-        },
+        }, /*
         {
           key: 'projectId',
           label: 'Project Id',
           sortable: true,
-        },
+        }, */
         {
           key: 'projectName',
           label: 'Project Name',
@@ -324,38 +339,37 @@ export default {
     getAllocation() {
       let allocations = [];
       let projects = [];
-      if (this.loggedInRole === 'ADMINISTRATOR') {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/allocation`, restHeader)
-          .then((response) => {
-            allocations = response.data;
-            // this.totalRows = this.items.length;
-          })
-          .then(() => {
-            axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
-              .then((response) => {
-                projects = response.data;
-              })
-              .then(() => {
-                for (let i = 0; i < allocations.length; i += 1) {
-                  allocations[i].projectEmail = 'n.a.';
-                  for (let j = 0; j < projects.length; j += 1) {
-                    if (allocations[i].projectId === projects[j].id) {
-                      allocations[i].projectName = projects[j].name;
-                      break;
-                    }
+
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/allocation`, restHeader)
+        .then((response) => {
+          allocations = response.data;
+          // this.totalRows = this.items.length;
+        })
+        .then(() => {
+          axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
+            .then((response) => {
+              projects = response.data;
+            })
+            .then(() => {
+              for (let i = 0; i < allocations.length; i += 1) {
+                allocations[i].projectEmail = 'n.a.';
+                for (let j = 0; j < projects.length; j += 1) {
+                  if (allocations[i].projectId === projects[j].id) {
+                    allocations[i].projectName = projects[j].name;
+                    break;
                   }
                 }
-                this.items = allocations;
-                this.totalRows = this.items.length;
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
+              }
+              this.items = allocations;
+              this.totalRows = this.items.length;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
 
       /* else if (this.loggedInRole === 'PROJECTMANAGER') {
         axios.get(`${this.ApiServer}:${this.ApiPort}/api/allocation?role=DEVELOPER`, restHeader)
