@@ -62,7 +62,6 @@ export default {
           this.loggedInEmployeeName = `${this.loggedInEmployee.firstName} ${this.loggedInEmployee.lastName}`;
           this.loggedInRole = this.loggedInEmployee.role;
           this.loggedInId = String(this.loggedInEmployee.id);
-          console.log(`${this.loggedInRole}`);
         } catch (error) {
           // COMMENTED OUT FOR DEV PURPOSE
           console.log(error);

@@ -1,6 +1,28 @@
 <template>
   <b-container fluid>
     <h1>Contracts</h1>
+
+    <h4>Data filter</h4>
+    <b-row>
+      <b-col>
+        <b-form-group label-cols="2" label="From Date">
+          <b-form-input type="date" v-bind:max="filterToDate" v-model="filterFromDate">
+          </b-form-input>
+        </b-form-group>
+      </b-col>
+      <b-col>
+        <b-form-group label-cols="2" label="To Date">
+          <b-form-input type="date" v-bind:min="filterFromDate" v-model="filterToDate">
+          </b-form-input>
+        </b-form-group>
+      </b-col>
+      <b-col md="2">
+        <b-button variant="primary" class="float-right"
+          @click="applyFilter">Filter</b-button>
+        <b-button class="float-right marg-right" @click="resetFilter">Reset</b-button>
+      </b-col>
+    </b-row>
+    <h4>Table filter</h4>
     <b-row>
       <b-col md="6" class="my-1">
         <b-form-group label-cols-sm="3" label="Filter" class="mb-0">
@@ -240,6 +262,7 @@ export default {
       // API
       ApiServer: process.env.VUE_APP_API_SERVER,
       ApiPort: process.env.VUE_APP_API_PORT,
+      // Table data
       items,
       fields: [
         {
@@ -286,12 +309,16 @@ export default {
         title: '',
         content: '',
       },
+      filterToDate: null,
+      filterFromDate: null,
+      // Info Modal data
       selectedContractId: null,
       selectedContractStartDate: '',
       selectedContractEndDate: '',
       selectedContractPensum: null,
       selectedContractEmployeeId: '',
       selectedContractEmail: '',
+      // Create Modal data
       createContractId: null,
       createContractStartDate: '',
       createContractEndDate: '',
@@ -519,24 +546,58 @@ export default {
       }
       return false;
     },
+    resetFilter() {
+      this.filterFromDate = null;
+      this.filterToDate = null;
+    },
+    applyFilter() {
+      if (this.filterFromDate === null && this.filterToDate === null) {
+        return;
+      }
+
+      let from = '';
+
+      if (this.filterFromDate !== null && this.filterFromDate !== '') {
+        from = `fromDate=${this.filterFromDate}&`;
+      }
+
+      let to = '';
+
+      if (this.filterToDate !== null && this.filterFromDate !== '') {
+        to = `toDate=${this.filterToDate}`;
+      }
+
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract?${from}${to}`, restHeader)
+        .then((response) => {
+          this.totalRows = response.data.length;
+          this.combineItems(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
   },
 };
 </script>
 
 <style scoped>
-  .marg-bot {
-    margin-bottom: 5px;
-  }
+h4 {
+  margin-top: 15px;
+}
 
-  .marg-right {
-    margin-right: 5px;
-  }
+.marg-bot {
+  margin-bottom: 5px;
+}
 
-  .marg-left {
-    margin-left: 5px;
-  }
+.marg-right {
+  margin-right: 5px;
+}
 
-  .marg-top {
-    margin-top: 5px;
-  }
+.marg-left {
+  margin-left: 5px;
+}
+
+.marg-top {
+  margin-top: 5px;
+}
 </style>
