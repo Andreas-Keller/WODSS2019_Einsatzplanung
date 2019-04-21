@@ -317,9 +317,9 @@
 
     <!-- modal graph for project -->
     <b-modal ref="modalGraph" id="modalGraph" size="xl"
-             @hide="modalGraphCancel" hide-footer hide-header-close>
-      <Calendar :projectId=this.graphId  :projectName=this.selectedProjectName
-                v-if="this.graphId"></Calendar>
+             @hide="modalGraphCancel" hide-footer hide-header-close
+             :title="`Project ${this.selectedProjectName}`">
+      <Calendar :projectId=this.graphId v-if="this.graphId"></Calendar>
     </b-modal>
     <!--
     <div v-for="item in items" :key=item.id>
@@ -460,8 +460,6 @@ export default {
       this.getProjects();
     },
     applyFilter() {
-      console.log('apply');
-
       if (this.filterFromDate === null && this.filterToDate === null && this.filterPmId === null) {
         return;
       }

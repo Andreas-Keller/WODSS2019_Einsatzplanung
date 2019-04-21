@@ -152,59 +152,105 @@
 
   <!-- Info modal -->
   <b-modal ref="infoAllocationModal" id="infoAllocationModal" title="Info Allocation"
-           size="lg" @hide="infoAllocationCancel"
-           hide-footer hide-header-close>
+    size="lg" @hide="infoAllocationCancel"
+    hide-footer hide-header-close>
     <b-form @submit="updateAllocation">
       <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
-                    label-cols="4" label-cols-lg="2" label="ID"
-                    label-for="selectedId2">
+        label-cols="4" label-cols-lg="2" label="ID"
+        label-for="selectedId2">
         <b-form-input id="selectedId2"
-                      v-model="selectedAllocationId"
-                      disabled required>
+          v-model="selectedAllocationId"
+          disabled required>
         </b-form-input>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
-                    label-for="selectedStartDate2">
+        label-for="selectedStartDate2">
         <b-form-input id="selectedStartDate2"
-                      v-model="selectedAllocationStartDate"
-                      v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
+          v-model="selectedAllocationStartDate" type="date"
+          v-bind:max="selectedAllocationEndDate" required>
         </b-form-input>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
-                    label-for="selectedEndDate2">
-        <b-form-input id="selectedEndDate2"
-                      v-model="selectedAllocationEndDate"
-                      v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
+        label-for="selectedEndDate2">
+        <b-form-input id="selectedEndDate2" type="date"
+          v-model="selectedAllocationEndDate"
+          v-bind:min="selectedAllocationStartDate" required>
         </b-form-input>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="Contract Id"
-                    label-for="selectedContractId2">
+        label-for="selectedContractId2">
         <b-form-input id="selectedContractId2"
-                      v-model="selectedAllocationContractId"
-                      v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
+          v-model="selectedAllocationContractId" disabled required>
         </b-form-input>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="Project Id"
-                    label-for="selectedAllocationRole">
+        label-for="selectedAllocationRole">
         <b-form-input id="selectedAllocationRole" v-model="selectedAllocationProjectId"
-                       class="marg-bot" required></b-form-input>
+          class="marg-bot" disabled required>
+        </b-form-input>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="Pensum %"
-                    label-for="selectedAllocationPensumPercentage">
+        label-for="selectedAllocationPensumPercentage">
         <b-form-input id="selectedAllocationPensumPercentage"
-                      v-model="selectedAllocationPensumPercentage"
-                      class="marg-bot" required></b-form-input>
+          v-model="selectedAllocationPensumPercentage"
+          class="marg-bot"
+          type="number" min="0" max="100" required></b-form-input>
       </b-form-group>
       <b-row>
         <b-col>
-          <b-button v-if="this.loggedInRole === 'ADMINISTRATOR'"
-                    @click="infoAllocationDelete" variant="danger">Delete Allocation</b-button>
+          <b-button @click="infoAllocationDelete" variant="danger">
+            Delete Allocation
+          </b-button>
         </b-col>
         <b-col>
-          <b-button v-if="this.loggedInRole === 'ADMINISTRATOR'"
-                    variant="warning" class="float-right marg-left"
-                    type="submit">Update</b-button>
+          <b-button
+            variant="warning" class="float-right marg-left"
+            type="submit">Update</b-button>
           <b-button @click="infoAllocationCancel" class="float-right">Cancel</b-button>
+        </b-col>
+      </b-row>
+    </b-form>
+  </b-modal>
+
+  <!-- Info modal Read Only -->
+  <b-modal ref="infoAllocationModalRO" id="infoAllocationModalRO" title="Info Allocation"
+    size="lg" @hide="infoAllocationCancelRO"
+    hide-footer hide-header-close>
+    <b-form>
+      <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
+        label-for="selectedStartDate2RO">
+        <b-form-input id="selectedStartDate2RO" type="date"
+          v-model="selectedAllocationStartDate" disabled>
+        </b-form-input>
+      </b-form-group>
+      <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
+        label-for="selectedEndDate2RO">
+        <b-form-input id="selectedEndDate2RO" type="date"
+          v-model="selectedAllocationEndDate" disabled>
+        </b-form-input>
+      </b-form-group>
+      <b-form-group label-cols="4" label-cols-lg="2" label="Contract Id"
+        label-for="selectedContractId2RO">
+        <b-form-input id="selectedContractId2RO"
+          v-model="selectedAllocationContractId" disabled>
+        </b-form-input>
+      </b-form-group>
+      <b-form-group label-cols="4" label-cols-lg="2" label="Project Id"
+        label-for="selectedAllocationRoleRO">
+        <b-form-input id="selectedAllocationRoleRO" v-model="selectedAllocationProjectId"
+          class="marg-bot" disabled>
+        </b-form-input>
+      </b-form-group>
+      <b-form-group label-cols="4" label-cols-lg="2" label="Pensum %"
+        label-for="selectedAllocationPensumPercentageRO">
+        <b-form-input id="selectedAllocationPensumPercentageRO"
+          v-model="selectedAllocationPensumPercentage"
+          class="marg-bot" type="number" disabled>
+          </b-form-input>
+      </b-form-group>
+      <b-row>
+        <b-col>
+          <b-button @click="infoAllocationCancelRO" class="float-right">Cancel</b-button>
         </b-col>
       </b-row>
     </b-form>
@@ -218,12 +264,12 @@
       <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
         label-for="startDate2">
         <b-form-input v-model="createAllocationStartDate" id="startDate2" class="marg-bot"
-        type="date" placeholder="Start Date" required/>
+        type="date" placeholder="Start Date" v-bind:max="createAllocationEndDate" required/>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
         label-for="endDate2">
         <b-form-input v-model="createAllocationEndDate" id="endDate2" class="marg-bot"
-          type="date" placeholder="End Date" required/>
+          type="date" placeholder="End Date" v-bind:min="createAllocationStartDate" required/>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="Contract ID"
         label-for="contractId12">
@@ -237,10 +283,11 @@
           :options="projectIdOptions" placeholder="Project Id" required>
         </b-form-select>
       </b-form-group>
-      <b-form-group label-cols="4" label-cols-lg="2" label="Pensum"
+      <b-form-group label-cols="4" label-cols-lg="2" label="Pensum %"
         label-for="pensum2">
         <b-form-input v-model="createAllocationPensumPercentage" id="pensum2"
-          class="marg-bot" placeholder="Pensum %" required/>
+          class="marg-bot" placeholder="Pensum %"
+          type="number" min="0" max="100" required/>
       </b-form-group>
       <b-row class="marg-top">
         <b-col>
@@ -267,6 +314,7 @@ export default {
   name: 'Allocations',
   props: {
     loggedInRole: String,
+    loggedInId: String,
   },
   beforeMount() {
     this.getAllocation();
@@ -441,9 +489,12 @@ export default {
 
               for (let i = 0; i < projs.length; i += 1) {
                 allocs[i].projectEmail = 'n.a.';
+                allocs[i].projectName = 'n.a.';
+                allocs[i].projectPmId = null;
                 for (let j = 0; j < projs.length; j += 1) {
                   if (allocs[i].projectId === projs[j].id) {
                     allocs[i].projectName = projs[j].name;
+                    allocs[i].projectPmId = projs[j].projectManagerId;
                     break;
                   }
                 }
@@ -498,10 +549,13 @@ export default {
             })
             .then(() => {
               for (let i = 0; i < allocations.length; i += 1) {
+                allocations[i].projectEmail = 'n.a.';
                 allocations[i].projectName = 'n.a.';
+                allocations[i].projectPmId = null;
                 for (let j = 0; j < projects.length; j += 1) {
                   if (allocations[i].projectId === projects[j].id) {
                     allocations[i].projectName = projects[j].name;
+                    allocations[i].projectPmId = projects[j].projectManagerId;
                     break;
                   }
                 }
@@ -596,7 +650,11 @@ export default {
       this.selectedAllocationProjectId = evt.projectId;
       this.selectedAllocationPensumPercentage = evt.pensumPercentage;
 
-      this.$refs.infoAllocationModal.show();
+      if (this.loggedInRole === 'ADMINISTRATOR' || this.loggedInId === evt.projectPmId) {
+        this.$refs.infoAllocationModal.show();
+      } else {
+        this.$refs.infoAllocationModalRO.show();
+      }
     },
     updateAllocation(evt) {
       evt.preventDefault();
@@ -653,6 +711,15 @@ export default {
       // this.selectedAllocationRole = null;
 
       this.$refs.infoAllocationModal.hide();
+    },
+    infoAllocationCancelRO() {
+      this.selectedAllocationId = null;
+      this.selectedAllocationStartDate = '';
+      this.selectedAllocationEndDate = '';
+      this.selectedAllocationContractId = null;
+      // this.selectedAllocationRole = null;
+
+      this.$refs.infoAllocationModalRO.hide();
     },
     getListIds(url) {
       // eslint-disable-next-line

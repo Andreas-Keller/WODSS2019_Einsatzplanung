@@ -16,7 +16,7 @@
       <b-tabs>
       </b-tabs>
     </div>
-    <Allocations :loggedInRole="loggedInRole"/>
+    <Allocations :loggedInRole="loggedInRole" :loggedInId="loggedInId" />
     <Footer />
   </div>
 </template>

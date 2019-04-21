@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>Project {{this.projectName}}</h1>
     <Highcharts  :options="this.chartOptions"></Highcharts>
   </div>
 </template>
@@ -22,7 +21,6 @@ export default {
   },
   props: {
     projectId: String,
-    projectName: String,
   },
   created() {
     testing = this.getValues();
