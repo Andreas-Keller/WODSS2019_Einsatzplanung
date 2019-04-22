@@ -34,9 +34,7 @@ exports.handler = async function getAllocations(req, res, next) {
                     data.push(response.payload[i]);
                 }
             }
-
             response.payload = data;
-
         }
         if (req.query.projectId) {
             let data = [];
@@ -50,7 +48,7 @@ exports.handler = async function getAllocations(req, res, next) {
         if (req.query.fromDate) {
             let data = [];
             for (let i = 0; i < response.payload.length; i++) {
-                if (response.payload[i].endDate >= req.query.fromDate) {
+                if (response.payload[i].startDate >= req.query.fromDate) {
                     data.push(response.payload[i]);
                 }
             }
@@ -59,7 +57,7 @@ exports.handler = async function getAllocations(req, res, next) {
         if (req.query.toDate) {
             let data = [];
             for (let i = 0; i < response.payload.length; i++) {
-                if (response.payload[i].startDate <= req.query.toDate) {
+                if (response.payload[i].endDate <= req.query.toDate) {
                     data.push(response.payload[i]);
                 }
             }
