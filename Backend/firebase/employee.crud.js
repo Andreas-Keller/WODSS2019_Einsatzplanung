@@ -32,8 +32,13 @@ const deleteEmployee = async (id) => {
 
     return await crud.update(data, employees);
 };
+
 const findBy = async (lookupVar, value) => {
     return await crud.findBy(lookupVar, value, employees);
+};
+
+const findAllBy = async (lookupVar, value) => {
+    return await crud.findAllBy(lookupVar, value, employees);
 };
 
 module.exports = {
@@ -42,5 +47,7 @@ module.exports = {
     createEmployee,
     updateEmployee,
     deleteEmployee,
-    findBy
+    findBy,
+    findAllBy,
+    employees
 };

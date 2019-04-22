@@ -27,11 +27,18 @@ const findBy = async (lookupVar, value) => {
     return await crud.findBy(lookupVar, value, projects);
 };
 
+const findAllBy = async (lookupVar, value) => {
+    return await crud.findAllBy(lookupVar, value, projects);
+};
+
 module.exports = {
     getProjects,
     getProject,
     createProject,
     updateProject,
     deleteProject,
-    findBy
+    findBy,
+    findAllBy,
+
+    projects
 };

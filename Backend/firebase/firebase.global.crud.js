@@ -52,7 +52,7 @@ const update = async (data, collection) => {
         return new Await_response(404, "id was null or undifined in update");
     }
     let response = await collection.doc(String(data.id)).update(data);
-
+    // TODO DO Something with response
     return new Await_response(200, "updated", data);
 };
 
@@ -79,8 +79,30 @@ const findBy = async (lookupVar, value, collection) => {
             });
         })
         .catch(err => {
-            console.log('Error getting employee', err);
-            response = new Await_response(500, "Error getting employee", err);
+            console.log('Error getting document', err);
+            response = new Await_response(500, "Error getting document", err);
+        });
+    return response;
+};
+
+const findAllBy = async (lookupVar, value, collection) => {
+    let response = null;
+    await collection.where(lookupVar, '==', String(value)).get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                console.log('No matching documents. (findAllBy)');
+                response = new Await_response(404, "No matching documents. (findAllBy)");
+            }
+            let data = [];
+            snapshot.forEach(doc => {
+                console.log(doc.id, '=>', doc.data());
+                data.push(doc.data())
+            });
+            response = new Await_response(200, "Found Data", data);
+        })
+        .catch(err => {
+            console.log('Error getting document', err);
+            response = new Await_response(500, "Error getting document", err);
         });
     return response;
 };
@@ -90,5 +112,6 @@ module.exports = {
     create,
     update,
     deleteEntity,
-    findBy
+    findBy,
+    findAllBy
 };
