@@ -8,6 +8,21 @@
  *   
  */
 exports.handler = function refreshToken(req, res, next) {
-  res.send('refreshToken')
+  let jwt = require('jsonwebtoken');
+  const user = util.decodeToken(req);
+  let token = jwt.sign(user,
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '24h' // expires in 24 hours
+      }
+  );
+
+  //TODO handle errors
+  res.status(200).send({
+    success: true,
+    message: 'New, updated JWT token after a successful refresh',
+    token: token
+  });
+
   next()
-}
+};
