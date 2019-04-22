@@ -33,7 +33,7 @@ const create = async (data, collection) => {
                     return new Await_response(200, "Created enitity", data);
                 }
                 snapshot.forEach(doc => {
-                    console.log(doc.id, '=>', doc.data());
+                    // console.log(doc.id, '=>', doc.data());
                     return new Await_response(400, "already found user with this id", false);
                 });
             })
@@ -74,7 +74,7 @@ const findBy = async (lookupVar, value, collection) => {
                 response = new Await_response(404, "No matching documents. (findBy)");
             }
             snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
+                // console.log(doc.id, '=>', doc.data());
                 response = new Await_response(200, "Found Data", doc.data());
             });
         })
@@ -95,7 +95,7 @@ const findAllBy = async (lookupVar, value, collection) => {
             }
             let data = [];
             snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
+                // console.log(doc.id, '=>', doc.data());
                 data.push(doc.data())
             });
             response = new Await_response(200, "Found Data", data);

@@ -26,6 +26,9 @@ const deleteAllocation = async (id) => {
 const findBy = async (lookupVar, value) => {
     return await crud.findBy(lookupVar, value, allocations);
 };
+const findAllBy = async (lookupVar, value) => {
+    return await crud.findAllBy(lookupVar, value, allocations);
+};
 
 module.exports = {
     getAllocations,
@@ -33,5 +36,7 @@ module.exports = {
     createAllocation,
     updateAllocation,
     deleteAllocation,
-    findBy
+    findBy,
+    findAllBy,
+    allocations
 };
