@@ -439,44 +439,49 @@ export default {
       }
     },
     applyFilter() {
-      if (this.filterFromDate === null && this.filterToDate === null
-        && this.filterEmpId && this.filterProjectId === null) {
-        return;
-      }
+      console.log(this.filterFromDate);
+      console.log(this.filterToDate);
+      console.log(this.filterEmpId);
+      console.log(this.filterProjectId);
+        if (this.filterFromDate === null && this.filterToDate === null
+          && this.filterEmpId && this.filterProjectId === null) {
+          return;
+        }
 
-      if (this.loggedInRole === 'DEVELOPER' && this.filterFromDate === null
-        && this.filterToDate === null && this.filterProjectId === null) {
-        return;
-      }
+        if (this.loggedInRole === 'DEVELOPER' && this.filterFromDate === null
+          && this.filterToDate === null && this.filterProjectId === null) {
+          return;
+        }
 
-      let from = '';
+        let from = '';
 
-      if (this.filterFromDate !== null && this.filterFromDate !== '') {
-        from = `fromDate=${this.filterFromDate}&`;
-      }
+        if (this.filterFromDate !== null && this.filterFromDate !== '') {
+          from = `fromDate=${this.filterFromDate}&`;
+        }
 
-      let to = '';
+        let to = '';
 
-      if (this.filterToDate !== null && this.filterToDate !== '') {
-        to = `toDate=${this.filterToDate}&`;
-      }
+        if (this.filterToDate !== null && this.filterToDate !== '') {
+          to = `toDate=${this.filterToDate}&`;
+        }
 
-      let proj = '';
+        let proj = '';
 
-      if (this.filterProjectId !== null) {
-        proj = `projectId=${this.filterProjectId}&`;
-      }
+        if (this.filterProjectId !== null) {
+          proj = `projectId=${this.filterProjectId}&`;
+        }
 
-      let emp = '';
+        let emp = '';
 
       if (this.filterEmpId !== null) {
-        emp = `employeeId=${this.filterEmpId}`;
+        emp = `employeeId=${this.filterEmpId}&`;
       }
 
       let allocs = [];
       let projs = [];
-
-      axios.get(`${this.ApiServer}:${this.ApiPort}/api/allocation?${from}${to}${proj}${emp}`,
+      let url = `${this.ApiServer}:${this.ApiPort}/api/allocation?${from}${to}${proj}${emp}`;
+      console.log(url.substr(0, url.length-1));
+      axios.get(url.substr(0, url.length-1),
         restHeader)
         .then((response) => {
           console.log(response);
