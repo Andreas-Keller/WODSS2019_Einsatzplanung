@@ -19,6 +19,7 @@ exports.handler = async function getAllocations(req, res, next) {
         if (user.role === "DEVELOPER") {
             let data = [];
             let cfb = require('../firebase/contract.crud');
+            //get all allocations which match with employee
             for (let i = 0; i < response.payload.length; i++) {
                 let contract = await cfb.getContract(response.payload[i].contractId);
                 if (contract.payload.employeeId == user.id) {
@@ -27,6 +28,7 @@ exports.handler = async function getAllocations(req, res, next) {
             }
             response.payload = data;
         }
+        //filters
         if (req.query.employeeId) {
             let data = [];
             for (let i = 0; i < response.payload.length; i++) {
