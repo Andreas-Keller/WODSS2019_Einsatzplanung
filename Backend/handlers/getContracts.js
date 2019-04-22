@@ -9,7 +9,6 @@
  *
  */
 exports.handler = async function getContracts(req, res, next) {
-    //res.send('getContracts')
     const contractFirebase = require('../firebase/contract.crud.js');
     let response = await contractFirebase.getContracts();
 
@@ -49,7 +48,5 @@ exports.handler = async function getContracts(req, res, next) {
     } else {
         res.status(response.httpStatus).send();
     }
-
-    res.status(response.httpStatus).send(response.payload);
     next();
 };

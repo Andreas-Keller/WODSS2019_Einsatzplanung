@@ -14,7 +14,6 @@ exports.handler = async function getProjects(req, res, next) {
     let response = await projectFirebase.getProjects();
     const util = require("../util/Util");
     const user = util.decodeToken(req);
-    console.log(req.query);
     if (response.httpStatus === 200) {
         if (user.role === "DEVELOPER") {
             let afb = require('../firebase/allocation.crud');
@@ -64,7 +63,6 @@ exports.handler = async function getProjects(req, res, next) {
                     data.push(response.payload[i]);
                 }
             }
-            console.log(data);
             response.payload = data;
         }
         if (req.query.toDate) {

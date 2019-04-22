@@ -13,9 +13,6 @@ function verify(token, req) {
         url = url.replace("/" + req.params.id, '');
     }
 
-    console.log(role);
-    console.log(url);
-
     switch (url) {
         case '/api/allocation':
             switch (method) {
@@ -127,7 +124,7 @@ module.exports = function Bearer(req, res, next) {
             error.status = error.statusCode = 401;
             next(error);
         } else {
-            console.log("OTHER");
+            //console.log("OTHER");
             const util = require("../../util/Util");
             const token = util.decodeToken(req);
             if (!verify(token, req)) {
