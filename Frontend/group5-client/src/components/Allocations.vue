@@ -443,35 +443,35 @@ export default {
       console.log(this.filterToDate);
       console.log(this.filterEmpId);
       console.log(this.filterProjectId);
-        if (this.filterFromDate === null && this.filterToDate === null
-          && this.filterEmpId && this.filterProjectId === null) {
-          return;
-        }
+      if (this.filterFromDate === null && this.filterToDate === null
+        && this.filterEmpId && this.filterProjectId === null) {
+        return;
+      }
 
-        if (this.loggedInRole === 'DEVELOPER' && this.filterFromDate === null
-          && this.filterToDate === null && this.filterProjectId === null) {
-          return;
-        }
+      if (this.loggedInRole === 'DEVELOPER' && this.filterFromDate === null
+        && this.filterToDate === null && this.filterProjectId === null) {
+        return;
+      }
 
-        let from = '';
+      let from = '';
 
-        if (this.filterFromDate !== null && this.filterFromDate !== '') {
-          from = `fromDate=${this.filterFromDate}&`;
-        }
+      if (this.filterFromDate !== null && this.filterFromDate !== '') {
+        from = `fromDate=${this.filterFromDate}&`;
+      }
 
-        let to = '';
+      let to = '';
 
-        if (this.filterToDate !== null && this.filterToDate !== '') {
-          to = `toDate=${this.filterToDate}&`;
-        }
+      if (this.filterToDate !== null && this.filterToDate !== '') {
+        to = `toDate=${this.filterToDate}&`;
+      }
 
-        let proj = '';
+      let proj = '';
 
-        if (this.filterProjectId !== null) {
-          proj = `projectId=${this.filterProjectId}&`;
-        }
+      if (this.filterProjectId !== null) {
+        proj = `projectId=${this.filterProjectId}&`;
+      }
 
-        let emp = '';
+      let emp = '';
 
       if (this.filterEmpId !== null) {
         emp = `employeeId=${this.filterEmpId}&`;
@@ -479,20 +479,20 @@ export default {
 
       let allocs = [];
       let projs = [];
-      let url = `${this.ApiServer}:${this.ApiPort}/api/allocation?${from}${to}${proj}${emp}`;
-      console.log(url.substr(0, url.length-1));
-      axios.get(url.substr(0, url.length-1),
+      const url = `${this.ApiServer}:${this.ApiPort}/api/allocation?${from}${to}${proj}${emp}`;
+      console.log(url.substr(0, url.length - 1));
+      axios.get(url,
         restHeader)
         .then((response) => {
           console.log(response);
           allocs = response.data;
         })
         .then(() => {
-          axios.get(axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader))
+          axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
             .then((response) => {
               projs = response.data;
 
-              for (let i = 0; i < projs.length; i += 1) {
+              for (let i = 0; i < allocs.length; i += 1) {
                 allocs[i].projectEmail = 'n.a.';
                 allocs[i].projectName = 'n.a.';
                 allocs[i].projectPmId = null;
@@ -509,10 +509,12 @@ export default {
               this.totalRows = this.items.length;
             })
             .catch((error) => {
+              console.log('project')
               console.log(error);
             });
         })
         .catch((error) => {
+          console.log('allocation');
           console.log(error);
         });
 
