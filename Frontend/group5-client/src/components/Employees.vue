@@ -327,14 +327,14 @@ export default {
       this.currentPage = 1;
     },
     getUser() {
-      if (this.loggedInRole === 'ADMINISTRATOR') {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, restHeader)
+      if (this.loggedInRole === 'PROJECTMANAGER') {
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=DEVELOPER`, restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
           });
-      } else if (this.loggedInRole === 'PROJECTMANAGER') {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=DEVELOPER`, restHeader)
+      } else {
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
