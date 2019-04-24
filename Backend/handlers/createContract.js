@@ -40,11 +40,9 @@ exports.handler = async function createContract(req, res, next) {
             if ((contract.startDate >= c.startDate && contract.startDate <= c.endDate) || (contract.endDate >= c.startDate && contract.endDate <= c.endDate)) {
                 canCreate = false;
             }
-            if ((c.startDate >= contract.startDate && c.endDate <= contract.startDate) || (c.startDate >= contract.endDate && c.endDate <= contract.endDate)) {
+            if ((c.startDate >= contract.startDate && c.endDate <= contract.endDate)) {
                 canCreate = false;
             }
-            console.log(contract.startDate >= c.startDate && contract.startDate <= c.endDate);
-            console.log(contract.endDate >= c.startDate && contract.endDate <= c.endDate);
         }
         if (canCreate) {
             const contractFirebase = require('../firebase/contract.crud.js');
