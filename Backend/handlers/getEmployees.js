@@ -14,9 +14,9 @@ exports.handler = async function getEmployees(req, res, next) {
     const util = require("../util/Util");
     const user = util.decodeToken(req);
     if (response.httpStatus === 200) {
-        if (user.role === "DEVELOPER") {
-            response.payload = [user];//return only dev\
-        }
+        // if (user.role === "DEVELOPER") {
+        //     response.payload = [user];//return only dev\
+        // }
         //filters
         let data = [];
         if (req.query.role != undefined) {
