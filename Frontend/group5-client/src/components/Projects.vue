@@ -492,11 +492,9 @@ export default {
       let PMs = [];
       let projects = [];
       const url = `${this.ApiServer}:${this.ApiPort}/api/project?${from}${to}${pmId}`;
-      console.log(url.substr(0, url.length - 1));
       axios.get(url.substr(0, url.length - 1),
         restHeader)
         .then((response) => {
-          console.log(response);
           projects = response.data;
         })
         .then(() => {

@@ -140,10 +140,11 @@
         aria-controls="allocationTable"
       />
     </b-col>
-    <b-col md="6" v-if="this.loggedInRole==='ADMINISTRATOR'">
+    <b-col md="6" v-if="this.loggedInRole !=='DEVELOPER'">
       <b-button
         class="float-right"
         variant="success"
+        @click="createAllocModalOpen"
         v-b-modal.createAllocationModal>
         Create Allocation
       </b-button>
@@ -280,7 +281,7 @@
       <b-form-group label-cols="4" label-cols-lg="2" label="Project ID"
         label-for="projectId2">
         <b-form-select v-model="createAllocationProjectId" id="projectId2" class="marg-bot"
-          :options="projectIdOptions" placeholder="Project Id" required>
+          :options="projectIdOptions" placeholder="Project" required>
         </b-form-select>
       </b-form-group>
       <b-form-group label-cols="4" label-cols-lg="2" label="Pensum %"
@@ -385,8 +386,8 @@ export default {
       createAllocationContractId: null,
       createAllocationProjectId: null,
       createAllocationPensumPercentage: null,
-      contractIdOptions: this.getListIds('contract'),
-      projectIdOptions: this.getListIds('project'),
+      contractIdOptions: [],
+      projectIdOptions: [],
       showFailCreateAllocationAlertFTE: false,
       showFailCreateAllocationAlertDATE: false,
       // Info allocation data
@@ -439,10 +440,6 @@ export default {
       }
     },
     applyFilter() {
-      console.log(this.filterFromDate);
-      console.log(this.filterToDate);
-      console.log(this.filterEmpId);
-      console.log(this.filterProjectId);
       if (this.filterFromDate === null && this.filterToDate === null
         && this.filterEmpId && this.filterProjectId === null) {
         return;
@@ -480,11 +477,9 @@ export default {
       let allocs = [];
       let projs = [];
       const url = `${this.ApiServer}:${this.ApiPort}/api/allocation?${from}${to}${proj}${emp}`;
-      console.log(url.substr(0, url.length - 1));
       axios.get(url,
         restHeader)
         .then((response) => {
-          console.log(response);
           allocs = response.data;
         })
         .then(() => {
@@ -509,16 +504,16 @@ export default {
               this.totalRows = this.items.length;
             })
             .catch((error) => {
-              console.log('project')
               console.log(error);
             });
         })
         .catch((error) => {
-          console.log('allocation');
           console.log(error);
         });
-
-      console.log('apply');
+    },
+    createAllocModalOpen() {
+      this.getAllocationIdOptions();
+      this.getContractIdOptions();
     },
     resetFilter() {
       this.filterFromDate = null;
@@ -728,10 +723,10 @@ export default {
 
       this.$refs.infoAllocationModalRO.hide();
     },
-    getListIds(url) {
+    getContractIdOptions() {
       // eslint-disable-next-line
-      let listIds = [{ value: null, text: `${url} Ids`, disabled: true }];
-      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/${url}`, restHeader)
+      const listIds = [{ value: null, text: 'Contracts', disabled: true }];
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract`, restHeader)
         .then(response => response.data)
         .then((data) => {
           data.forEach((entry) => {
@@ -748,7 +743,26 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-      return listIds;
+      this.contractIdOptions = listIds;
+    },
+    getAllocationIdOptions() {
+      const list = [{ value: null, text: 'Projects', disabled: true }];
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project`, restHeader)
+        .then(response => response.data)
+        .then((data) => {
+          data.forEach((entry) => {
+            if (this.loggedInRole === 'ADMINISTRATOR' || (this.loggedInRole === 'PROJECTMANAGER' && this.loggedInId === entry.projectManagerId)) {
+              list.push({
+                text: entry.name,
+                value: entry.id,
+              });
+            }
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      this.projectIdOptions = list;
     },
     calculateRemainingFTEofProject() {
       let FTE = 0;
