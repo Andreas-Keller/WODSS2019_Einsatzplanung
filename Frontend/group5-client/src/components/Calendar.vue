@@ -41,6 +41,12 @@ export default {
           startOnTick: true,
           endOnTick: true,
         },
+        yAxis: {
+          title: {
+            text: 'Absolute Workload Percentage',
+            // align: 'center'
+          },
+        },
         plotOptions: {
           area: {
             stacking: 'normal',
