@@ -1,5 +1,6 @@
 <template>
   <b-container fluid>
+    <!-- Error Alert -->
     <div class="top-alert">
       <b-alert class="inner-alert" variant="danger" dismissible
       :show="showErrorAlert" @dismissed="dismissErrorAlert">
@@ -7,6 +8,7 @@
       </b-alert>
     </div>
 
+    <!-- Visible Content on page -->
     <h1>Projects</h1>
     <h4>Data filter</h4>
     <b-row>
@@ -101,30 +103,12 @@
       @filtered="onFiltered"
       @row-clicked="projectInfoModal"
     >
-      <!--
-      <template slot="name" slot-scope="row">
-        {{ row.value.first }} {{ row.value.last }}
-      </template>
-
-      <template slot="isActive" slot-scope="row">
-        {{ row.value ? 'Yes' : 'No' }}
-      </template>
-      -->
       <template slot="graph" slot-scope="row">
         <b-button size="sm" @click="modalGraph(row.item)" class="mr-1"
                   variant="primary">
           Project Calendar
         </b-button>
       </template>
-      <!--
-      <template slot="row-details" slot-scope="row">
-        <b-card>
-          <ul>
-            <li v-for="(value, key) in row.item" :key="key">{{ key }}: {{ value }}</li>
-          </ul>
-        </b-card>
-      </template>
-      -->
     </b-table>
 
     <b-row>
@@ -335,11 +319,6 @@
              :title="`Project ${this.selectedProjectName}`" centered>
       <Calendar :projectId=this.graphId v-if="this.graphId"></Calendar>
     </b-modal>
-    <!--
-    <div v-for="item in items" :key=item.id>
-      <Calendar :projectId=item.id  :projectName=item.name></Calendar>
-    </div>
-    -->
   </b-container>
 </template>
 
@@ -381,12 +360,6 @@ export default {
       // Table data
       items,
       fields: [
-        /*
-        {
-          key: 'id',
-          label: 'ID',
-          sortable: true,
-        }, */
         {
           key: 'name',
           label: 'Name',
@@ -408,11 +381,7 @@ export default {
           label: 'FTE',
           sortable: true,
           sortDirection: 'desc',
-        }, /*
-      {
-        key: 'projectManagerId',
-        label: 'ProjectManagerID',
-      }, */
+        },
         {
           key: 'projectManagerMail',
           label: 'Projectmanager E-Mail',
@@ -731,8 +700,6 @@ export default {
     },
   },
 };
-
-
 </script>
 
 <style scoped>

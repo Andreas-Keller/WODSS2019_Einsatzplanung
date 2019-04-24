@@ -374,25 +374,6 @@ export default {
         .then((its) => {
           this.combineItems(its);
         });
-
-      /*
-      if (this.loggedInRole === 'ADMINISTRATOR') {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract`, restHeader)
-          .then((response) => {
-            this.totalRows = response.data.length;
-            return response.data;
-          })
-          .then((its) => {
-            this.combineItems(its);
-          });
-      } else if (this.loggedInRole === 'PROJECTMANAGER') {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract`, restHeader)
-          .then((response) => {
-            this.items = response.data;
-            this.totalRows = this.items.length;
-          });
-      }
-      */
     },
     createContract(evt) {
       evt.preventDefault();
@@ -509,7 +490,7 @@ export default {
         axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, this.restHeader)
           .then(response => response.data)
           .then(res => res.forEach((entry) => {
-            if (entry.role !== 'ADMINISTRATOR') {
+            if (entry.role !== 'ADMINISTRATOR' && entry.active === true) {
               employees.push({ value: entry.id, text: entry.emailAddress });
             }
           }))

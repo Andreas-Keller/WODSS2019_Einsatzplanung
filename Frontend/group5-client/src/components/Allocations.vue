@@ -105,32 +105,6 @@
     @filtered="onFiltered"
     @row-clicked="allocationInfoModal"
   >
-    <!--
-      <template slot="name" slot-scope="row">
-        {{ row.value.first }} {{ row.value.last }}
-      </template>
-
-      <template slot="isActive" slot-scope="row">
-        {{ row.value ? 'Yes' : 'No' }}
-      </template>
-
-      <template slot="actions" slot-scope="row">
-        <b-button size="sm" @click="info(row.item, row.index, $event.target)" class="mr-1">
-          Info modal
-        </b-button>
-        <b-button size="sm" @click="row.toggleDetails">
-          {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
-        </b-button>
-      </template>
-
-      <template slot="row-details" slot-scope="row">
-        <b-card>
-          <ul>
-            <li v-for="(value, key) in row.item" :key="key">{{ key }}: {{ value }}</li>
-          </ul>
-        </b-card>
-      </template>
-      -->
   </b-table>
 
   <b-row>
@@ -585,7 +559,8 @@ export default {
           });
       } */
     },
-    createAllocation() {
+    createAllocation(evt) {
+      evt.preventDefault();
       const data = {
         startDate: this.createAllocationStartDate,
         endDate: this.createAllocationEndDate,
