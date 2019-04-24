@@ -1,5 +1,11 @@
 <template>
 <b-container fluid>
+  <div class="top-alert">
+      <b-alert class="inner-alert" variant="danger" dismissible :show="showErrorAlert">
+        {{this.errorMsg}}
+      </b-alert>
+    </div>
+
   <b-alert v-model="showFailCreateAllocationAlertFTE" variant="danger" class="alert-center"
            fade dismissible>
     Project already fully occupied - Decrease pensum or reduce timerange
@@ -154,7 +160,8 @@
   <!-- Info modal -->
   <b-modal ref="infoAllocationModal" id="infoAllocationModal" title="Info Allocation"
     size="lg" @hide="infoAllocationCancel"
-    hide-footer hide-header-close>
+    hide-footer hide-header-close
+    centered>
     <b-form @submit="updateAllocation">
       <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
         label-cols="4" label-cols-lg="2" label="ID"
@@ -216,7 +223,7 @@
   <!-- Info modal Read Only -->
   <b-modal ref="infoAllocationModalRO" id="infoAllocationModalRO" title="Info Allocation"
     size="lg" @hide="infoAllocationCancelRO"
-    hide-footer hide-header-close>
+    hide-footer hide-header-close centered>
     <b-form>
       <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
         label-for="selectedStartDate2RO">
@@ -260,7 +267,7 @@
   <!-- Create Allocation Modal -->
   <b-modal ref="createAllocation" id="createAllocationModal"
     title="Create Allocation" @hide="createAllocationModalCancel" hide-footer
-    hide-header-close size="lg">
+    hide-header-close size="lg" centered>
     <b-form @submit="createAllocation">
       <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
         label-for="startDate2">
@@ -326,6 +333,8 @@ export default {
       ApiServer: process.env.VUE_APP_API_SERVER,
       ApiPort: process.env.VUE_APP_API_PORT,
       restHeader: null,
+      errorMsg: '',
+      showErrorAlert: false,
       // Table data
       items,
       fields: [ /*
@@ -419,7 +428,7 @@ export default {
           }
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
       if (this.loggedInRole !== 'DEVELOPER') {
         axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, this.restHeader)
@@ -434,7 +443,7 @@ export default {
             }
           })
           .catch((error) => {
-            console.log(error);
+            this.errorHandler(error);
           });
       }
     },
@@ -503,11 +512,11 @@ export default {
               this.totalRows = this.items.length;
             })
             .catch((error) => {
-              console.log(error);
+              this.errorHandler(error);
             });
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     createAllocModalOpen() {
@@ -565,11 +574,11 @@ export default {
               this.totalRows = this.items.length;
             })
             .catch((error) => {
-              console.log(error);
+              this.errorHandler(error);
             });
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
 
       /* else if (this.loggedInRole === 'PROJECTMANAGER') {
@@ -626,7 +635,7 @@ export default {
                 this.createAllocationModalCancel();
               })
               .catch((error) => {
-                console.log(error);
+                this.errorHandler(error);
               });
           } else {
             this.createAllocationModalCancel();
@@ -684,7 +693,7 @@ export default {
           this.infoAllocationCancel();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     infoAllocationDelete() {
@@ -701,7 +710,7 @@ export default {
           this.infoAllocationCancel();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     infoAllocationCancel() {
@@ -740,7 +749,7 @@ export default {
           });
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
       this.contractIdOptions = listIds;
     },
@@ -759,7 +768,7 @@ export default {
           });
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
       this.projectIdOptions = list;
     },
@@ -791,7 +800,7 @@ export default {
         // eslint-disable-next-line
         .then(() => { return { FTE: FTE, occupiedFTE: alreadyOcuppiedFTE }; })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     calculateIfAllocationWithinContract() {
@@ -807,12 +816,16 @@ export default {
           return { allocationOk: ok };
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     getNameOfNewProject(projectId) {
       return axios.get(`${this.ApiServer}:${this.ApiPort}/api/project/${projectId}`, this.restHeader)
         .then(response => response.data);
+    },
+    errorHandler(error) {
+      this.errorMsg = error.response.data;
+      this.showErrorAlert = true;
     },
   },
 };
@@ -837,5 +850,16 @@ h4 {
 
 .marg-top {
   margin-top: 5px;
+}
+
+.top-alert {
+  position: fixed;
+  top: 15px;
+  width: calc(100% - 30px);
+  z-index: 999999;
+}
+
+.inner-alert {
+  margin: 0;
 }
 </style>

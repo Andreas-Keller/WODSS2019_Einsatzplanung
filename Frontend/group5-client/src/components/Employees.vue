@@ -1,5 +1,11 @@
 <template>
   <b-container fluid>
+    <div class="top-alert">
+      <b-alert class="inner-alert" variant="danger" dismissible :show="showErrorAlert">
+        {{this.errorMsg}}
+      </b-alert>
+    </div>
+
     <h1>Employees</h1>
     <!-- User Interface controls -->
     <b-row>
@@ -115,7 +121,7 @@
     <!-- Info modal -->
     <b-modal ref="infoUserModal" id="infoUserModal" title="Info Emyployee"
       size="lg" @hide="infoUserCancel"
-      hide-footer hide-header-close>
+      hide-footer hide-header-close centered>
       <b-form @submit="updateUser">
         <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
           label-cols="4" label-cols-lg="2" label="ID"
@@ -175,7 +181,7 @@
     <!-- Create User Modal -->
     <b-modal ref="createUser" id="createUserModal"
       title="Create Employee" @hide="createUserModalCancel" hide-footer hide-header-close
-      size="lg">
+      size="lg" centered>
       <b-form @submit="createUser">
         <b-form-group label-cols="4" label-cols-lg="2" label="First Name"
           label-for="firstName">
@@ -238,6 +244,8 @@ export default {
       ApiServer: process.env.VUE_APP_API_SERVER,
       ApiPort: process.env.VUE_APP_API_PORT,
       restHeader: null,
+      errorMsg: '',
+      showErrorAlert: false,
       // Table data
       items,
       fields: [
@@ -367,7 +375,7 @@ export default {
           this.createUserModalCancel();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     createUserModalCancel() {
@@ -414,7 +422,7 @@ export default {
           this.infoUserCancel();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     infoUserDelete() {
@@ -432,7 +440,7 @@ export default {
           this.infoUserCancel();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     infoUserCancel() {
@@ -443,6 +451,10 @@ export default {
       this.selectedUserRole = null;
 
       this.$refs.infoUserModal.hide();
+    },
+    errorHandler(error) {
+      this.errorMsg = error.response.data;
+      this.showErrorAlert = true;
     },
   },
 };
@@ -463,5 +475,16 @@ export default {
 
 .marg-top {
   margin-top: 5px;
+}
+
+.top-alert {
+  position: fixed;
+  top: 15px;
+  width: calc(100% - 30px);
+  z-index: 999999;
+}
+
+.inner-alert {
+  margin: 0;
 }
 </style>
