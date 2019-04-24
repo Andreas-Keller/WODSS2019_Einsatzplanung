@@ -54,15 +54,16 @@ exports.handler = async function updateProject(req, res, next) {
             let updatedProject = await projectFirebase.updateProject(project);
             //update allocations
             let allocationFirebase = await require('../firebase/allocation.crud.js');
-            let allocations = allocationFirebase.findAllBy('projectId', project.id);
-            for (const a of allocations) {
-                if (a.startDate > updatedProject.endDate) {
+            let allocations = await allocationFirebase.findAllBy('projectId', project.id);
+            for (const a of allocations.payload) {
+                if (a.startDate > project.endDate) {
+                    console.log("delete pls");
                     await allocationFirebase.deleteAllocation(a.id);
 
-                } else if (a.endDate > updatedProject.endDate) {
-                    a.endDate = updatedProject.endDate;
+                } else if (a.endDate > project.endDate) {
+                    console.log("update pls");
+                    a.endDate = project.endDate;
                     await allocationFirebase.updateAllocation(a);
-
                 }
             }
             res.status(updatedProject.httpStatus).send(updatedProject.payload);
