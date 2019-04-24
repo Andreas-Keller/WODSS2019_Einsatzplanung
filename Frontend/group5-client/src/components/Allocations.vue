@@ -561,10 +561,19 @@ export default {
           newAllocation.projectId = response.data.projectId;
           newAllocation.pensumPercentage = response.data.pensumPercentage;
 
-          this.items.unshift(newAllocation);
-          this.totalRows = this.items.length;
+          axios.get(`${this.ApiServer}:${this.ApiPort}/api/project/${response.data.projectId}`, this.restHeader)
+            .then((response2) => {
+              newAllocation.projectName = response2.data.name;
+              newAllocation.projectPmId = response2.data.projectManagerId;
 
-          this.createAllocationModalCancel();
+              this.items.unshift(newAllocation);
+              this.totalRows = this.items.length;
+
+              this.createAllocationModalCancel();
+            })
+            .catch((error) => {
+              this.errorHandler(error);
+            });
         })
         .catch((error) => {
           this.errorHandler(error);
