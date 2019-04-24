@@ -20,29 +20,34 @@ const getAll = async (collection) => {
 
 const fbHelper = require('./firebaseHelper.js');
 const create = async (data, collection) => {
-    while (true) {
-        let returnValue = null;
-        let id = fbHelper.getRandomID();
-        let entity = await collection.where("id", '==', id).limit(1).get()
-            .then(async snapshot => {
-                if (snapshot.empty) {
-                    //console.log('Found unused ID (in create)');
-                    data.id = String(id);
-                    returnValue = collection.doc(String(id))
-                        .set(data, {merge: true});
-                    return new Await_response(200, "Created enitity", data);
-                }
-                snapshot.forEach(doc => {
-                    // console.log(doc.id, '=>', doc.data());
-                    return new Await_response(400, "already found user with this id", false);
+    if (data.id != null) { //if id is supplied, use it
+        collection.doc(String(data.id)).set(data, {merge: true});
+        return new Await_response(200, "Created enitity", data);
+    } else { //if id is missing, find uuid
+        while (true) {
+            let returnValue = null;
+            let id = fbHelper.getRandomID();
+            let entity = await collection.where("id", '==', id).limit(1).get()
+                .then(async snapshot => {
+                    if (snapshot.empty) {
+                        //console.log('Found unused ID (in create)');
+                        data.id = String(id);
+                        returnValue = collection.doc(String(id))
+                            .set(data, {merge: true});
+                        return new Await_response(200, "Created enitity", data);
+                    }
+                    snapshot.forEach(doc => {
+                        // console.log(doc.id, '=>', doc.data());
+                        return new Await_response(400, "already found user with this id", false);
+                    });
+                })
+                .catch(err => {
+                    //console.log('Error getting employee', err);
+                    return new Await_response(500, 'Error creating employee', false);
                 });
-            })
-            .catch(err => {
-                //console.log('Error getting employee', err);
-                return new Await_response(500, 'Error creating employee', false);
-            });
-        if (entity.payload !== false) {
-            return entity;
+            if (entity.payload !== false) {
+                return entity;
+            }
         }
     }
 };
@@ -60,9 +65,11 @@ const deleteEntity = async (id, collection) => {
     if (id == null) {
         return new Await_response(404, "id was null or undifined in delete");
     }
-    return new Await_response(204, "deleted", await collection
+    let entityToDelete = (await findBy('id', id, collection)).payload;//return deleted entity
+    await collection
         .doc(String(id))
-        .delete());
+        .delete();
+    return new Await_response(204, "deleted", entityToDelete);
 };
 
 const findBy = async (lookupVar, value, collection) => {
@@ -79,7 +86,7 @@ const findBy = async (lookupVar, value, collection) => {
             });
         })
         .catch(err => {
-           // console.log('Error getting document', err);
+            // console.log('Error getting document', err);
             response = new Await_response(500, "Error getting document", err);
         });
     return response;
