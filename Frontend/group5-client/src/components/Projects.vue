@@ -1,5 +1,11 @@
 <template>
   <b-container fluid>
+    <div class="top-alert">
+      <b-alert class="inner-alert" variant="danger" dismissible :show="showErrorAlert">
+        {{this.errorMsg}}
+      </b-alert>
+    </div>
+
     <h1>Projects</h1>
     <h4>Data filter</h4>
     <b-row>
@@ -142,7 +148,7 @@
 
     <!-- Info Project Modal -->
     <b-modal ref="infoProjectModal" id="infoProjectModal" title="Info Project"
-             size="lg" @hide="infoProjectCancel" hide-footer hide-header-close>
+             size="lg" @hide="infoProjectCancel" hide-footer hide-header-close centered>
       <b-form @submit="updateProject">
         <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
                       label-cols="4" label-cols-lg="2" label="ID"
@@ -224,7 +230,7 @@
 
     <!-- Info Project Modal Read-Only -->
     <b-modal ref="infoProjectModalRO" id="infoProjectModalRO" title="Info Project"
-             size="lg" @hide="infoProjectCancel" hide-footer hide-header-close>
+             size="lg" @hide="infoProjectCancel" hide-footer hide-header-close centered>
       <b-form>
         <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
                       label-cols="4" label-cols-lg="2" label="ID"
@@ -280,7 +286,7 @@
     <!-- Create Project Modal -->
     <b-modal ref="createProjectModal" id="createProjectModal"
              title="Create Project" @hide="createProjectModalCancel" hide-footer
-             hide-header-close size="lg">
+             hide-header-close size="lg" centered>
       <b-form @submit="createProject">
         <b-form-group label-cols="4" label-cols-lg="2" label="Project Name"
                       label-for="projectName">
@@ -325,7 +331,7 @@
     <!-- modal graph for project -->
     <b-modal ref="modalGraph" id="modalGraph" size="xl"
              @hide="modalGraphCancel" hide-footer hide-header-close
-             :title="`Project ${this.selectedProjectName}`">
+             :title="`Project ${this.selectedProjectName}`" centered>
       <Calendar :projectId=this.graphId v-if="this.graphId"></Calendar>
     </b-modal>
     <!--
@@ -369,6 +375,8 @@ export default {
       ApiServer: process.env.VUE_APP_API_SERVER,
       ApiPort: process.env.VUE_APP_API_PORT,
       restHeader: null,
+      errorMsg: '',
+      showErrorAlert: false,
       // Table data
       items,
       fields: [
@@ -517,11 +525,11 @@ export default {
               this.items = projects;
             })
             .catch((error) => {
-              console.log(error);
+              this.errorHandler(error);
             });
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     createProject(evt) {
@@ -555,7 +563,7 @@ export default {
           this.createProjectModalCancelBtn();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     createProjectModalCancelBtn() {
@@ -585,7 +593,7 @@ export default {
           this.pmOptions = arr;
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     getProjects() {
@@ -615,11 +623,11 @@ export default {
               this.items = projects;
             })
             .catch((error) => {
-              console.log(error);
+              this.errorHandler(error);
             });
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     updateProject(evt) {
@@ -652,7 +660,7 @@ export default {
           this.infoProjectCancelBtn();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     projectInfoModal(evt) {
@@ -700,7 +708,7 @@ export default {
           this.infoProjectCancelBtn();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     modalGraph(item) {
@@ -713,6 +721,10 @@ export default {
       this.selectedProjectName = '';
       this.$refs.modalGraph.hide();
     },
+    errorHandler(error) {
+      this.errorMsg = error.response.data;
+      this.showErrorAlert = true;
+    },
   },
 };
 
@@ -720,23 +732,34 @@ export default {
 </script>
 
 <style scoped>
-  h4 {
-    margin-top: 15px;
-  }
+h4 {
+  margin-top: 15px;
+}
 
-  .marg-bot {
-    margin-bottom: 5px;
-  }
+.marg-bot {
+  margin-bottom: 5px;
+}
 
-  .marg-right {
-    margin-right: 5px;
-  }
+.marg-right {
+  margin-right: 5px;
+}
 
-  .marg-left {
-    margin-left: 5px;
-  }
+.marg-left {
+  margin-left: 5px;
+}
 
-  .marg-top {
-    margin-top: 5px;
-  }
+.marg-top {
+  margin-top: 5px;
+}
+
+.top-alert {
+  position: fixed;
+  top: 15px;
+  width: calc(100% - 30px);
+  z-index: 999999;
+}
+
+.inner-alert {
+  margin: 0;
+}
 </style>

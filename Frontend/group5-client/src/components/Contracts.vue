@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
     <div class="top-alert">
-      <b-alert ref="errorAlert" class="inner-alert" show variant="danger" dismissible>
+      <b-alert class="inner-alert" variant="danger" dismissible :show="showErrorAlert">
         {{this.errorMsg}}
       </b-alert>
     </div>
@@ -149,7 +149,7 @@
     <!-- Info Contract Modal -->
     <b-modal ref="infoContractModal" id="infoContractModal" :title=this.infoTitle
              size="lg" @hide="infoContractCancel"
-             hide-footer hide-header-close>
+             hide-footer hide-header-close centered>
       <b-form @submit="updateContract">
         <b-form-group v-if="this.loggedInRole === 'ADMINISTRATOR'"
                       label-cols="4" label-cols-lg="2" label="ID"
@@ -164,14 +164,16 @@
                       label-for="selectedStartDate">
           <b-form-input id="selectedStartDate" type="date"
                         v-model="selectedContractStartDate"
-                        v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
+                        v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'"
+                        v-bind:max="selectedContractEndDate" required>
           </b-form-input>
         </b-form-group>
         <b-form-group label-cols="4" label-cols-lg="2" label="End Date"
                       label-for="selectedEndDate">
           <b-form-input id="selectedEndDate" type="date"
                         v-model="selectedContractEndDate"
-                        v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'" required>
+                        v-bind:disabled="this.loggedInRole !== 'ADMINISTRATOR'"
+                        v-bind:min="selectedContractStartDate" required>
           </b-form-input>
         </b-form-group>
         <b-form-group label-cols="4" label-cols-lg="2" label="Pensum"
@@ -207,7 +209,8 @@
     <b-modal ref="createContract" id="createContractModal"
              title="Create Contract" @hide="createContractModalCancel" hide-footer
              hide-header-close
-             size="lg">
+             size="lg"
+             centered>
       <b-form @submit="createContract">
         <b-form-group label-cols="4" label-cols-lg="2" label="Start Date"
                       label-for="startDate9">
@@ -270,6 +273,7 @@ export default {
       ApiPort: process.env.VUE_APP_API_PORT,
       restHeader: null,
       errorMsg: '',
+      showErrorAlert: false,
       // Table data
       items,
       fields: [
@@ -424,7 +428,7 @@ export default {
           this.createContractModalCancel();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     createContractModalCancel() {
@@ -469,7 +473,7 @@ export default {
           this.infoContractCancel();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     infoContractDelete() {
@@ -486,7 +490,7 @@ export default {
           this.infoContractCancel();
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     infoContractCancel() {
@@ -510,7 +514,7 @@ export default {
           }))
           .then(() => employees)
           .catch((error) => {
-            console.log(error);
+            this.errorHandler(error);
           });
       }
       this.employeeIdOptions = employees;
@@ -587,11 +591,12 @@ export default {
           this.combineItems(response.data);
         })
         .catch((error) => {
-          console.log(error);
+          this.errorHandler(error);
         });
     },
     errorHandler(error) {
-      this.errorMsg = error.response;
+      this.errorMsg = error.response.data;
+      this.showErrorAlert = true;
     },
   },
 };
@@ -622,7 +627,7 @@ h4 {
   position: fixed;
   top: 15px;
   width: calc(100% - 30px);
-  z-index: 20;
+  z-index: 999999;
 }
 
 .inner-alert {
