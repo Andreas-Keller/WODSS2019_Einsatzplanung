@@ -54,7 +54,7 @@ const create = async (data, collection) => {
 
 const update = async (data, collection) => {
     if (data.id == null) {
-        return new Await_response(404, "id was null or undifined in update");
+        return new Await_response(404, "id was null or undefined in update");
     }
     let response = await collection.doc(String(data.id)).update(data);
     // TODO DO Something with response
@@ -63,7 +63,7 @@ const update = async (data, collection) => {
 
 const deleteEntity = async (id, collection) => {
     if (id == null) {
-        return new Await_response(404, "id was null or undifined in delete");
+        return new Await_response(404, "id was null or undefined in delete");
     }
     let entityToDelete = (await findBy('id', id, collection)).payload;//return deleted entity
     await collection

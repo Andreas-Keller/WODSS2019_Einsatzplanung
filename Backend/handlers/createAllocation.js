@@ -47,14 +47,9 @@ exports.handler = async function createAllocation(req, res, next) {
         for (const x of projectAllocations.payload) {
             ftePercentage += x.pensumPercentage;
         }
-        console.log(ftePercentage);
-        console.log(allocation.pensumPercentage);
-        console.log(foundProject.payload.ftePercentage);
-        if (ftePercentage + allocation.pensumPercentage > foundProject.payload.ftePercentage) {
-            console.log("err")
+        if (ftePercentage + allocation.pensumPercentage > foundProject.payload.ftePercentage*100) {// check if added percentage goes over fte
             res.status(412).send("Precondition for the allocation failed");
         } else {
-            console.log("create")
             let createdAllocation = await allocationFirebase.createAllocation(allocation);
             res.status(createdAllocation.httpStatus).send(createdAllocation.payload);
         }
