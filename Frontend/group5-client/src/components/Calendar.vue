@@ -29,6 +29,9 @@ export default {
       testing: null,
       chartOptions: {
         title: { text: 'Project Overview', align: 'left' },
+        tooltip: {
+          enabled: false,
+        },
         chart: {
           type: 'area',
           spacingBottom: 30,
