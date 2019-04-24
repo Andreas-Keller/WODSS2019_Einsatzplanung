@@ -25,8 +25,6 @@ exports.handler = async function updateProject(req, res, next) {
         id: String(req.params.id)
     };
 
-    console.log(project);
-
     if (project.name === null ||
         project.ftePercentage === null ||
         project.startDate === null ||
@@ -57,11 +55,9 @@ exports.handler = async function updateProject(req, res, next) {
             let allocations = await allocationFirebase.findAllBy('projectId', project.id);
             for (const a of allocations.payload) {
                 if (a.startDate > project.endDate) {
-                    console.log("delete pls");
                     await allocationFirebase.deleteAllocation(a.id);
 
                 } else if (a.endDate > project.endDate) {
-                    console.log("update pls");
                     a.endDate = project.endDate;
                     await allocationFirebase.updateAllocation(a);
                 }
@@ -69,6 +65,5 @@ exports.handler = async function updateProject(req, res, next) {
             res.status(updatedProject.httpStatus).send(updatedProject.payload);
         }
     }
-
     next()
 };
