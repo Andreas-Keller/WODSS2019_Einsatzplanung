@@ -59,6 +59,10 @@ export default {
         try {
           const decoded = jwtDecode(localStorage.getItem('token'));
           this.loggedInEmployee = decoded;
+          if (decoded.exp < (new Date().getTime() / 1000)) {
+            localStorage.removeItem('token');
+            this.$router.push({ name: 'login' });
+          }
           this.loggedInEmployeeName = `${this.loggedInEmployee.firstName} ${this.loggedInEmployee.lastName}`;
           this.loggedInRole = this.loggedInEmployee.role;
           this.loggedInId = String(this.loggedInEmployee.id);

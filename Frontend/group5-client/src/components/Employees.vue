@@ -220,9 +220,6 @@ import axios from 'axios';
 
 const items = [];
 
-const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-
-
 export default {
   name: 'Employees',
 
@@ -231,6 +228,7 @@ export default {
   },
 
   beforeMount() {
+    this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
     this.getUser();
   },
 
@@ -239,6 +237,7 @@ export default {
       // API
       ApiServer: process.env.VUE_APP_API_SERVER,
       ApiPort: process.env.VUE_APP_API_PORT,
+      restHeader: null,
       // Table data
       items,
       fields: [
@@ -328,13 +327,13 @@ export default {
     },
     getUser() {
       if (this.loggedInRole === 'PROJECTMANAGER') {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=DEVELOPER`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=DEVELOPER`, this.restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
           });
       } else {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, this.restHeader)
           .then((response) => {
             this.items = response.data;
             this.totalRows = this.items.length;
@@ -351,7 +350,7 @@ export default {
         emailAddress: this.createUserEmail,
       };
 
-      axios.post(`${this.ApiServer}:${this.ApiPort}/api/employee?password=${this.createUserPw}&role=${this.createUserRole}`, data, restHeader)
+      axios.post(`${this.ApiServer}:${this.ApiPort}/api/employee?password=${this.createUserPw}&role=${this.createUserRole}`, data, this.restHeader)
         .then((response) => {
           const newUser = {
             id: response.data.id,
@@ -399,7 +398,7 @@ export default {
         emailAddress: this.selectedUserEmail,
       };
 
-      axios.put(`${this.ApiServer}:${this.ApiPort}/api/employee/${this.selectedUserId}`, data, restHeader)
+      axios.put(`${this.ApiServer}:${this.ApiPort}/api/employee/${this.selectedUserId}`, data, this.restHeader)
         // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -419,7 +418,7 @@ export default {
         });
     },
     infoUserDelete() {
-      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/employee/${this.selectedUserId}`, restHeader)
+      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/employee/${this.selectedUserId}`, this.restHeader)
         // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {

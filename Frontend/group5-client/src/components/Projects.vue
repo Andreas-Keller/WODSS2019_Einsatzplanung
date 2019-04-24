@@ -340,8 +340,6 @@
 import axios from 'axios';
 import Calendar from '@/components/Calendar.vue';
 
-const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-
 const items = [];
 
 export default {
@@ -355,6 +353,8 @@ export default {
   },
 
   beforeMount() {
+    this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+
     this.getProjects();
     this.loadPMs();
 
@@ -368,6 +368,7 @@ export default {
       // API
       ApiServer: process.env.VUE_APP_API_SERVER,
       ApiPort: process.env.VUE_APP_API_PORT,
+      restHeader: null,
       // Table data
       items,
       fields: [
@@ -493,12 +494,12 @@ export default {
       let projects = [];
       const url = `${this.ApiServer}:${this.ApiPort}/api/project?${from}${to}${pmId}`;
       axios.get(url.substr(0, url.length - 1),
-        restHeader)
+        this.restHeader)
         .then((response) => {
           projects = response.data;
         })
         .then(() => {
-          axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
+          axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, this.restHeader)
             .then((response) => {
               PMs = response.data;
             })
@@ -536,7 +537,7 @@ export default {
         projectManagerId: pmId,
       };
 
-      axios.post(`${this.ApiServer}:${this.ApiPort}/api/project`, data, restHeader)
+      axios.post(`${this.ApiServer}:${this.ApiPort}/api/project`, data, this.restHeader)
         .then((response) => {
           const newProject = {
             id: response.data.id,
@@ -571,7 +572,7 @@ export default {
       this.loadPMs();
     },
     loadPMs() {
-      axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, this.restHeader)
         .then((response) => {
           const arr = [{ value: null, text: 'PM', disabled: true }];
           for (let i = 0; i < response.data.length; i += 1) {
@@ -591,12 +592,12 @@ export default {
       let PMs = [];
       let projects = [];
 
-      axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, this.restHeader)
         .then((response) => {
           projects = response.data;
         })
         .then(() => {
-          axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, restHeader)
+          axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee?role=PROJECTMANAGER`, this.restHeader)
             .then((response) => {
               PMs = response.data;
             })
@@ -635,7 +636,7 @@ export default {
         projectManagerId: pmId,
       };
 
-      axios.put(`${this.ApiServer}:${this.ApiPort}/api/project/${this.selectedProjectId}`, data, restHeader)
+      axios.put(`${this.ApiServer}:${this.ApiPort}/api/project/${this.selectedProjectId}`, data, this.restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -686,7 +687,7 @@ export default {
       this.selectedProjectPmId = null;
     },
     infoProjectDelete() {
-      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/project/${this.selectedProjectId}`, restHeader)
+      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/project/${this.selectedProjectId}`, this.restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {

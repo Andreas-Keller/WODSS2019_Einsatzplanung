@@ -1,5 +1,11 @@
 <template>
   <b-container fluid>
+    <div class="top-alert">
+      <b-alert ref="errorAlert" class="inner-alert" show variant="danger" dismissible>
+        {{this.errorMsg}}
+      </b-alert>
+    </div>
+
     <h1>Contracts</h1>
 
     <h4>Data filter</h4>
@@ -128,6 +134,7 @@
         <b-button
           class="float-right"
           variant="success"
+          @click="getEmployees"
           v-b-modal.createContractModal>
           Create Contract
         </b-button>
@@ -242,8 +249,6 @@
 <script>
 import axios from 'axios';
 
-const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-
 const items = [];
 
 export default {
@@ -254,6 +259,7 @@ export default {
   },
 
   beforeMount() {
+    this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
     this.getContract();
   },
 
@@ -262,6 +268,8 @@ export default {
       // API
       ApiServer: process.env.VUE_APP_API_SERVER,
       ApiPort: process.env.VUE_APP_API_PORT,
+      restHeader: null,
+      errorMsg: '',
       // Table data
       items,
       fields: [
@@ -326,7 +334,7 @@ export default {
       createContractEmployeeId: null,
       createContractEmail: '',
       infoTitle: '',
-      employeeIdOptions: this.getEmployees(),
+      employeeIdOptions: [],
     };
   },
   computed: {
@@ -353,7 +361,7 @@ export default {
       this.currentPage = 1;
     },
     getContract() {
-      axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract`, restHeader)
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract`, this.restHeader)
         .then((response) => {
           this.totalRows = response.data.length;
           return response.data;
@@ -393,7 +401,7 @@ export default {
       Promise.resolve(this.getEmailFromEmployeeId(this.createContractEmployeeId))
       // eslint-disable-next-line
         .then(email => this.createContractEmail = email)
-        .then(() => axios.post(`${this.ApiServer}:${this.ApiPort}/api/contract`, data, restHeader))
+        .then(() => axios.post(`${this.ApiServer}:${this.ApiPort}/api/contract`, data, this.restHeader))
         // eslint-disable-next-line
         .then(async (response) => await {
           res: response,
@@ -446,7 +454,7 @@ export default {
         employeeId: this.selectedContractEmployeeId,
       };
 
-      axios.put(`${this.ApiServer}:${this.ApiPort}/api/contract/${this.selectedContractId}`, data, restHeader)
+      axios.put(`${this.ApiServer}:${this.ApiPort}/api/contract/${this.selectedContractId}`, data, this.restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -465,7 +473,7 @@ export default {
         });
     },
     infoContractDelete() {
-      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/contract/${this.selectedContractId}`, restHeader)
+      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/contract/${this.selectedContractId}`, this.restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -493,17 +501,23 @@ export default {
     getEmployees() {
       const employees = [{ value: null, text: 'Employee', disabled: true }];
       if (this.loggedInRole === 'ADMINISTRATOR') {
-        axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/employee`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, this.restHeader)
           .then(response => response.data)
-          .then(res => res.forEach(entry => employees
-            .push({ value: entry.id, text: entry.emailAddress })))
-          .then(() => employees);
+          .then(res => res.forEach((entry) => {
+            if (entry.role !== 'ADMINISTRATOR') {
+              employees.push({ value: entry.id, text: entry.emailAddress });
+            }
+          }))
+          .then(() => employees)
+          .catch((error) => {
+            console.log(error);
+          });
       }
-      return employees;
+      this.employeeIdOptions = employees;
     },
     combineItems(its) {
       const employees = [];
-      axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, restHeader)
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, this.restHeader)
         .then(response => response.data)
         .then(res => res.forEach(entry => employees
           .push({ value: entry.id, text: entry.emailAddress })))
@@ -532,7 +546,7 @@ export default {
     },
     async getEmailFromEmployeeId(employeeId) {
       let address;
-      await axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee/${employeeId}`, restHeader)
+      await axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee/${employeeId}`, this.restHeader)
       // eslint-disable-next-line
         .then(response => address = response.data.emailAddress);
       return address;
@@ -567,7 +581,7 @@ export default {
         to = `toDate=${this.filterToDate}`;
       }
 
-      axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract?${from}${to}`, restHeader)
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/contract?${from}${to}`, this.restHeader)
         .then((response) => {
           this.totalRows = response.data.length;
           this.combineItems(response.data);
@@ -575,6 +589,9 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+    },
+    errorHandler(error) {
+      this.errorMsg = error.response;
     },
   },
 };
@@ -599,5 +616,16 @@ h4 {
 
 .marg-top {
   margin-top: 5px;
+}
+
+.top-alert {
+  position: fixed;
+  top: 15px;
+  width: calc(100% - 30px);
+  z-index: 20;
+}
+
+.inner-alert {
+  margin: 0;
 }
 </style>

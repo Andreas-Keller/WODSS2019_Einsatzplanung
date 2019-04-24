@@ -308,9 +308,6 @@ import axios from 'axios';
 
 const items = [];
 
-const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-
-
 export default {
   name: 'Allocations',
   props: {
@@ -318,6 +315,7 @@ export default {
     loggedInId: String,
   },
   beforeMount() {
+    this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
     this.getAllocation();
     this.loadFilterOptions();
   },
@@ -327,6 +325,7 @@ export default {
       // API
       ApiServer: process.env.VUE_APP_API_SERVER,
       ApiPort: process.env.VUE_APP_API_PORT,
+      restHeader: null,
       // Table data
       items,
       fields: [ /*
@@ -409,7 +408,7 @@ export default {
   },
   methods: {
     loadFilterOptions() {
-      axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, this.restHeader)
         .then((response) => {
           this.filterProjectOptions.push({ value: null, text: 'Project', disabled: true });
           for (let i = 0; i < response.data.length; i += 1) {
@@ -423,7 +422,7 @@ export default {
           console.log(error);
         });
       if (this.loggedInRole !== 'DEVELOPER') {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, restHeader)
+        axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, this.restHeader)
           .then((response) => {
             this.filterEmpOptions.push({ value: null, text: 'Employee', disabled: true });
 
@@ -478,12 +477,12 @@ export default {
       let projs = [];
       const url = `${this.ApiServer}:${this.ApiPort}/api/allocation?${from}${to}${proj}${emp}`;
       axios.get(url,
-        restHeader)
+        this.restHeader)
         .then((response) => {
           allocs = response.data;
         })
         .then(() => {
-          axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
+          axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, this.restHeader)
             .then((response) => {
               projs = response.data;
 
@@ -539,13 +538,13 @@ export default {
       let allocations = [];
       let projects = [];
 
-      axios.get(`${this.ApiServer}:${this.ApiPort}/api/allocation`, restHeader)
+      axios.get(`${this.ApiServer}:${this.ApiPort}/api/allocation`, this.restHeader)
         .then((response) => {
           allocations = response.data;
           // this.totalRows = this.items.length;
         })
         .then(() => {
-          axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, restHeader)
+          axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, this.restHeader)
             .then((response) => {
               projects = response.data;
             })
@@ -610,7 +609,7 @@ export default {
             Promise.resolve(this.getNameOfNewProject(this.createAllocationProjectId))
             // eslint-disable-next-line
               .then((obj) => newAllocation.projectName = obj.name)
-            axios.post(`${this.ApiServer}:${this.ApiPort}/api/allocation`, data, restHeader)
+            axios.post(`${this.ApiServer}:${this.ApiPort}/api/allocation`, data, this.restHeader)
               .then((response) => {
                 newAllocation.id = response.data.id;
                 newAllocation.startDate = response.data.startDate;
@@ -669,7 +668,7 @@ export default {
         pensumPercentage: this.selectedAllocationPensumPercentage,
       };
 
-      axios.put(`${this.ApiServer}:${this.ApiPort}/api/allocation/${this.selectedAllocationId}`, data, restHeader)
+      axios.put(`${this.ApiServer}:${this.ApiPort}/api/allocation/${this.selectedAllocationId}`, data, this.restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -689,7 +688,7 @@ export default {
         });
     },
     infoAllocationDelete() {
-      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/allocation/${this.selectedAllocationId}`, restHeader)
+      axios.delete(`${this.ApiServer}:${this.ApiPort}/api/allocation/${this.selectedAllocationId}`, this.restHeader)
       // eslint-disable-next-line
         .then((response) => {
           for (let i = 0; i < this.items.length; i += 1) {
@@ -726,7 +725,7 @@ export default {
     getContractIdOptions() {
       // eslint-disable-next-line
       const listIds = [{ value: null, text: 'Contracts', disabled: true }];
-      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract`, restHeader)
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract`, this.restHeader)
         .then(response => response.data)
         .then((data) => {
           data.forEach((entry) => {
@@ -747,7 +746,7 @@ export default {
     },
     getAllocationIdOptions() {
       const list = [{ value: null, text: 'Projects', disabled: true }];
-      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project`, restHeader)
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project`, this.restHeader)
         .then(response => response.data)
         .then((data) => {
           data.forEach((entry) => {
@@ -769,13 +768,13 @@ export default {
       let alreadyOcuppiedFTE = 0;
       const oneDay = 1000 * 60 * 60 * 24;
       // get the project's FTE
-      return axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project/${this.createAllocationProjectId}`, restHeader)
+      return axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project/${this.createAllocationProjectId}`, this.restHeader)
         .then(response => response.data)
         .then((data) => {
           FTE = data.ftePercentage;
         })
         // collect already occupied FTE's in allocations
-        .then(() => axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/allocation`, restHeader))
+        .then(() => axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/allocation`, this.restHeader))
         .then(response => response.data)
         .then((data) => {
           data.forEach((entry) => {
@@ -796,7 +795,7 @@ export default {
         });
     },
     calculateIfAllocationWithinContract() {
-      return axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract/${this.createAllocationContractId}`, restHeader)
+      return axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract/${this.createAllocationContractId}`, this.restHeader)
         .then(response => response.data)
         .then((contract) => {
           let ok = false;
@@ -812,7 +811,7 @@ export default {
         });
     },
     getNameOfNewProject(projectId) {
-      return axios.get(`${this.ApiServer}:${this.ApiPort}/api/project/${projectId}`, restHeader)
+      return axios.get(`${this.ApiServer}:${this.ApiPort}/api/project/${projectId}`, this.restHeader)
         .then(response => response.data);
     },
   },
