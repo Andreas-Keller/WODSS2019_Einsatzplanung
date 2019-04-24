@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Highcharts  :options="chartOptions"></Highcharts>
+    <Highcharts :options="chartOptions"></Highcharts>
   </div>
 </template>
 
@@ -91,12 +91,6 @@ export default {
             // eslint-disable-next-line
             level = entry[2];
             endDate = (new Date(entry[0])).getTime();
-          });
-        })
-        .then(() => {
-          // eslint-disable-next-line
-          statistics.sort(function (a, b) {
-            return new Date(a[0]) - new Date(b[0]);
           });
         });
       return statistics;

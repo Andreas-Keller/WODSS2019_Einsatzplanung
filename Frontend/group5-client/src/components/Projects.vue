@@ -315,7 +315,7 @@
 
     <!-- modal graph for project -->
     <b-modal ref="modalGraph" id="modalGraph" size="xl"
-             @hide="modalGraphCancel" hide-footer hide-header-close
+             @hide="modalGraphCancel" hide-footer
              :title="`Project ${this.selectedProjectName}`" centered>
       <Calendar :projectId=this.graphId v-if="this.graphId"></Calendar>
     </b-modal>
