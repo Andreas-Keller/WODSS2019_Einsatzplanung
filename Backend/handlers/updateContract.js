@@ -42,12 +42,30 @@ exports.handler = async function updateContract(req, res, next) {
             res.status(500).send("Uncaught or internal server error");
 
         } else if (foundContract.httpStatus === 404 ||
-                    foundEmployee.httpStatus === 404) {
+            foundEmployee.httpStatus === 404) {
             res.status(404).send("Contract or employee not found");
 
-        } else {
-            let updatedContract = await contractFirebase.updateContract(contract);
-            res.status(updatedContract.httpStatus).send(updatedContract.payload);
+        } else {//Delete contract and try to add a new one, if it fails, contract can not be modified
+            let responseDelete = await contractFirebase.deleteContract(contract.id)
+
+            let employeeContracts = await require('../firebase/contract.crud').findAllBy('employeeId', contract.employeeId);
+            let canCreate = true;
+            for (const c of employeeContracts.payload) {
+                if ((contract.startDate >= c.startDate && contract.startDate <= c.endDate) || (contract.endDate >= c.startDate && contract.endDate <= c.endDate)) {
+                    canCreate = false;
+                }
+                if ((c.startDate >= contract.startDate && c.endDate <= contract.endDate)) {
+                    canCreate = false;
+                }
+            }
+            if (canCreate) {
+                const contractFirebase = require('../firebase/contract.crud.js');
+                let response = await contractFirebase.createContract(contract);
+                res.status(response.httpStatus).send(response.payload);
+            } else {
+                let response = await contractFirebase.createContract(responseDelete.payload);
+                res.status(412).send("Precondition for the contract failed");
+            }
         }
     }
     next();
