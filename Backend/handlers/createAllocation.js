@@ -34,11 +34,9 @@ exports.handler = async function createAllocation(req, res, next) {
         res.status(412).send("Precondition for the allocation failed");
 
     } else if (foundContract.httpStatus === 500 || foundProject.httpStatus === 500) {
-        res.status(500).send('Uncaught or internal server error')
-
+        res.status(foundContract.httpStatus).send('Uncaught or internal server error')
     } else if (foundContract.httpStatus === 404 || foundProject.httpStatus === 404) {
-        res.status(404).send("Contract or project not found")
-
+        res.status(foundContract.httpStatus).send("Contract or project not found")
     } else {
         const allocationFirebase = require('../firebase/allocation.crud.js');
         //check if new allocation fits in fte percentage of project
@@ -47,11 +45,41 @@ exports.handler = async function createAllocation(req, res, next) {
         for (const x of projectAllocations.payload) {
             ftePercentage += x.pensumPercentage;
         }
-        if (ftePercentage + allocation.pensumPercentage > foundProject.payload.ftePercentage*100) {// check if added percentage goes over fte
+        if (ftePercentage + allocation.pensumPercentage > foundProject.payload.ftePercentage * 100) {
             res.status(412).send("Precondition for the allocation failed");
         } else {
-            let createdAllocation = await allocationFirebase.createAllocation(allocation);
-            res.status(createdAllocation.httpStatus).send(createdAllocation.payload);
+            //check if employee is allowed to add allocation
+            let allEmployeeAllocations = await allocationFirebase.findAllBy('contractId', foundContract.payload.id);
+
+            let canCreate = true;
+
+            //sorting allocations by date
+            let d = [];
+            allEmployeeAllocations.payload.push(allocation);
+            for (const c of allEmployeeAllocations.payload) {
+                d.push({date: c.startDate, p: c.pensumPercentage});
+                d.push({date: c.endDate, p: -c.pensumPercentage});
+            }
+            d.sort((a, b) => {
+                return new Date(a.date) - new Date(b.date);
+            });
+
+            console.log(d)
+
+            //if sum over 100, cant add it
+            let percentageNow = 0;
+            for (const v of d) {
+                percentageNow += v.p;
+                if (percentageNow > foundContract.payload.pensumPercentage) {
+                    canCreate = false;
+                }
+            }
+            if (canCreate) {
+                let createdAllocation = await allocationFirebase.createAllocation(allocation);
+                res.status(createdAllocation.httpStatus).send(createdAllocation.payload);
+            } else {
+                res.status(412).send("Precondition for the allocation failed");
+            }
         }
     }
     next()
