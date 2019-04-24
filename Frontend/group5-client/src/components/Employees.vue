@@ -206,6 +206,7 @@ export default {
 
   props: {
     loggedInRole: String,
+    loggedInId: String,
   },
 
   beforeMount() {
@@ -313,8 +314,17 @@ export default {
       } else {
         axios.get(`${this.ApiServer}:${this.ApiPort}/api/employee`, this.restHeader)
           .then((response) => {
-            this.items = response.data;
-            this.totalRows = this.items.length;
+            if (this.loggedInRole === 'DEVELOPER') {
+              for (let i = 0; i < response.data.length; i += 1) {
+                if (response.data[i].id === this.loggedInId) {
+                  this.items = [response.data[i]];
+                  break;
+                }
+              }
+            } else {
+              this.items = response.data;
+              this.totalRows = this.items.length;
+            }
           });
       }
     },

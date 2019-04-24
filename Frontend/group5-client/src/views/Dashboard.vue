@@ -1,7 +1,7 @@
 <template>
   <div>
     <Navbar :employeeName="this.loggedInEmployeeName" class="marg-bot-nav" />
-    <Employees :loggedInRole="loggedInRole" />
+    <Employees :loggedInRole="loggedInRole" :loggedInId="loggedInId" />
     <div class="marg-line">
       <b-tabs>
       </b-tabs>
