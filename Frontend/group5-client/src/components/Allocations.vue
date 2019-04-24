@@ -1,16 +1,12 @@
 <template>
 <b-container fluid>
   <div class="top-alert">
-      <b-alert class="inner-alert" variant="danger" dismissible
-      :show="showErrorAlert" @dismissed="dismissErrorAlert">
-        {{this.errorMsg}}
-      </b-alert>
-    </div>
+    <b-alert class="inner-alert" variant="danger" dismissible
+    :show="showErrorAlert" @dismissed="dismissErrorAlert">
+      {{this.errorMsg}}
+    </b-alert>
+  </div>
 
-  <b-alert v-model="showFailCreateAllocationAlertDATE" variant="danger" class="alert-center"
-           fade dismissible>
-    New allocation not compatible with contract - decrease pensum or change timerange
-  </b-alert>
   <h1>Allocations</h1>
   <!-- Allocation Interface controls -->
   <h4>Data filter</h4>
@@ -308,21 +304,12 @@ export default {
       showErrorAlert: false,
       // Table data
       items,
-      fields: [ /*
-        {
-          key: 'id',
-          label: 'Allocation Id',
-        }, */
+      fields: [
         {
           key: 'contractId',
           label: 'Contract Id',
           sortable: true,
-        }, /*
-        {
-          key: 'projectId',
-          label: 'Project Id',
-          sortable: true,
-        }, */
+        },
         {
           key: 'projectName',
           label: 'Project Name',
@@ -419,7 +406,7 @@ export default {
     },
     applyFilter() {
       if (this.filterFromDate === null && this.filterToDate === null
-        && this.filterEmpId && this.filterProjectId === null) {
+        && this.filterEmpId === null && this.filterProjectId === null) {
         return;
       }
 
@@ -498,6 +485,8 @@ export default {
       this.filterToDate = null;
       this.filterEmpId = null;
       this.filterProjectId = null;
+
+      this.getAllocation();
     },
     info(item, index, button) {
       this.modalInfo.title = `Row index: ${index}`;
@@ -550,14 +539,6 @@ export default {
         .catch((error) => {
           this.errorHandler(error);
         });
-
-      /* else if (this.loggedInRole === 'PROJECTMANAGER') {
-        axios.get(`${this.ApiServer}:${this.ApiPort}/api/allocation?role=DEVELOPER`, restHeader)
-          .then((response) => {
-            this.items = response.data;
-            this.totalRows = this.items.length;
-          });
-      } */
     },
     createAllocation(evt) {
       evt.preventDefault();

@@ -299,11 +299,7 @@ export default {
           label: 'Pensum %',
           sortable: true,
           sortDirection: 'desc',
-        }, /*
-        {
-          key: 'employeeId',
-          label: 'EmployeeID',
-        }, */
+        },
         {
           key: 'email',
           label: 'Employee Email',
@@ -549,6 +545,7 @@ export default {
     resetFilter() {
       this.filterFromDate = null;
       this.filterToDate = null;
+      this.getContract();
     },
     applyFilter() {
       if (this.filterFromDate === null && this.filterToDate === null) {
