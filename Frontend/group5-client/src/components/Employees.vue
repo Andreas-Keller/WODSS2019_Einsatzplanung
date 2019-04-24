@@ -1,7 +1,8 @@
 <template>
   <b-container fluid>
     <div class="top-alert">
-      <b-alert class="inner-alert" variant="danger" dismissible :show="showErrorAlert">
+      <b-alert class="inner-alert" variant="danger" dismissible
+      :show="showErrorAlert" @dismissed="dismissErrorAlert">
         {{this.errorMsg}}
       </b-alert>
     </div>
@@ -451,6 +452,9 @@ export default {
       this.selectedUserRole = null;
 
       this.$refs.infoUserModal.hide();
+    },
+    dismissErrorAlert() {
+      this.showErrorAlert = false;
     },
     errorHandler(error) {
       this.errorMsg = error.response.data;

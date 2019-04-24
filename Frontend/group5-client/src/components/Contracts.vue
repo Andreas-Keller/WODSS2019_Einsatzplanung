@@ -1,7 +1,8 @@
 <template>
   <b-container fluid>
     <div class="top-alert">
-      <b-alert class="inner-alert" variant="danger" dismissible :show="showErrorAlert">
+      <b-alert class="inner-alert" variant="danger" dismissible
+      :show="showErrorAlert" @dismissed="dismissErrorAlert">
         {{this.errorMsg}}
       </b-alert>
     </div>
@@ -423,7 +424,7 @@ export default {
           return newContract;
         })
         .then((newContract) => {
-          this.items.push(newContract);
+          this.items.unshift(newContract);
           this.totalRows = this.items.length;
           this.createContractModalCancel();
         })
@@ -593,6 +594,9 @@ export default {
         .catch((error) => {
           this.errorHandler(error);
         });
+    },
+    dismissErrorAlert() {
+      this.showErrorAlert = false;
     },
     errorHandler(error) {
       this.errorMsg = error.response.data;

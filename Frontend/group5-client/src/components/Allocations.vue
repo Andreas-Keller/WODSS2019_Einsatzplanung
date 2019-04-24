@@ -1,7 +1,8 @@
 <template>
 <b-container fluid>
   <div class="top-alert">
-      <b-alert class="inner-alert" variant="danger" dismissible :show="showErrorAlert">
+      <b-alert class="inner-alert" variant="danger" dismissible
+      :show="showErrorAlert" @dismissed="dismissErrorAlert">
         {{this.errorMsg}}
       </b-alert>
     </div>
@@ -585,6 +586,35 @@ export default {
       } */
     },
     createAllocation() {
+      const data = {
+        startDate: this.createAllocationStartDate,
+        endDate: this.createAllocationEndDate,
+        contractId: this.createAllocationContractId,
+        projectId: this.createAllocationProjectId,
+        pensumPercentage: this.createAllocationPensumPercentage,
+      };
+
+      const newAllocation = {};
+
+      axios.post(`${this.ApiServer}:${this.ApiPort}/api/allocation`, data, this.restHeader)
+        .then((response) => {
+          newAllocation.id = response.data.id;
+          newAllocation.startDate = response.data.startDate;
+          newAllocation.endDate = response.data.endDate;
+          newAllocation.contractId = response.data.contractId;
+          newAllocation.projectId = response.data.projectId;
+          newAllocation.pensumPercentage = response.data.pensumPercentage;
+
+          this.items.unshift(newAllocation);
+          this.totalRows = this.items.length;
+
+          this.createAllocationModalCancel();
+        })
+        .catch((error) => {
+          this.errorHandler(error);
+        });
+    },
+    createAllocation_old() {
       this.showFailCreateAllocationAlertDATE = false;
       Promise.resolve(this.calculateIfAllocationWithinContract())
       // eslint-disable-next-line
@@ -818,6 +848,9 @@ export default {
     getNameOfNewProject(projectId) {
       return axios.get(`${this.ApiServer}:${this.ApiPort}/api/project/${projectId}`, this.restHeader)
         .then(response => response.data);
+    },
+    dismissErrorAlert() {
+      this.showErrorAlert = false;
     },
     errorHandler(error) {
       this.errorMsg = error.response.data;

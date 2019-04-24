@@ -67,8 +67,6 @@ export default {
           this.loggedInRole = this.loggedInEmployee.role;
           this.loggedInId = String(this.loggedInEmployee.id);
         } catch (error) {
-          // COMMENTED OUT FOR DEV PURPOSE
-          console.log(error);
           localStorage.removeItem('token');
           this.$router.push({ name: 'login' });
         }

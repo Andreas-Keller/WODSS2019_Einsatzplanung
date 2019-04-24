@@ -1,7 +1,8 @@
 <template>
   <b-container fluid>
     <div class="top-alert">
-      <b-alert class="inner-alert" variant="danger" dismissible :show="showErrorAlert">
+      <b-alert class="inner-alert" variant="danger" dismissible
+      :show="showErrorAlert" @dismissed="dismissErrorAlert">
         {{this.errorMsg}}
       </b-alert>
     </div>
@@ -164,7 +165,7 @@
              this.loggedInId !== String(this.selectedProjectPmId)" required>
           </b-form-input>
         </b-form-group>
-        <b-form-group label-cols="4" label-cols-lg="2" label="FTE Percentage"
+        <b-form-group label-cols="4" label-cols-lg="2" label="FTE"
                       label-for="selectedProjectFte">
           <b-form-input
             id="selectedProjectFte" v-model="selectedProjectFte"
@@ -720,6 +721,9 @@ export default {
       this.graphId = '';
       this.selectedProjectName = '';
       this.$refs.modalGraph.hide();
+    },
+    dismissErrorAlert() {
+      this.showErrorAlert = false;
     },
     errorHandler(error) {
       this.errorMsg = error.response.data;
