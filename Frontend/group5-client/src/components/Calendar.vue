@@ -1,18 +1,12 @@
 <template>
   <div>
-    <Highcharts  :options="this.chartOptions"></Highcharts>
+    <Highcharts  :options="chartOptions"></Highcharts>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import { Chart } from 'highcharts-vue';
-
-const restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-
-let testing;
-
-let result;
 
 export default {
   name: 'Calendar',
@@ -22,21 +16,17 @@ export default {
   props: {
     projectId: String,
   },
-  created() {
-    testing = this.getValues();
-  },
-  mounted() {
-    this.$forceUpdate();
-  },
-  updated() {
-    testing.forEach(entry => result.push({ x: entry.x, y: entry.y }));
-    this.chartOptions.series[0].data = testing;
-  },
-  beforeDestroy() {
-    this.chartOptions.series[0].data = [1, 2, 3];
+  beforeMount() {
+    this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+
+    this.testing = this.getValues();
+
+    this.chartOptions.series[0].data = this.testing;
   },
   data() {
     return {
+      restHeader: null,
+      testing: null,
       chartOptions: {
         title: { text: 'Project Overview', align: 'left' },
         chart: {
@@ -66,7 +56,7 @@ export default {
     getValues() {
       const statistics = [];
       // eslint-disable-next-line
-      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/allocation`, restHeader)
+      axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/allocation`, this.restHeader)
         .then(response => response.data)
         .then((allocations) => {
           // eslint-disable-next-line

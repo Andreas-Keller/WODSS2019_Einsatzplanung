@@ -614,61 +614,6 @@ export default {
           this.errorHandler(error);
         });
     },
-    createAllocation_old() {
-      this.showFailCreateAllocationAlertDATE = false;
-      Promise.resolve(this.calculateIfAllocationWithinContract())
-      // eslint-disable-next-line
-        .then(obj => this.showFailCreateAllocationAlertDATE = obj.allocationOk)
-        .then(() => {
-          Promise.resolve(this.calculateRemainingFTEofProject())
-            .then((FTES) => {
-              if (FTES.FTE <= FTES.occupiedFTE) {
-                const err = { data: 'roject already fully occupied - Decrease pensum or reduce timerange.' };
-                Promise.reject(err);
-              }
-            });
-        })
-        .then(() => {
-          if (!this.showFailCreateAllocationAlertDATE) {
-            const data = {
-              startDate: this.createAllocationStartDate,
-              endDate: this.createAllocationEndDate,
-              contractId: this.createAllocationContractId,
-              projectId: this.createAllocationProjectId,
-              pensumPercentage: this.createAllocationPensumPercentage,
-            };
-            const newAllocation = {};
-
-            Promise.resolve(this.getNameOfNewProject(this.createAllocationProjectId))
-            // eslint-disable-next-line
-              .then((obj) => newAllocation.projectName = obj.name)
-            axios.post(`${this.ApiServer}:${this.ApiPort}/api/allocation`, data, this.restHeader)
-              .then((response) => {
-                newAllocation.id = response.data.id;
-                newAllocation.startDate = response.data.startDate;
-                newAllocation.endDate = response.data.endDate;
-                newAllocation.contractId = response.data.contractId;
-                newAllocation.projectId = response.data.projectId;
-                newAllocation.pensumPercentage = response.data.pensumPercentage;
-                return newAllocation;
-              })
-              .then((alloc) => {
-                this.items.push(alloc);
-                this.totalRows = this.items.length;
-
-                this.createAllocationModalCancel();
-              })
-              .catch((error) => {
-                this.errorHandler(error);
-              });
-          } else {
-            this.createAllocationModalCancel();
-          }
-        })
-        .catch((error) => {
-          this.errorHandler(error);
-        });
-    },
     createAllocationModalCancel() {
       this.createAllocationStartDate = '';
       this.createAllocationEndDate = '';
@@ -797,53 +742,6 @@ export default {
           this.errorHandler(error);
         });
       this.projectIdOptions = list;
-    },
-    calculateRemainingFTEofProject() {
-      let FTE = 0;
-      let alreadyOcuppiedFTE = 0;
-      const oneDay = 1000 * 60 * 60 * 24;
-      // get the project's FTE
-      return axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/project/${this.createAllocationProjectId}`, this.restHeader)
-        .then(response => response.data)
-        .then((data) => {
-          FTE = data.ftePercentage;
-        })
-        // collect already occupied FTE's in allocations
-        .then(() => axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/allocation`, this.restHeader))
-        .then(response => response.data)
-        .then((data) => {
-          data.forEach((entry) => {
-            if (entry.projectId === this.createAllocationProjectId) {
-              const pensum = entry.pensumPercentage;
-              const duration = Math.round(
-                (new Date(entry.endDate).getTime()
-              - new Date(entry.startDate).getTime()) / oneDay,
-              );
-              alreadyOcuppiedFTE += pensum * duration;
-            }
-          });
-        })
-        // eslint-disable-next-line
-        .then(() => { return { FTE: FTE, occupiedFTE: alreadyOcuppiedFTE }; })
-        .catch((error) => {
-          this.errorHandler(error);
-        });
-    },
-    calculateIfAllocationWithinContract() {
-      return axios.get(`${process.env.VUE_APP_API_SERVER}:${process.env.VUE_APP_API_PORT}/api/contract/${this.createAllocationContractId}`, this.restHeader)
-        .then(response => response.data)
-        .then((contract) => {
-          let ok = false;
-          if (contract.pensumPercentage < this.createAllocationPensumPercentage
-          || contract.startDate > this.createAllocationStartDate
-          || contract.endDate < this.createAllocationEndDate) {
-            ok = true;
-          }
-          return { allocationOk: ok };
-        })
-        .catch((error) => {
-          this.errorHandler(error);
-        });
     },
     getNameOfNewProject(projectId) {
       return axios.get(`${this.ApiServer}:${this.ApiPort}/api/project/${projectId}`, this.restHeader)

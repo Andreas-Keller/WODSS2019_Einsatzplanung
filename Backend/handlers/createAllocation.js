@@ -41,8 +41,23 @@ exports.handler = async function createAllocation(req, res, next) {
 
     } else {
         const allocationFirebase = require('../firebase/allocation.crud.js');
-        let createdAllocation = await allocationFirebase.createAllocation(allocation);
-        res.status(createdAllocation.httpStatus).send(createdAllocation.payload);
+        //check if new allocation fits in fte percentage of project
+        let projectAllocations = await allocationFirebase.findAllBy('projectId', allocation.projectId);
+        let ftePercentage = 0;
+        for (const x of projectAllocations.payload) {
+            ftePercentage += x.pensumPercentage;
+        }
+        console.log(ftePercentage);
+        console.log(allocation.pensumPercentage);
+        console.log(foundProject.payload.ftePercentage);
+        if (ftePercentage + allocation.pensumPercentage > foundProject.payload.ftePercentage) {
+            console.log("err")
+            res.status(412).send("Precondition for the allocation failed");
+        } else {
+            console.log("create")
+            let createdAllocation = await allocationFirebase.createAllocation(allocation);
+            res.status(createdAllocation.httpStatus).send(createdAllocation.payload);
+        }
     }
     next()
 };
