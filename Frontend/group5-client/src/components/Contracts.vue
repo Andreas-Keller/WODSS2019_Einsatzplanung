@@ -120,6 +120,12 @@
         </b-card>
       </template>
       -->
+      <template slot="graph" slot-scope="row">
+        <b-button size="sm" @click="modalGraph(row.item)" class="mr-1"
+                  variant="primary">
+          Contract Calendar
+        </b-button>
+      </template>
     </b-table>
 
     <b-row>
@@ -247,17 +253,28 @@
         </b-row>
       </b-form>
     </b-modal>
+
+    <!-- modal graph for contract -->
+    <b-modal ref="modalGraph" id="modalGraph" size="xl"
+             @hide="modalGraphCancel" hide-footer
+             :title="`Contract ${this.selectedContractEmail}: ${this.selectedContractPensum}%`"
+             centered>
+      <CalendarContracts :contractId=this.graphId v-if="this.graphId"></CalendarContracts>
+    </b-modal>
   </b-container>
 </template>
 
 <script>
 import axios from 'axios';
+import CalendarContracts from '@/components/CalendarContracts.vue';
 
 const items = [];
 
 export default {
   name: 'Contracts',
-
+  components: {
+    CalendarContracts,
+  },
   props: {
     loggedInRole: String,
   },
@@ -305,6 +322,10 @@ export default {
           label: 'Employee Email',
           sortable: true,
         },
+        {
+          key: 'graph',
+          label: 'Graph',
+        },
       ],
       currentPage: 1,
       perPage: 5,
@@ -336,6 +357,8 @@ export default {
       createContractEmail: '',
       infoTitle: '',
       employeeIdOptions: [],
+      // Graph Modal Data
+      graphId: '',
     };
   },
   computed: {
@@ -572,6 +595,18 @@ export default {
         .catch((error) => {
           this.errorHandler(error);
         });
+    },
+    modalGraph(item) {
+      this.$refs.modalGraph.show();
+      this.graphId = item.id;
+      this.selectedContractEmail = item.email;
+      this.selectedContractPensum = item.pensumPercentage;
+    },
+    modalGraphCancel() {
+      this.graphId = '';
+      this.selectedContractEmail = '';
+      this.selectedContractPensum = null;
+      this.$refs.modalGraph.hide();
     },
     dismissErrorAlert() {
       this.showErrorAlert = false;

@@ -9,12 +9,12 @@ import axios from 'axios';
 import { Chart } from 'highcharts-vue';
 
 export default {
-  name: 'Calendar',
+  name: 'CalendarContracts',
   components: {
     Highcharts: Chart,
   },
   props: {
-    projectId: String,
+    contractId: String,
   },
   beforeMount() {
     this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
@@ -28,7 +28,7 @@ export default {
       restHeader: null,
       testing: null,
       chartOptions: {
-        title: { text: 'Project Overview', align: 'left' },
+        title: { text: 'Contract Overview', align: 'left' },
         tooltip: {
           enabled: false,
         },
@@ -73,33 +73,27 @@ export default {
             return new Date(a.startDate) - new Date(b.startDate);
           });
           const sortedAllocations = [];
-          let level = 0;
           allocations.forEach((entry) => {
-            if (String(entry.projectId) === this.projectId) {
-              sortedAllocations.push([entry.startDate, entry.pensumPercentage, level, 'first']);
-              sortedAllocations.push([entry.endDate, entry.pensumPercentage, level, 'last']);
-              level += 1;
+            if (String(entry.contractId) === this.contractId) {
+              sortedAllocations.push([entry.startDate, entry.pensumPercentage, 'first']);
+              sortedAllocations.push([entry.endDate, entry.pensumPercentage, 'last']);
             }
           });
           // eslint-disable-next-line
           sortedAllocations.sort(function (a, b) {
             return new Date(a[0]) - new Date(b[0]);
           });
-          level = 0;
           let pensum = 0;
           let endDate;
           sortedAllocations.forEach((entry) => {
-            if (entry[3] === 'first') pensum += entry[1];
+            if (entry[2] === 'first') pensum += entry[1];
             else pensum -= entry[1];
             if ((new Date(entry[0])).getTime() === endDate) statistics.pop();
             statistics.push({ x: (new Date(entry[0])).getTime(), y: pensum });
             if ((new Date(entry[0])).getTime() > endDate
-              && level === entry[2]
-              && (pensum - entry[3]) >= 0) {
+              && (pensum - entry[2]) >= 0) {
               statistics.push({ x: (new Date(entry[0])).getTime() + 1, y: 0 });
             }
-            // eslint-disable-next-line
-            level = entry[2];
             endDate = (new Date(entry[0])).getTime();
           });
         });
