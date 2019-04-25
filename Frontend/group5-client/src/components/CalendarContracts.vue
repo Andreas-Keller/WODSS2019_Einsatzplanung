@@ -15,6 +15,9 @@ export default {
   },
   props: {
     contractId: String,
+    contractStart: String,
+    contractEnd: String,
+    contractPensum: Number,
   },
   beforeMount() {
     this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
@@ -22,6 +25,11 @@ export default {
     this.testing = this.getValues();
 
     this.chartOptions.series[0].data = this.testing;
+
+    this.chartOptions.series[1].data = [
+      { x: (new Date(this.contractStart)).getTime(), y: this.contractPensum },
+      { x: (new Date(this.contractEnd)).getTime(), y: this.contractPensum },
+    ];
   },
   data() {
     return {
@@ -57,6 +65,11 @@ export default {
           // data: [1,2,3] // sample data
           data: [1, 2, 3],
           name: 'Workload',
+        }, {
+          // data: [1,2,3] // sample data
+          data: [1, 2, 3],
+          name: 'Contract Pensum',
+          type: 'line',
         }],
       },
     };

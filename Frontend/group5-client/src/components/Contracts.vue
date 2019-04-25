@@ -259,7 +259,12 @@
              @hide="modalGraphCancel" hide-footer
              :title="`Contract ${this.selectedContractEmail}: ${this.selectedContractPensum}%`"
              centered>
-      <CalendarContracts :contractId=this.graphId v-if="this.graphId"></CalendarContracts>
+      <CalendarContracts :contractId=this.graphId
+                         :contractStart=this.selectedContractStartDate
+                         :contractEnd=this.selectedContractEndDate
+                         :contractPensum=this.selectedContractPensum
+                         v-if="this.graphId">
+      </CalendarContracts>
     </b-modal>
   </b-container>
 </template>
@@ -601,11 +606,15 @@ export default {
       this.graphId = item.id;
       this.selectedContractEmail = item.email;
       this.selectedContractPensum = item.pensumPercentage;
+      this.selectedContractStartDate = item.startDate;
+      this.selectedContractEndDate = item.endDate;
     },
     modalGraphCancel() {
       this.graphId = '';
       this.selectedContractEmail = '';
       this.selectedContractPensum = null;
+      this.selectedContractStartDate = '';
+      this.selectedContractEndDate = '';
       this.$refs.modalGraph.hide();
     },
     dismissErrorAlert() {
