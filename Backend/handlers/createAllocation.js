@@ -37,7 +37,13 @@ exports.handler = async function createAllocation(req, res, next) {
         res.status(foundContract.httpStatus).send('Uncaught or internal server error')
     } else if (foundContract.httpStatus === 404 || foundProject.httpStatus === 404) {
         res.status(foundContract.httpStatus).send("Contract or project not found")
-    } else {
+    } else if (foundContract.payload.startDate > allocation.startDate //date boundary checks
+        || foundContract.payload.startDate > allocation.endDate
+        || foundContract.payload.endDate < allocation.startDate
+        || foundContract.payload.endDate < allocation.endDate) {
+        res.status(412).send("Precondition for the allocation failed");
+    }
+    else {
         const allocationFirebase = require('../firebase/allocation.crud.js');
         //check if new allocation fits in fte percentage of project
         let projectAllocations = await allocationFirebase.findAllBy('projectId', allocation.projectId);
