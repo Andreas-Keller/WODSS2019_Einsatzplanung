@@ -63,14 +63,46 @@ exports.handler = async function updateAllocation(req, res, next) {
             let projectAllocations = await allocationFirebase.findAllBy('projectId', allocation.projectId);
             let ftePercentage = 0;
             for (const x of projectAllocations.payload) {
-                ftePercentage += x.pensumPercentage;
+                if (!(x.id === allocation.id)) {
+                    ftePercentage += x.pensumPercentage;
+                }
             }
             if (ftePercentage + allocation.pensumPercentage > foundProject.payload.ftePercentage * 100) {
                 res.status(412).send("Precondition for the allocation failed");
 
             } else {
-                let updatedAllocation = await allocationFirebase.updateAllocation(allocation);
-                res.status(updatedAllocation.httpStatus).send(updatedAllocation.payload);
+                //check if employee is allowed to add allocation
+                let allEmployeeAllocations = await allocationFirebase.findAllBy('contractId', foundContract.payload.id);
+
+                let canCreate = true;
+
+                //sorting allocations by date
+                let d = [];
+                allEmployeeAllocations.payload.push(allocation);
+                for (const c of allEmployeeAllocations.payload) {
+                    d.push({date: c.startDate, p: c.pensumPercentage});
+                    d.push({date: c.endDate, p: -c.pensumPercentage});
+                }
+                d.sort((a, b) => {
+                    return new Date(a.date) - new Date(b.date);
+                });
+
+                console.log(d)
+
+                //if sum over 100, cant add it
+                let percentageNow = 0;
+                for (const v of d) {
+                    percentageNow += v.p;
+                    if (percentageNow > foundContract.payload.pensumPercentage) {
+                        canCreate = false;
+                    }
+                }
+                if (canCreate) {
+                    let updatedAllocation = await allocationFirebase.updateAllocation(allocation);
+                    res.status(updatedAllocation.httpStatus).send(updatedAllocation.payload);
+                } else {
+                    res.status(412).send("Precondition for the allocation failed");
+                }
             }
         }
     }
