@@ -52,9 +52,26 @@ exports.handler = async function updateAllocation(req, res, next) {
                     foundProject.httpStatus === 404) {
             res.status(404).send("Allocation, contract or project not found");
 
+        } else if (foundContract.payload.startDate > allocation.startDate //date boundary checks
+            || foundContract.payload.startDate > allocation.endDate
+            || foundContract.payload.endDate < allocation.startDate
+            || foundContract.payload.endDate < allocation.endDate) {
+            res.status(412).send("Precondition for the allocation failed");
+
         } else {
-            let updatedAllocation = await allocationFirebase.updateAllocation(allocation);
-            res.status(updatedAllocation.httpStatus).send(updatedAllocation.payload);
+            //check if updated allocation pensum fits in fte of project
+            let projectAllocations = await allocationFirebase.findAllBy('projectId', allocation.projectId);
+            let ftePercentage = 0;
+            for (const x of projectAllocations.payload) {
+                ftePercentage += x.pensumPercentage;
+            }
+            if (ftePercentage + allocation.pensumPercentage > foundProject.payload.ftePercentage * 100) {
+                res.status(412).send("Precondition for the allocation failed");
+
+            } else {
+                let updatedAllocation = await allocationFirebase.updateAllocation(allocation);
+                res.status(updatedAllocation.httpStatus).send(updatedAllocation.payload);
+            }
         }
     }
     next()
