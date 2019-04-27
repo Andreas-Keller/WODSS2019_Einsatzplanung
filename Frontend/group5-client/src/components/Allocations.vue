@@ -522,7 +522,8 @@ export default {
                 allocations[i].projectName = 'n.a.';
                 allocations[i].projectPmId = null;
                 for (let j = 0; j < projects.length; j += 1) {
-                  if (allocations[i].projectId === projects[j].id) {
+                  // eslint-disable-next-line
+                  if (allocations[i].projectId == projects[j].id) {
                     allocations[i].projectName = projects[j].name;
                     allocations[i].projectPmId = projects[j].projectManagerId;
                     break;
