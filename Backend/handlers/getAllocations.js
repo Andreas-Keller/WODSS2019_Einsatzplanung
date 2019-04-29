@@ -34,8 +34,10 @@ exports.handler = async function getAllocations(req, res, next) {
             let cfb = require('../firebase/contract.crud');
             for (let i = 0; i < response.payload.length; i++) {
                 let contract = await cfb.getContract(response.payload[i].contractId);
-                if (contract.payload.employeeId == req.query.employeeId) {
-                    data.push(response.payload[i]);
+                if (contract.httpStatus !== 404) {
+                    if (contract.payload.employeeId == req.query.employeeId) {
+                        data.push(response.payload[i]);
+                    }
                 }
             }
             response.payload = data;
