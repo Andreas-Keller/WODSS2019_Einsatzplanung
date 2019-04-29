@@ -74,30 +74,32 @@ exports.handler = async function updateAllocation(req, res, next) {
                 //check if employee is allowed to add allocation
                 let allEmployeeAllocations = await allocationFirebase.findAllBy('contractId', foundContract.payload.id);
 
-                let canCreate = true;
+                let canUpdate = true;
 
                 //sorting allocations by date
                 let d = [];
-                allEmployeeAllocations.payload.push(allocation);
                 for (const c of allEmployeeAllocations.payload) {
-                    d.push({date: c.startDate, p: c.pensumPercentage});
-                    d.push({date: c.endDate, p: -c.pensumPercentage});
+                    if (!(c.id === allocation.id)) {
+                        d.push({date: c.startDate, p: c.pensumPercentage});
+                        d.push({date: c.endDate, p: -c.pensumPercentage});
+                    }
                 }
+                d.push({date: allocation.startDate, p: allocation.pensumPercentage});
+                d.push({date: allocation.endDate, p: -allocation.pensumPercentage});
+
                 d.sort((a, b) => {
                     return new Date(a.date) - new Date(b.date);
                 });
-
-                console.log(d)
 
                 //if sum over 100, cant add it
                 let percentageNow = 0;
                 for (const v of d) {
                     percentageNow += v.p;
                     if (percentageNow > foundContract.payload.pensumPercentage) {
-                        canCreate = false;
+                        canUpdate = false;
                     }
                 }
-                if (canCreate) {
+                if (canUpdate) {
                     let updatedAllocation = await allocationFirebase.updateAllocation(allocation);
                     res.status(updatedAllocation.httpStatus).send(updatedAllocation.payload);
                 } else {
