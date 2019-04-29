@@ -19,10 +19,10 @@ exports.handler = async function updateAllocation(req, res, next) {
 
     let allocation = {
         pensumPercentage: req.body.pensumPercentage,
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
-        projectId: req.body.projectId,
-        contractId: req.body.contractId,
+        startDate: String(req.body.startDate),
+        endDate: String(req.body.endDate),
+        projectId: String(req.body.projectId),
+        contractId: String(req.body.contractId),
         id: String(req.params.id)
     };
 
