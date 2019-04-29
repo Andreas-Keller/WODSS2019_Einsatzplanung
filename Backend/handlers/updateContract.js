@@ -18,8 +18,8 @@ exports.handler = async function updateContract(req, res, next) {
 
     let contract = {
         pensumPercentage: req.body.pensumPercentage,
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
+        startDate: String(req.body.startDate),
+        endDate: String(req.body.endDate),
         employeeId: String(req.body.employeeId),
         id: String(req.params.id)
     };

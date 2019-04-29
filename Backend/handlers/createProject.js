@@ -14,10 +14,10 @@
  */
 exports.handler = async function createProject(req, res, next) {
     let project = {
-        name: req.body.name,
+        name: String(req.body.name),
         ftePercentage: req.body.ftePercentage,
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
+        startDate: String(req.body.startDate),
+        endDate: String(req.body.endDate),
         projectManagerId: String(req.body.projectManagerId)
     };
     const projectFirebase = require('../firebase/project.crud.js');

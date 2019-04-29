@@ -14,8 +14,8 @@
 
 exports.handler = async function createContract(req, res, next) {
     let contract = {
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
+        startDate: String(req.body.startDate),
+        endDate: String(req.body.endDate),
         pensumPercentage: req.body.pensumPercentage,
         employeeId: String(req.body.employeeId)
     };

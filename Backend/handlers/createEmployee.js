@@ -19,12 +19,12 @@
 
 exports.handler = async function createEmployee(req, res, next) {
     let employee = {
-        rawPassword: req.query.password,
-        role: req.query.role,
+        rawPassword: String(req.query.password),
+        role: String(req.query.role),
         active: req.body.active,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        emailAddress: req.body.emailAddress
+        firstName: String(req.body.firstName),
+        lastName: String(req.body.lastName),
+        emailAddress: String(req.body.emailAddress)
     };
 
     if (employee.active === null ||

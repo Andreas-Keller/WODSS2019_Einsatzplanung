@@ -15,8 +15,8 @@
 
 exports.handler = async function createAllocation(req, res, next) {
     let allocation = {
-        startDate: req.body.startDate,
-        endDate: req.body.endDate,
+        startDate: String(req.body.startDate),
+        endDate: String(req.body.endDate),
         pensumPercentage: req.body.pensumPercentage,
         contractId: String(req.body.contractId),
         projectId: String(req.body.projectId)
