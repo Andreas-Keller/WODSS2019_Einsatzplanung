@@ -69,9 +69,7 @@ exports.handler = async function createAllocation(req, res, next) {
             d.sort((a, b) => {
                 return new Date(a.date) - new Date(b.date);
             });
-
-            console.log(d)
-
+            
             //if sum over 100, cant add it
             let percentageNow = 0;
             for (const v of d) {
