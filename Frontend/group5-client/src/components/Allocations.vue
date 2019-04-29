@@ -457,7 +457,7 @@ export default {
                 allocs[i].projectName = 'n.a.';
                 allocs[i].projectPmId = null;
                 for (let j = 0; j < projs.length; j += 1) {
-                  if (allocs[i].projectId === projs[j].id) {
+                  if (allocs[i].projectId == projs[j].id) {
                     allocs[i].projectName = projs[j].name;
                     allocs[i].projectPmId = projs[j].projectManagerId;
                     break;

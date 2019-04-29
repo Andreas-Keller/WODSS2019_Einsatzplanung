@@ -31,8 +31,10 @@ exports.handler = async function getAllocations(req, res, next) {
         //filters
         if (req.query.employeeId) {
             let data = [];
+            let cfb = require('../firebase/contract.crud');
             for (let i = 0; i < response.payload.length; i++) {
-                if (response.payload[i].employeeId == req.query.employeeId) {
+                let contract = await cfb.getContract(response.payload[i].contractId);
+                if (contract.payload.employeeId == req.query.employeeId) {
                     data.push(response.payload[i]);
                 }
             }
@@ -41,7 +43,7 @@ exports.handler = async function getAllocations(req, res, next) {
         if (req.query.projectId) {
             let data = [];
             for (let i = 0; i < response.payload.length; i++) {
-                if (response.payload[i].projectId === req.query.projectId) {
+                if (response.payload[i].projectId == req.query.projectId) {
                     data.push(response.payload[i]);
                 }
             }

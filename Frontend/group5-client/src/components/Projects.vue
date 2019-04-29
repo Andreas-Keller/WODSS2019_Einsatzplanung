@@ -572,6 +572,7 @@ export default {
 
       axios.get(`${this.ApiServer}:${this.ApiPort}/api/project`, this.restHeader)
         .then((response) => {
+          console.log(response.data);
           projects = response.data;
         })
         .then(() => {
