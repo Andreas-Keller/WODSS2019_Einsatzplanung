@@ -339,13 +339,15 @@ export default {
   },
 
   beforeMount() {
-    this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+    if (localStorage.getItem('token') !== null) {
+      this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
 
-    this.getProjects();
-    this.loadPMs();
+      this.getProjects();
+      this.loadPMs();
 
-    if (this.loggedInRole === 'DEVELOPER') {
-      this.fields.splice(5, 1);
+      if (this.loggedInRole === 'DEVELOPER') {
+        this.fields.splice(5, 1);
+      }
     }
   },
 

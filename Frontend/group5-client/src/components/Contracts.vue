@@ -285,8 +285,10 @@ export default {
   },
 
   beforeMount() {
-    this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-    this.getContract();
+    if (localStorage.getItem('token') !== null) {
+      this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+      this.getContract();
+    }
   },
 
   data() {

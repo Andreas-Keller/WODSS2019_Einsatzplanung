@@ -289,9 +289,11 @@ export default {
     loggedInId: String,
   },
   beforeMount() {
-    this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-    this.getAllocation();
-    this.loadFilterOptions();
+    if (localStorage.getItem('token') !== null) {
+      this.restHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+      this.getAllocation();
+      this.loadFilterOptions();
+    }
   },
 
   data() {

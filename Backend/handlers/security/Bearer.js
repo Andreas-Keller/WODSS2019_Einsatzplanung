@@ -3,6 +3,10 @@
  */
 
 function verify(token, req) {
+    if (token === null) {
+        return false
+    }
+
     let role = token.role;
     let url = String(req.url);
     let method = String(req.method)
@@ -117,7 +121,6 @@ function verify(token, req) {
 module.exports = function Bearer(req, res, next) {
     if (req.url === '/api/token') {
         //LOGIN DOES NOT REQUIRE A TOKEN
-        console.log("LOGIN")
     } else {
         if (req.headers.authorization == null) {
             const error = new Error('Unauthenticated or invalid token');
