@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: This documentation provides an overview of the FHNW wodss API.
-  version: 1.0.0
+  version: 2.0.0
   title: FHNW Projektplanung (Modul wodss)
   contact:
     name: Wächter Simon
@@ -34,26 +34,16 @@ paths:
           in: query
           description: Filter the allocations by an employee (Filters can stack)
           required: false
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
+          type: string
           allowEmptyValue: false
-          x-example: 42
+          x-example: '42'
         - name: projectId
           in: query
           description: Filter the allocations by a project (Filters can stack)
           required: false
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
+          type: string
           allowEmptyValue: false
-          x-example: 42
+          x-example: '42'
         - name: fromDate
           in: query
           description: 'Start date (YYYY-MM-DD) to create a time range with a lower boundary (Allocations with a start date before, but an end date after this date will match the criteria). Filters can stack'
@@ -136,13 +126,8 @@ paths:
           in: path
           description: ID of the allocation
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '200':
           description: 'Specific allocation (ADMINISTRATOR, PROJECTMANAGER: All, DEVELOPER: Assigned projects)'
@@ -179,13 +164,8 @@ paths:
           in: path
           description: ID of the allocation to be updated
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '200':
           description: 'Specific updated allocation (ADMINISTRATOR: All, PROJECTMANAGER: Own projects)'
@@ -216,13 +196,8 @@ paths:
           in: path
           description: ID of the allocation to be deleted
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '204':
           description: 'Allocation successfully deleted (ADMINISTRATOR: All, PROJECTMANAGER: Own projects)'
@@ -323,13 +298,8 @@ paths:
           in: path
           description: ID of the contract
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '200':
           description: 'Specific contract (ADMINISTRATOR, PROJECTMANAGER: All, DEVELOPER: Own contracts)'
@@ -366,13 +336,8 @@ paths:
           in: path
           description: ID of the contract to be updated
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '200':
           description: Specific updated contract (ADMINISTRATOR)
@@ -403,13 +368,8 @@ paths:
           in: path
           description: ID of the contract to be deleted
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '204':
           description: Contract successfully deleted (ADMINISTRATOR)
@@ -517,13 +477,8 @@ paths:
           in: path
           description: ID of the employee
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '200':
           description: 'Specific employee (ADMINISTRATOR, PROJECTMANAGER, DEVELOPER)'
@@ -558,13 +513,8 @@ paths:
           in: path
           description: ID of the employee to be updated
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '200':
           description: Specific updated employee (ADMINISTRATOR)
@@ -595,13 +545,8 @@ paths:
           in: path
           description: ID of the employee to be anonymized
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '204':
           description: Employee successfully anonymized (ADMINISTRATOR)
@@ -629,14 +574,9 @@ paths:
           in: query
           description: Filter the projects by a project manager ID
           required: false
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
+          type: string
           allowEmptyValue: false
-          x-example: 42
+          x-example: '42'
         - name: fromDate
           in: query
           description: 'Start date (YYYY-MM-DD) to create a time range with a lower boundary (Projects with a start date before, but an end date after this date will match the criteria). Filters can stack'
@@ -714,13 +654,8 @@ paths:
           in: path
           description: ID of the project
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '200':
           description: 'Specific project (ADMINISTRATOR, PROJECTMANAGER: All, DEVELOPER: Assigned projects)'
@@ -751,13 +686,8 @@ paths:
           in: path
           description: ID of the project to be updated
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
         - in: body
           name: project
           description: Updated project (The ID in the body will be ignored)
@@ -794,13 +724,8 @@ paths:
           in: path
           description: ID of the project to be deleted
           required: true
-          type: integer
-          maximum: 9223372036854776000
-          exclusiveMaximum: false
-          minimum: 1
-          exclusiveMinimum: false
-          format: int64
-          x-example: 42
+          type: string
+          x-example: '42'
       responses:
         '204':
           description: Project and allocations successfully deleted (ADMINISTRATOR)
@@ -894,15 +819,10 @@ definitions:
       - startDate
     properties:
       id:
-        type: integer
-        format: int64
-        example: 42
+        type: string
+        example: '42'
         description: Allocation ID
         readOnly: true
-        minimum: 1
-        maximum: 9223372036854776000
-        exclusiveMinimum: false
-        exclusiveMaximum: false
       startDate:
         type: string
         format: date
@@ -923,23 +843,13 @@ definitions:
         exclusiveMinimum: false
         exclusiveMaximum: false
       contractId:
-        type: integer
-        format: int64
-        example: 42
+        type: string
+        example: '42'
         description: Contract ID of the allocation
-        minimum: 1
-        maximum: 9223372036854776000
-        exclusiveMinimum: false
-        exclusiveMaximum: false
       projectId:
-        type: integer
-        format: int64
-        example: 42
+        type: string
+        example: '42'
         description: Project ID of the allocation
-        minimum: 1
-        maximum: 9223372036854776000
-        exclusiveMinimum: false
-        exclusiveMaximum: false
     title: Allocation
     description: Represents the work unit an employee is doing for a project
   Contract:
@@ -951,15 +861,10 @@ definitions:
       - startDate
     properties:
       id:
-        type: integer
-        format: int64
-        example: 42
+        type: string
+        example: '42'
         description: Contract ID
         readOnly: true
-        minimum: 1
-        maximum: 9223372036854776000
-        exclusiveMinimum: false
-        exclusiveMaximum: false
       startDate:
         type: string
         format: date
@@ -980,14 +885,9 @@ definitions:
         exclusiveMinimum: false
         exclusiveMaximum: false
       employeeId:
-        type: integer
-        format: int64
-        example: 42
+        type: string
+        example: '42'
         description: Employee ID of the contract
-        minimum: 1
-        maximum: 9223372036854776000
-        exclusiveMinimum: false
-        exclusiveMaximum: false
     title: Contract
     description: 'Represents the contract an employee can have (Multiple contracts are possible, but date overlapping is not allowed)'
   Credentials:
@@ -1018,15 +918,10 @@ definitions:
       active:
         type: boolean
       id:
-        type: integer
-        format: int64
-        example: 42
+        type: string
+        example: '42'
         description: Employee ID
         readOnly: true
-        minimum: 1
-        maximum: 9223372036854776000
-        exclusiveMinimum: false
-        exclusiveMaximum: false
       firstName:
         type: string
         example: Simon
@@ -1066,15 +961,10 @@ definitions:
       - startDate
     properties:
       id:
-        type: integer
-        format: int64
-        example: 42
+        type: string
+        example: '42'
         description: Project ID
         readOnly: true
-        minimum: 1
-        maximum: 9223372036854776000
-        exclusiveMinimum: false
-        exclusiveMaximum: false
       name:
         type: string
         example: 'IP5: Distributed IOT systems'
@@ -1101,14 +991,9 @@ definitions:
         example: '2019-06-13'
         description: Project end date (YYYY-MM-DD)
       projectManagerId:
-        type: integer
-        format: int64
-        example: 5
+        type: string
+        example: '5'
         description: Project manager employee ID
-        minimum: 1
-        maximum: 9223372036854776000
-        exclusiveMinimum: false
-        exclusiveMaximum: false
     title: Project
     description: Represents a FHNW research project with a given full-time-equivalent (FTE) workload in percentages managed by a project manager employee
   Token:
