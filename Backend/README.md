@@ -1,8 +1,6 @@
 # node/express backend mit firebase db
 ## Pre-Requisites 
-
-## Firebase Project
-### Creating a project
+### Creating a Firebase Project
 Creating an Firebase application by a click on https://console.firebase.google.com/
 
 ### Obtaining service account key
