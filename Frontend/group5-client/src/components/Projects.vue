@@ -416,12 +416,12 @@ export default {
         { value: null, text: 'PM', disabled: true },
       ],
       // Info project data
-      selectedProjectId: null,
+      selectedProjectId: '',
       selectedProjectName: '',
       selectedProjectFte: null,
       selectedProjectStart: '',
       selectedProjectEnd: '',
-      selectedProjectPmId: null,
+      selectedProjectPmId: '',
       selectedProjectPmIdMail: '',
       // Graph Project Id
       graphId: '',

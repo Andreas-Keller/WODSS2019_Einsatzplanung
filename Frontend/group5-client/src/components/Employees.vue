@@ -275,7 +275,7 @@ export default {
         { value: 'DEVELOPER', text: 'Developer' },
       ],
       // Info user data
-      selectedUserId: null,
+      selectedUserId: '',
       selectedUserFirstName: '',
       selectedUserLastName: '',
       selectedUserEmail: '',

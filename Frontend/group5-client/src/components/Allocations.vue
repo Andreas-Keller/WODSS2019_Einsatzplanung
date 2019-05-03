@@ -351,18 +351,18 @@ export default {
       // Create allocation data
       createAllocationStartDate: '',
       createAllocationEndDate: '',
-      createAllocationContractId: null,
-      createAllocationProjectId: null,
+      createAllocationContractId: '',
+      createAllocationProjectId: '',
       createAllocationPensumPercentage: null,
       contractIdOptions: [],
       projectIdOptions: [],
       showFailCreateAllocationAlertDATE: false,
       // Info allocation data
-      selectedAllocationId: null,
+      selectedAllocationId: '',
       selectedAllocationStartDate: '',
       selectedAllocationEndDate: '',
-      selectedAllocationContractId: null,
-      selectedAllocationProjectId: null,
+      selectedAllocationContractId: '',
+      selectedAllocationProjectId: '',
       selectedAllocationPensumPercentage: null,
     };
   },
