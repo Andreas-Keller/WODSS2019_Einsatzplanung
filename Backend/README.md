@@ -18,7 +18,7 @@ Put the service key ```.json``` into WODSS2019_Einsatzplanung/Backend/firebase f
 2. Add a new Employee
 3. Give this Employee the ADMINISTRATOR Role
 ```
-
+# Setup
 ## Project setup
 ```
 npm install
