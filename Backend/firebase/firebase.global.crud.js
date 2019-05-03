@@ -26,7 +26,7 @@ const create = async (data, collection) => {
     } else { //if id is missing, find uuid
         while (true) {
             let returnValue = null;
-            let id = fbHelper.getRandomID();
+            let id = fbHelper.getRandomUUID();
             let entity = await collection.where("id", '==', id).limit(1).get()
                 .then(async snapshot => {
                     if (snapshot.empty) {
