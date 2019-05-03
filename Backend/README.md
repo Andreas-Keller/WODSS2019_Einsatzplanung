@@ -27,5 +27,3 @@ npm install
 npm start dev
 ```
 
-### Customize configuration
-
