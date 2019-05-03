@@ -683,7 +683,7 @@ export default {
                 {
                   disabled: false,
                   text: String(entry.id),
-                  value: Number(entry.id),
+                  value: String(entry.id),
                 },
               );
           });
